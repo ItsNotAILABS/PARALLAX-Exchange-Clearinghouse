@@ -35,6 +35,7 @@ import PhantomExchange "phantom_exchange";
 import AiArtifactRegistry "ai_artifact_registry";
 import PhantomClearinghouse "phantom_clearinghouse";
 import TokenFactory "token_factory";
+import ProductionEngines "production_engines";
 
 
 
@@ -109,6 +110,11 @@ actor PARALLAX {
   // ── DOMAIN 32 — TOKEN_FACTORY_STATE ─────────────────────────────────────
   // Create and manage custom tokens: AI tokens, creator tokens, artifact tokens.
   var tokenFactoryState : TokenFactory.TokenFactoryState = TokenFactory.defaultTokenFactoryState();
+
+  // ── DOMAIN 33 — PRODUCTION_ENGINES_STATE ──────────────────────────────────
+  // 24 sovereign financial-economic production engines with Latin names,
+  // multi-model AI ensembles (93 models total), and phi-derived math governance.
+  var productionEnginesState : ProductionEngines.ProductionEngineState = ProductionEngines.defaultProductionEngineState();
 
 
   // ══════════════════════════════════════════════════════════════════════
@@ -1976,6 +1982,53 @@ actor PARALLAX {
     let beat = SovereignDB.getBeatCount(db).toInt();
     tokenFactoryState := TokenFactory.verifyAndList(tokenFactoryState, tokenId, beat);
     true
+  };
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // DOMAIN 33 — PRODUCTION ENGINES PUBLIC ENDPOINTS
+  // 24 sovereign financial-economic production engines (Latin-named, AI multi-model)
+  // ══════════════════════════════════════════════════════════════════════════
+
+  /// getProductionEnginesState — full production engine state
+  public query func getProductionEnginesState() : async ProductionEngines.ProductionEngineState {
+    productionEnginesState
+  };
+
+  /// getProductionEngine — get a specific engine by ID (e.g. "PE-001")
+  public query func getProductionEngine(engineId : Text) : async ?ProductionEngines.ProductionEngine {
+    ProductionEngines.getEngine(productionEnginesState, engineId)
+  };
+
+  /// getProductionEngineByLatin — get engine by official Latin name
+  public query func getProductionEngineByLatin(latin : Text) : async ?ProductionEngines.ProductionEngine {
+    ProductionEngines.getEngineByLatinName(productionEnginesState, latin)
+  };
+
+  /// getProductionEngineCount — total number of production engines (24)
+  public query func getProductionEngineCount() : async Nat {
+    ProductionEngines.getEngineCount(productionEnginesState)
+  };
+
+  /// getProductionModelCount — total AI models across all engines (93)
+  public query func getProductionModelCount() : async Nat {
+    ProductionEngines.getTotalModels(productionEnginesState)
+  };
+
+  /// getProductionMetrics — aggregate production statistics
+  public query func getProductionMetrics() : async {
+    engineCount : Nat;
+    totalModels : Nat;
+    totalProtocols : Nat;
+    averageModelsPerEngine : Float;
+    totalParameterCount : Nat;
+    systemCoherence : Float;
+  } {
+    ProductionEngines.getProductionMetrics(productionEnginesState)
+  };
+
+  /// checkProductionCoherence — verify global Kuramoto coherence gate R ≥ φ⁻¹
+  public query func checkProductionCoherence() : async Bool {
+    ProductionEngines.checkGlobalCoherence(productionEnginesState)
   };
 
 };
