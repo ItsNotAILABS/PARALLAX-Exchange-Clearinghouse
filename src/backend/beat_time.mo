@@ -41,10 +41,10 @@
 // Architect: Alfredo Medina Hernandez — The Architect of the Field
 
 import Phi    "phi";
-import Float  "mo:base/Float";
-import Nat    "mo:base/Nat";
-import Nat64  "mo:base/Nat64";
-import Int    "mo:base/Int";
+import Float  "mo:core/Float";
+import Nat    "mo:core/Nat";
+import Nat64  "mo:core/Nat64";
+import Int    "mo:core/Int";
 
 module {
 
