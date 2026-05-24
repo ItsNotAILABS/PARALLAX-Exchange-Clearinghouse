@@ -39,7 +39,7 @@
 The organism runs on ICP canisters. Canister cycles are paid by the organism's own treasury. Users **never** pay gas. Ever.
 
 ### ⚡ **873ms Instant Settlement**
-Settlement is not a separate step — it IS the heartbeat. Every 873ms (φ⁴ × 1000/7.83), all trades settle with cryptographic finality.
+Settlement is not a separate step — it IS the heartbeat. Every **873ms** all trades settle with cryptographic finality. *(Derived from φ⁴ × 1000ms / 7.83Hz Schumann resonance)*
 
 ### 🧠 **AI-First Architecture**
 Every trade is a cognitive act. The **Phantom Intelligence Engine** reasons about markets continuously:
@@ -132,7 +132,7 @@ public let PHI : Float = 1.6180339887498948482;
 
 ### Prerequisites
 - [DFINITY SDK](https://internetcomputer.org/docs/current/developer-docs/setup/install) 
-- [pnpm](https://pnpm.io/) or npm
+- [pnpm](https://pnpm.io/) (recommended)
 - [mops](https://mops.one/) (Motoko package manager)
 
 ### Installation
