@@ -36,6 +36,10 @@ import AiArtifactRegistry "ai_artifact_registry";
 import PhantomClearinghouse "phantom_clearinghouse";
 import TokenFactory "token_factory";
 import ProductionEngines "production_engines";
+import IntelligenceContracts "intelligence_contracts";
+import IntelligenceRouting "intelligence_routing";
+import IntelligenceExtensions "intelligence_extensions";
+import IntelligenceCoupling "intelligence_coupling";
 
 
 
@@ -115,6 +119,26 @@ actor PARALLAX {
   // 24 sovereign financial-economic production engines with Latin names,
   // multi-model AI ensembles (93 models total), and phi-derived math governance.
   var productionEnginesState : ProductionEngines.ProductionEngineState = ProductionEngines.defaultProductionEngineState();
+
+  // ── DOMAIN 34 — INTELLIGENCE_CONTRACTS_STATE ─────────────────────────────
+  // Internal Intelligence Contracts: modular contract infrastructure for AI.
+  // Routing, reasoning, valuation, extension, coupling, oracle, guardian contracts.
+  var intelligenceContractsState : IntelligenceContracts.IntelligenceContractState = IntelligenceContracts.genesisIntelligenceContractState();
+
+  // ── DOMAIN 35 — INTELLIGENCE_ROUTING_STATE ───────────────────────────────
+  // Dynamic intelligence routing engine with 7 strategies: priority, weighted,
+  // coherence, capability, latency, chain, broadcast, and adaptive (default).
+  var intelligenceRoutingState : IntelligenceRouting.IntelligenceRoutingState = IntelligenceRouting.genesisIntelligenceRoutingState();
+
+  // ── DOMAIN 36 — INTELLIGENCE_EXTENSIONS_STATE ────────────────────────────
+  // AI extension plugin system: 8 slots (F(6)), capability registration,
+  // health checks, doctrine validation, influence weighting back to main.
+  var intelligenceExtensionsState : IntelligenceExtensions.IntelligenceExtensionState = IntelligenceExtensions.genesisIntelligenceExtensionState();
+
+  // ── DOMAIN 37 — INTELLIGENCE_COUPLING_STATE ──────────────────────────────
+  // Coupling layer: external AI systems bind back to organism through contracts.
+  // Write-back gated at R≥0.618. Message queue depth F(8)=21.
+  var intelligenceCouplingState : IntelligenceCoupling.IntelligenceCouplingState = IntelligenceCoupling.genesisIntelligenceCouplingState();
 
 
   // ══════════════════════════════════════════════════════════════════════
@@ -197,6 +221,22 @@ actor PARALLAX {
       // ── TOKEN FACTORY — Domain 32: yield distribution ─────────────────────
       // Distribute phi-derived yield to staked token holders (Fibonacci-gated).
       tokenFactoryState := TokenFactory.distributeYield(tokenFactoryState, beat.toInt());
+
+      // ── INTELLIGENCE CONTRACTS — Domain 34: contract execution ─────────────
+      // Execute pending contracts, decay inactive contracts, update registry.
+      intelligenceContractsState := IntelligenceContracts.tickContracts(intelligenceContractsState, novaCoherence, beat.toInt());
+
+      // ── INTELLIGENCE ROUTING — Domain 35: signal routing ───────────────────
+      // Process signal queue (up to 8 per beat), route using adaptive strategy.
+      intelligenceRoutingState := IntelligenceRouting.tickRouting(intelligenceRoutingState, novaCoherence, beat.toInt());
+
+      // ── INTELLIGENCE EXTENSIONS — Domain 36: extension maintenance ─────────
+      // Health checks, budget reset, influence computation.
+      intelligenceExtensionsState := IntelligenceExtensions.tickExtensions(intelligenceExtensionsState, novaCoherence, beat.toInt());
+
+      // ── INTELLIGENCE COUPLING — Domain 37: coupling sync ───────────────────
+      // Process message queue, sync coupled systems, compute aggregate coherence.
+      intelligenceCouplingState := IntelligenceCoupling.tickCoupling(intelligenceCouplingState, novaCoherence, beat.toInt());
 
       // ── BANKING SSU beat increment — Domain 17 ───────────────────────────
       // PIL loop: upregulate weakest monitoring domain each beat
@@ -2029,6 +2069,141 @@ actor PARALLAX {
   /// checkProductionCoherence — verify global Kuramoto coherence gate R ≥ φ⁻¹
   public query func checkProductionCoherence() : async Bool {
     ProductionEngines.checkGlobalCoherence(productionEnginesState)
+  };
+
+  // ══════════════════════════════════════════════════════════════════════
+  // DOMAIN 34 — INTELLIGENCE CONTRACTS
+  // Internal Intelligence Contracts for AI routing, reasoning, and coupling.
+  // ══════════════════════════════════════════════════════════════════════
+
+  /// getIntelligenceContractState — full state snapshot
+  public query func getIntelligenceContractState() : async IntelligenceContracts.IntelligenceContractState {
+    intelligenceContractsState
+  };
+
+  /// getIntelligenceContract — get single contract by ID
+  public query func getIntelligenceContract(contractId : Text) : async ?IntelligenceContracts.IntelligenceContract {
+    IntelligenceContracts.getContract(intelligenceContractsState, contractId)
+  };
+
+  /// listIntelligenceContracts — list all contracts
+  public query func listIntelligenceContracts() : async [IntelligenceContracts.IntelligenceContract] {
+    IntelligenceContracts.listContracts(intelligenceContractsState)
+  };
+
+  /// getActiveIntelligenceContracts — list active contracts only
+  public query func getActiveIntelligenceContracts() : async [IntelligenceContracts.IntelligenceContract] {
+    IntelligenceContracts.getActiveContracts(intelligenceContractsState)
+  };
+
+  /// getIntelligenceContractMetrics — aggregate statistics
+  public query func getIntelligenceContractMetrics() : async {
+    totalContracts : Nat;
+    activeContracts : Nat;
+    totalExecutions : Nat;
+  } {
+    {
+      totalContracts = intelligenceContractsState.registry.totalContracts;
+      activeContracts = intelligenceContractsState.registry.activeContracts;
+      totalExecutions = intelligenceContractsState.registry.totalExecutions;
+    }
+  };
+
+  // ══════════════════════════════════════════════════════════════════════
+  // DOMAIN 35 — INTELLIGENCE ROUTING
+  // Dynamic routing engine with adaptive strategy selection.
+  // ══════════════════════════════════════════════════════════════════════
+
+  /// getIntelligenceRoutingState — full routing state snapshot
+  public query func getIntelligenceRoutingState() : async IntelligenceRouting.IntelligenceRoutingState {
+    intelligenceRoutingState
+  };
+
+  /// getRoutingTable — get current routing table
+  public query func getRoutingTable() : async IntelligenceRouting.RoutingTable {
+    intelligenceRoutingState.routingTable
+  };
+
+  /// getRoutingMetrics — aggregate routing statistics
+  public query func getRoutingMetrics() : async {
+    totalRoutes : Nat;
+    activeRoutes : Nat;
+    signalsRouted : Nat;
+    signalsDropped : Nat;
+  } {
+    {
+      totalRoutes = intelligenceRoutingState.routingTable.totalRoutes;
+      activeRoutes = intelligenceRoutingState.routingTable.activeRoutes;
+      signalsRouted = intelligenceRoutingState.signalsRouted;
+      signalsDropped = intelligenceRoutingState.signalsDropped;
+    }
+  };
+
+  // ══════════════════════════════════════════════════════════════════════
+  // DOMAIN 36 — INTELLIGENCE EXTENSIONS
+  // AI extension plugin system with 8 capability slots.
+  // ══════════════════════════════════════════════════════════════════════
+
+  /// getIntelligenceExtensionsState — full extensions state snapshot
+  public query func getIntelligenceExtensionsState() : async IntelligenceExtensions.IntelligenceExtensionState {
+    intelligenceExtensionsState
+  };
+
+  /// getExtensionSlots — get all 8 extension slots
+  public query func getExtensionSlots() : async [IntelligenceExtensions.ExtensionSlot] {
+    intelligenceExtensionsState.registry.slots
+  };
+
+  /// getExtensionMetrics — aggregate extension statistics
+  public query func getExtensionMetrics() : async {
+    totalExtensions : Nat;
+    activeExtensions : Nat;
+    totalCalls : Nat;
+    aggregateInfluence : Float;
+  } {
+    {
+      totalExtensions = intelligenceExtensionsState.registry.totalExtensions;
+      activeExtensions = intelligenceExtensionsState.registry.activeExtensions;
+      totalCalls = intelligenceExtensionsState.registry.totalCalls;
+      aggregateInfluence = IntelligenceExtensions.computeAggregateInfluence(intelligenceExtensionsState);
+    }
+  };
+
+  // ══════════════════════════════════════════════════════════════════════
+  // DOMAIN 37 — INTELLIGENCE COUPLING
+  // External AI binding layer with write-back coherence gates.
+  // ══════════════════════════════════════════════════════════════════════
+
+  /// getIntelligenceCouplingState — full coupling state snapshot
+  public query func getIntelligenceCouplingState() : async IntelligenceCoupling.IntelligenceCouplingState {
+    intelligenceCouplingState
+  };
+
+  /// getCoupledSystems — list all coupled AI systems
+  public query func getCoupledSystems() : async [(Text, Text, Float)] {
+    IntelligenceCoupling.getActiveSystems(intelligenceCouplingState)
+  };
+
+  /// getCouplingMetrics — aggregate coupling statistics
+  public query func getCouplingMetrics() : async {
+    totalSystems : Nat;
+    activeSystems : Nat;
+    totalMessages : Nat;
+    totalWriteBacks : Nat;
+    globalCoherence : Float;
+  } {
+    {
+      totalSystems = intelligenceCouplingState.registry.totalSystems;
+      activeSystems = intelligenceCouplingState.registry.activeSystems;
+      totalMessages = intelligenceCouplingState.registry.totalMessages;
+      totalWriteBacks = intelligenceCouplingState.registry.totalWriteBacks;
+      globalCoherence = intelligenceCouplingState.globalCoherence;
+    }
+  };
+
+  /// getPendingWriteBacks — list pending write-back requests (validated, awaiting apply)
+  public query func getPendingWriteBacks() : async [IntelligenceCoupling.WriteBackRequest] {
+    IntelligenceCoupling.getPendingWriteBacks(intelligenceCouplingState)
   };
 
 };
