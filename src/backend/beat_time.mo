@@ -95,6 +95,126 @@ module {
 
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // INTERNAL FAST BEAT — Protected Internal Timing
+  // Faster phi-harmonic beats for internal substrate operations.
+  // NOT exposed externally. Used for rapid internal state propagation.
+  //
+  // DOCTRINE: "The organism has two rhythms — the sovereign external beat that
+  //            communicates with the world (873ms), and the rapid internal beat
+  //            that propagates state within the substrate. The internal beat is
+  //            protected — external systems cannot see or trigger it."
+  //
+  // PYTHAGORAS: internal rates are phi-inverse harmonics of the sovereign beat
+  // EUCLID: defined once here, used by internal modules only
+  // CONFUCIUS: right relationship — internal and external have separate roles
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /// INTERNAL_FAST_BEAT_MS: 873 × φ⁻² = 333ms (AV node harmonic)
+  /// The protected internal fast beat. 2.62× faster than sovereign beat.
+  /// Used for rapid state propagation within the substrate.
+  /// NOT exposed to external systems.
+  let INTERNAL_FAST_BEAT_MS : Float = Phi.HEARTBEAT_MS * Phi.PHI_INV_2;  // 333.5
+
+  /// INTERNAL_FAST_BEAT_NS: 333ms in nanoseconds = 333,500,000 ns
+  let INTERNAL_FAST_BEAT_NS : Nat64 = 333_500_000;
+
+  /// INTERNAL_RAPID_BEAT_MS: 873 × φ⁻³ = 206ms (HRV harmonic)
+  /// The fastest protected internal beat. 4.24× faster than sovereign beat.
+  /// Used for critical path operations requiring immediate state update.
+  /// This is the organism's "reflex" — bypasses normal cardiac timing.
+  let INTERNAL_RAPID_BEAT_MS : Float = Phi.HEARTBEAT_MS * Phi.PHI_INV_3;  // 206.2
+
+  /// INTERNAL_RAPID_BEAT_NS: 206ms in nanoseconds = 206,200,000 ns
+  let INTERNAL_RAPID_BEAT_NS : Nat64 = 206_200_000;
+
+  /// INTERNAL_ULTRA_BEAT_MS: 873 × φ⁻⁴ = 127ms (Schumann period harmonic)
+  /// The deepest internal beat — substrate-level timing only.
+  /// Derivation: 873 × 0.1459 = 127.4ms ≈ 1000ms/7.83Hz = Schumann period
+  /// This closes the loop: φ⁴/Schumann → 873ms → φ⁻⁴ → Schumann period
+  let INTERNAL_ULTRA_BEAT_MS : Float = Phi.HEARTBEAT_MS * Phi.PHI_INV_4;  // 127.4
+
+  /// INTERNAL_ULTRA_BEAT_NS: 127ms in nanoseconds = 127,400,000 ns
+  let INTERNAL_ULTRA_BEAT_NS : Nat64 = 127_400_000;
+
+  /// Ratio of sovereign to internal fast beat: φ² = 2.618
+  /// One sovereign beat = 2.618 internal fast beats
+  let SOVEREIGN_TO_FAST_RATIO : Float = Phi.PHI_2;  // 2.618
+
+  /// Ratio of sovereign to internal rapid beat: φ³ = 4.236
+  /// One sovereign beat = 4.236 internal rapid beats
+  let SOVEREIGN_TO_RAPID_RATIO : Float = Phi.PHI_3;  // 4.236
+
+  /// Ratio of sovereign to internal ultra beat: φ⁴ = 6.854
+  /// One sovereign beat = 6.854 internal ultra beats
+  let SOVEREIGN_TO_ULTRA_RATIO : Float = Phi.PHI_4;  // 6.854
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // INTERNAL BEAT CONVERSION FUNCTIONS (Private)
+  // These are module-internal — not exported with `public`
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /// Convert sovereign beats to internal fast beats
+  func sovereignToFastBeats(sovereign_beats : Float) : Float {
+    sovereign_beats * SOVEREIGN_TO_FAST_RATIO
+  };
+
+  /// Convert sovereign beats to internal rapid beats
+  func sovereignToRapidBeats(sovereign_beats : Float) : Float {
+    sovereign_beats * SOVEREIGN_TO_RAPID_RATIO
+  };
+
+  /// Convert sovereign beats to internal ultra beats
+  func sovereignToUltraBeats(sovereign_beats : Float) : Float {
+    sovereign_beats * SOVEREIGN_TO_ULTRA_RATIO
+  };
+
+  /// Convert internal fast beats to sovereign beats
+  func fastBeatsToSovereign(fast_beats : Float) : Float {
+    fast_beats / SOVEREIGN_TO_FAST_RATIO
+  };
+
+  /// Convert internal rapid beats to sovereign beats
+  func rapidBeatsToSovereign(rapid_beats : Float) : Float {
+    rapid_beats / SOVEREIGN_TO_RAPID_RATIO
+  };
+
+  /// Convert internal ultra beats to sovereign beats
+  func ultraBeatsToSovereign(ultra_beats : Float) : Float {
+    ultra_beats / SOVEREIGN_TO_ULTRA_RATIO
+  };
+
+  /// Get the internal fast beat interval in milliseconds
+  func getInternalFastBeatMs() : Float {
+    INTERNAL_FAST_BEAT_MS
+  };
+
+  /// Get the internal rapid beat interval in milliseconds
+  func getInternalRapidBeatMs() : Float {
+    INTERNAL_RAPID_BEAT_MS
+  };
+
+  /// Get the internal ultra beat interval in milliseconds
+  func getInternalUltraBeatMs() : Float {
+    INTERNAL_ULTRA_BEAT_MS
+  };
+
+  /// Get the internal fast beat interval in nanoseconds (for ICP timers)
+  func getInternalFastBeatNs() : Nat64 {
+    INTERNAL_FAST_BEAT_NS
+  };
+
+  /// Get the internal rapid beat interval in nanoseconds (for ICP timers)
+  func getInternalRapidBeatNs() : Nat64 {
+    INTERNAL_RAPID_BEAT_NS
+  };
+
+  /// Get the internal ultra beat interval in nanoseconds (for ICP timers)
+  func getInternalUltraBeatNs() : Nat64 {
+    INTERNAL_ULTRA_BEAT_NS
+  };
+
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // FIBONACCI BEAT INTERVALS — The Harmonic Timer Ladder
   // F(n) beats as natural timer intervals
   // All intervals are phi-harmonic — no arbitrary durations
