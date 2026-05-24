@@ -5,7 +5,7 @@
 ### *The AI-First Sovereign Exchange — Zero Gas Fees, Instant Settlement*
 
 [![Built on ICP](https://img.shields.io/badge/Built_on-Internet_Computer-29abe2?style=for-the-badge&logo=dfinity&logoColor=white)](https://internetcomputer.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![License: Sovereign](https://img.shields.io/badge/License-PARALLAX_Sovereign-red.svg?style=for-the-badge)](LICENSE)
 [![Motoko](https://img.shields.io/badge/Language-Motoko-purple?style=for-the-badge)](https://internetcomputer.org/docs/current/motoko/main/motoko)
 
 **Trade everything. Pay nothing. Settle instantly.**
@@ -190,7 +190,14 @@ cd src/frontend && pnpm dev
 
 ## 📜 License
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **PARALLAX Sovereign License** — see the [LICENSE](LICENSE) file for details.
+
+**Key terms:**
+- ✅ View and study for personal/educational use
+- ✅ Redistribute unmodified with attribution
+- ✅ AI/ML training with attribution
+- ⚠️ Commercial use requires separate license
+- ❌ No modifications without permission
 
 ---
 
