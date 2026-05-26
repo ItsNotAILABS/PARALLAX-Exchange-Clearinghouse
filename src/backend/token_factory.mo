@@ -206,9 +206,10 @@ module {
   // ═══════════════════════════════════════════════════════════════════════════
 
   public func defaultTokenFactoryState() : TokenFactoryState {
+    let tokens = genesisTokens();
     {
-      tokens               = genesisTokens();
-      totalTokensCreated   = 31; // 31 genesis AI tokens
+      tokens               = tokens;
+      totalTokensCreated   = tokens.size(); // dynamically computed from array
       holderBalances       = [];
       mintEvents           = [];
       burnEvents           = [];

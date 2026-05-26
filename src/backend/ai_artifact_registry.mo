@@ -214,14 +214,15 @@ module {
   // ═══════════════════════════════════════════════════════════════════════════
 
   public func defaultAiArtifactRegistryState() : AiArtifactRegistryState {
+    let artifacts = genesisArtifacts();
     {
-      artifacts            = genesisArtifacts();
-      totalArtifacts       = 30; // 30 genesis AI artifacts
+      artifacts            = artifacts;
+      totalArtifacts       = artifacts.size(); // dynamically computed from array
       listings             = [];
       totalListings        = 0;
       totalSales           = 0;
       totalRoyaltiesPaid   = 0.0;
-      creators             = [("alfredo-medina", defaultCreatorProfile())];
+      creators             = [("alfredo-medina", defaultCreatorProfile(artifacts.size()))];
       totalCreators        = 1;
       totalMarketCap       = 0.0;
       totalVolume          = 0.0;
@@ -230,18 +231,20 @@ module {
     }
   };
 
-  func defaultCreatorProfile() : CreatorProfile {
+  // Dynamically generate artifact IDs based on count
+  func generateArtifactIds(count : Nat) : [Text] {
+    Array.tabulate<Text>(count, func (i : Nat) : Text {
+      let num = i + 1;
+      let padded = if (num < 10) { "00" # Nat.toText(num) } else if (num < 100) { "0" # Nat.toText(num) } else { Nat.toText(num) };
+      "ART-GENESIS-" # padded
+    })
+  };
+
+  func defaultCreatorProfile(artifactCount : Nat) : CreatorProfile {
     {
       principal        = "alfredo-medina";
       displayName      = "Alfredo Medina Hernandez — The Architect of the Field";
-      artifactsCreated = [
-        "ART-GENESIS-001", "ART-GENESIS-002", "ART-GENESIS-003", "ART-GENESIS-004", "ART-GENESIS-005",
-        "ART-GENESIS-006", "ART-GENESIS-007", "ART-GENESIS-008", "ART-GENESIS-009", "ART-GENESIS-010",
-        "ART-GENESIS-011", "ART-GENESIS-012", "ART-GENESIS-013", "ART-GENESIS-014", "ART-GENESIS-015",
-        "ART-GENESIS-016", "ART-GENESIS-017", "ART-GENESIS-018", "ART-GENESIS-019", "ART-GENESIS-020",
-        "ART-GENESIS-021", "ART-GENESIS-022", "ART-GENESIS-023", "ART-GENESIS-024", "ART-GENESIS-025",
-        "ART-GENESIS-026", "ART-GENESIS-027", "ART-GENESIS-028", "ART-GENESIS-029", "ART-GENESIS-030"
-      ];
+      artifactsCreated = generateArtifactIds(artifactCount);
       totalRoyalties   = 0.0;
       reputationScore  = 1.0; // sovereign creator — maximum reputation
       memberSinceBeat  = 0;
