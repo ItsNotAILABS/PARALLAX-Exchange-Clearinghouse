@@ -59,11 +59,28 @@ Trade everything in existence:
 | Category | Examples |
 |----------|----------|
 | **Crypto** | BTC, ETH, ICP, SOL |
-| **AI Tokens** | Compute, Inference, Training |
-| **AI Artifacts** | Models, Embeddings, Protocols |
+| **AI Compute Tokens** | GPU, TPU, Memory, Bandwidth, Storage |
+| **AI Inference Tokens** | Inference, RAG, Embedding, Reasoning Chain |
+| **AI Training Tokens** | Training, Fine-Tune, LoRA, Data |
+| **AI Agent Tokens** | Agent Execution, Orchestration, Workflows |
+| **AI Capability Tokens** | Vision, Audio, Code Gen, Translation, Prediction |
+| **AI Governance Tokens** | Model Votes, Dataset Votes, Safety Audits, Certifications |
+| **AI Artifacts** | Models, Agents, RAG Pipelines, Embeddings, Knowledge Graphs |
 | **Creator Tokens** | Personal tokens, Fan tokens |
 | **Stablecoins** | USDC, USDT (bridged) |
 | **Real World Assets** | Commodities, Real Estate |
+
+### 🤖 **AI Artifact Marketplace**
+Trade tokenized AI intellectual property:
+| Artifact Type | Description |
+|---------------|-------------|
+| **Foundation Models** | Large language models, vision models, multimodal |
+| **Fine-tuned Models** | Domain-specific adaptations, LoRA weights |
+| **Autonomous Agents** | Full agents with tools, memory, and workflows |
+| **RAG Systems** | Pipelines, vector databases, knowledge bases |
+| **Generative Models** | Image, video, audio, code, 3D generation |
+| **Training Datasets** | Curated, synthetic, preference, instruction data |
+| **Safety & Alignment** | Guardrails, filters, evaluation suites |
 
 ### 🏭 **24 Production Engines**
 Sovereign financial-economic production engines with Latin names, running 93+ AI model ensembles:
@@ -107,10 +124,34 @@ Sovereign financial-economic production engines with Latin names, running 93+ AI
 | `phantom_intelligence.mo` | AI reasoning layer — decides WHAT to trade and WHY |
 | `phantom_exchange.mo` | Order book, matching engine — executes trades |
 | `phantom_clearinghouse.mo` | Settlement, netting, guarantees |
-| `token_factory.mo` | Mint AI tokens, creator tokens, artifact tokens |
+| `token_factory.mo` | Mint 37 AI token types (Compute, GPU, Agent, RAG, etc.) |
+| `ai_artifact_registry.mo` | Register & trade 55 artifact types (Models, Agents, RAG, etc.) |
 | `production_engines.mo` | 24 Latin-named AI production engines |
 | `phi.mo` | Golden ratio constants & Fibonacci sequences |
 | `sovereign_db.mo` | Orthogonal persistence — single source of truth |
+
+### AI Token Types (37 Types, 31 Genesis Instances)
+
+| Category | Token Types |
+|----------|-------------|
+| **Core Infrastructure** | AICPU, AIMEM, AIINF, AITRAIN, AIDATA |
+| **Advanced Resources** | AIGPU, AITPU, AIBW, AIST, AIFT, AIEMB, AIRAG, AIAGENT, AIORCH, AICHAIN |
+| **Specialized Capabilities** | AIVIS, AIAUD, AICODE, AITRANS, AISENT, AIANOM, AIPRED, AIOPT, AISIM |
+| **Governance & Quality** | AIMVOTE, AIDVOTE, AISAFE, AIRED, AIBENCH, AICERT |
+| **Standard Types** | creatorPersonal, artifactBacked, governance, yield, utility, rewardPoints, fractionalNFT |
+
+### AI Artifact Types (55 Types, 30 Genesis Instances)
+
+| Category | Artifact Types |
+|----------|----------------|
+| **Foundation** | Sovereign Models, Embeddings, Knowledge Graphs, Protocols, Predictions |
+| **Advanced Models** | Foundation, Fine-tuned, LoRA, Merged, Quantized, Distilled, Multimodal, Specialist, Aligned |
+| **Autonomous Agents** | Agents, Toolkits, Memory, Personas, Workflows, Orchestrators, Evaluators |
+| **RAG & Knowledge** | RAG Pipelines, Vector DBs, Embedding Models, Rerankers, Chunkers, Knowledge Bases |
+| **Prompts & Evaluation** | Templates, Libraries, Few-Shot Examples, Evaluation Suites, Test Harnesses, Red-Team Datasets |
+| **Training & Data** | Synthetic, Labeled, Preference, Instruction, Code, Multilingual Datasets |
+| **Generative** | Image, Video, Audio, Code, 3D, Motion, TTS, Voice Clone Models |
+| **Safety** | Safety Filters, Alignment Protocols, Guardrails, Toxicity Classifiers, Bias Audits |
 
 ## 🔢 The PHI Foundation
 
