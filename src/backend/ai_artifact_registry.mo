@@ -252,7 +252,7 @@ module {
   };
 
   // Genesis artifacts — the founding AI artifacts of PARALLAX
-  // 30 foundational artifacts covering all major artifact categories
+  // 30 genesis artifact instances (out of 55 artifact types) covering all major categories
   func genesisArtifacts() : [(Text, ArtifactRecord)] {
     [
       // ═══════════════════════════════════════════════════════════════════════════
