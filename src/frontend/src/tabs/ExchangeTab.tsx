@@ -60,6 +60,39 @@ const ALL_TOKENS = [
   { code: "DRT", tier: "base" },
   { code: "OMT", tier: "base" },
   { code: "MTC", tier: "gold" },
+  { code: "BTC", tier: "silver" },
+  { code: "ETH", tier: "silver" },
+  { code: "AICPU", tier: "gold" },
+  { code: "AIMEM", tier: "gold" },
+  { code: "AIINF", tier: "gold" },
+  { code: "AITRAIN", tier: "gold" },
+  { code: "AIDATA", tier: "gold" },
+  { code: "AIGPU", tier: "silver" },
+  { code: "AITPU", tier: "silver" },
+  { code: "AIBW", tier: "silver" },
+  { code: "AIST", tier: "silver" },
+  { code: "AIFT", tier: "silver" },
+  { code: "AIEMB", tier: "silver" },
+  { code: "AIRAG", tier: "silver" },
+  { code: "AIAGENT", tier: "silver" },
+  { code: "AIORCH", tier: "silver" },
+  { code: "AICHAIN", tier: "silver" },
+  { code: "AIVIS", tier: "base" },
+  { code: "AIAUD", tier: "base" },
+  { code: "AICODE", tier: "base" },
+  { code: "AITRANS", tier: "base" },
+  { code: "AISENT", tier: "base" },
+  { code: "AIANOM", tier: "base" },
+  { code: "AIPRED", tier: "base" },
+  { code: "AIOPT", tier: "base" },
+  { code: "AISIM", tier: "base" },
+  { code: "AIMVOTE", tier: "base" },
+  { code: "AIDVOTE", tier: "base" },
+  { code: "AISAFE", tier: "base" },
+  { code: "AIRED", tier: "base" },
+  { code: "AIBENCH", tier: "base" },
+  { code: "AICERT", tier: "base" },
+  { code: "MEDINA", tier: "gold" },
 ] as const;
 
 type TokenCode = (typeof ALL_TOKENS)[number]["code"];
@@ -2035,6 +2068,421 @@ function MultiChainTab({ eng }: { eng: IntelligenceEngineResult }) {
   );
 }
 
+function variantName(value: unknown): string {
+  if (!value || typeof value !== "object") return "unknown";
+  const keys = Object.keys(value as Record<string, unknown>);
+  return keys[0] ?? "unknown";
+}
+
+interface CatalogTabProps {
+  actor: any;
+  isAuthenticated: boolean;
+  onOpenPair: (pair: TokenCode) => void;
+}
+
+function CatalogTab({
+  actor,
+  isAuthenticated,
+  onOpenPair,
+}: CatalogTabProps) {
+  const [pairs, setPairs] = useState<any[]>([]);
+  const [tokens, setTokens] = useState<any[]>([]);
+  const [artifacts, setArtifacts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({
+    symbol: "",
+    name: "",
+    description: "",
+    tokenType: "creatorPersonal",
+    maxSupply: "1000000",
+  });
+
+  const loadCatalog = useCallback(async () => {
+    if (!actor) return;
+    setLoading(true);
+    try {
+      const [pairData, tokenData, artifactData] = await Promise.all([
+        actor.getTradingPairs?.().catch(() => []) ?? Promise.resolve([]),
+        actor.getAllCustomTokens?.().catch(() => []) ?? Promise.resolve([]),
+        actor.getTradeableArtifacts?.().catch(() => []) ?? Promise.resolve([]),
+      ]);
+      setPairs(pairData as any[]);
+      setTokens(tokenData as any[]);
+      setArtifacts(artifactData as any[]);
+    } finally {
+      setLoading(false);
+    }
+  }, [actor]);
+
+  useEffect(() => {
+    loadCatalog();
+  }, [loadCatalog]);
+
+  const listedTokens = useMemo(
+    () => tokens.filter((token) => token.listedOnExchange),
+    [tokens],
+  );
+  const pendingTokens = useMemo(
+    () => tokens.filter((token) => !token.listedOnExchange),
+    [tokens],
+  );
+
+  const handleCreateToken = async () => {
+    if (!actor || !isAuthenticated || submitting) return;
+    const maxSupply = Number.parseFloat(form.maxSupply);
+    if (
+      !form.symbol.trim() ||
+      !form.name.trim() ||
+      !form.description.trim() ||
+      !Number.isFinite(maxSupply) ||
+      maxSupply <= 0
+    ) {
+      toast.error("Complete the token form before creating.");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await actor.createCustomToken(
+        form.symbol.trim().toUpperCase(),
+        form.name.trim(),
+        form.description.trim(),
+        form.tokenType,
+        maxSupply,
+      );
+      toast.success(`Created ${form.symbol.trim().toUpperCase()} token draft.`);
+      setForm((prev) => ({
+        ...prev,
+        symbol: "",
+        name: "",
+        description: "",
+      }));
+      await loadCatalog();
+    } catch (error) {
+      toast.error(`Token creation failed: ${String(error)}`);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleVerifyAndList = async (tokenId: string) => {
+    if (!actor || !isAuthenticated || submitting) return;
+    setSubmitting(true);
+    try {
+      await actor.verifyAndListToken(tokenId);
+      toast.success("Token verified and listed on the exchange.");
+      await loadCatalog();
+    } catch (error) {
+      toast.error(`Listing failed: ${String(error)}`);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="p-4 space-y-4">
+      <div className="grid gap-4 md:grid-cols-4">
+        {[
+          { label: "MARKETS", value: pairs.length, color: C.gold },
+          { label: "LISTED TOKENS", value: listedTokens.length, color: C.cyan },
+          { label: "PENDING LISTINGS", value: pendingTokens.length, color: C.amber },
+          { label: "ARTIFACTS", value: artifacts.length, color: C.purple },
+        ].map((metric) => (
+          <PanelBox key={metric.label} className="p-4">
+            <Lbl>{metric.label}</Lbl>
+            <div
+              className="font-mono text-2xl mt-2"
+              style={{ color: metric.color }}
+            >
+              {loading ? "…" : metric.value.toLocaleString()}
+            </div>
+          </PanelBox>
+        ))}
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-[1.3fr_1fr]">
+        <PanelBox className="overflow-hidden">
+          <div
+            className="px-4 py-3 border-b flex items-center justify-between"
+            style={{ borderColor: C.border }}
+          >
+            <SectionTitle>MARKET CATALOG</SectionTitle>
+            <button
+              type="button"
+              onClick={() => void loadCatalog()}
+              className="font-mono text-[9px] tracking-[0.25em] px-2 py-1 border"
+              style={{ color: C.muted, borderColor: C.border }}
+            >
+              REFRESH
+            </button>
+          </div>
+          <div className="max-h-[480px] overflow-auto">
+            <table className="w-full">
+              <thead>
+                <tr
+                  className="font-mono text-[8px] tracking-[0.3em]"
+                  style={{ color: C.muted }}
+                >
+                  <th className="px-3 py-2 text-left">PAIR</th>
+                  <th className="px-3 py-2 text-left">BASE</th>
+                  <th className="px-3 py-2 text-left">QUOTE</th>
+                  <th className="px-3 py-2 text-left">CATEGORY</th>
+                  <th className="px-3 py-2 text-left">STATUS</th>
+                  <th className="px-3 py-2 text-right">OPEN</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pairs.map(([pairId, pair]) => {
+                  const baseToken = pair.baseToken as TokenCode;
+                  const canOpen = ALL_TOKENS.some((token) => token.code === baseToken);
+                  return (
+                    <tr
+                      key={pairId}
+                      className="border-t"
+                      style={{ borderColor: C.border }}
+                    >
+                      <td className="px-3 py-2 font-mono text-[10px]" style={{ color: C.text }}>
+                        {pairId}
+                      </td>
+                      <td className="px-3 py-2">
+                        <TokenBadge code={pair.baseToken} />
+                      </td>
+                      <td className="px-3 py-2 font-mono text-[10px]" style={{ color: C.text }}>
+                        {pair.quoteToken}
+                      </td>
+                      <td className="px-3 py-2 font-mono text-[9px]" style={{ color: C.cyan }}>
+                        {variantName(pair.baseCategory)}
+                      </td>
+                      <td className="px-3 py-2 font-mono text-[9px]" style={{ color: C.gold }}>
+                        {variantName(pair.status)}
+                      </td>
+                      <td className="px-3 py-2 text-right">
+                        <button
+                          type="button"
+                          disabled={!canOpen}
+                          onClick={() => {
+                            if (canOpen) onOpenPair(baseToken);
+                          }}
+                          className="font-mono text-[8px] tracking-[0.25em] px-2 py-1 border disabled:opacity-40"
+                          style={{ color: C.gold, borderColor: `${C.gold}33` }}
+                        >
+                          TRADE
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+                {pairs.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      className="px-3 py-6 text-center font-mono text-[9px]"
+                      style={{ color: C.dim }}
+                    >
+                      {loading ? "LOADING MARKET CATALOG…" : "NO MARKETS FOUND"}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </PanelBox>
+
+        <PanelBox className="p-4 space-y-4">
+          <SectionTitle>LAUNCH STUDIO</SectionTitle>
+          <div className="grid gap-3">
+            <input
+              value={form.symbol}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, symbol: e.target.value }))
+              }
+              placeholder="TOKEN SYMBOL"
+              className="bg-transparent border px-3 py-2 font-mono text-[10px] outline-none"
+              style={{ borderColor: C.border, color: C.text }}
+            />
+            <input
+              value={form.name}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, name: e.target.value }))
+              }
+              placeholder="TOKEN NAME"
+              className="bg-transparent border px-3 py-2 font-mono text-[10px] outline-none"
+              style={{ borderColor: C.border, color: C.text }}
+            />
+            <textarea
+              value={form.description}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, description: e.target.value }))
+              }
+              placeholder="WHAT THIS TOKEN POWERS"
+              rows={4}
+              className="bg-transparent border px-3 py-2 font-mono text-[10px] outline-none resize-none"
+              style={{ borderColor: C.border, color: C.text }}
+            />
+            <div className="grid gap-3 md:grid-cols-2">
+              <select
+                value={form.tokenType}
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, tokenType: e.target.value }))
+                }
+                className="bg-transparent border px-3 py-2 font-mono text-[10px] outline-none"
+                style={{ borderColor: C.border, color: C.text }}
+              >
+                {[
+                  "creatorPersonal",
+                  "utility",
+                  "governance",
+                  "yield",
+                  "rewardPoints",
+                  "artifactBacked",
+                  "aiCompute",
+                  "aiInference",
+                ].map((tokenType) => (
+                  <option
+                    key={tokenType}
+                    value={tokenType}
+                    style={{ background: CANVAS_BG }}
+                  >
+                    {tokenType}
+                  </option>
+                ))}
+              </select>
+              <input
+                value={form.maxSupply}
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, maxSupply: e.target.value }))
+                }
+                placeholder="MAX SUPPLY"
+                className="bg-transparent border px-3 py-2 font-mono text-[10px] outline-none"
+                style={{ borderColor: C.border, color: C.text }}
+              />
+            </div>
+            <button
+              type="button"
+              disabled={!isAuthenticated || submitting}
+              onClick={() => void handleCreateToken()}
+              className="font-mono text-[9px] tracking-[0.3em] px-3 py-2 border disabled:opacity-40"
+              style={{ color: C.gold, borderColor: `${C.gold}44` }}
+            >
+              CREATE TOKEN DRAFT
+            </button>
+            {!isAuthenticated && (
+              <div className="font-mono text-[8px]" style={{ color: C.amber }}>
+                Authenticate to mint and list new exchange assets.
+              </div>
+            )}
+          </div>
+        </PanelBox>
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-[1.2fr_1fr]">
+        <PanelBox className="overflow-hidden">
+          <div className="px-4 py-3 border-b" style={{ borderColor: C.border }}>
+            <SectionTitle>TOKEN LISTINGS</SectionTitle>
+          </div>
+          <div className="max-h-[420px] overflow-auto">
+            {tokens.length === 0 ? (
+              <div
+                className="px-4 py-6 font-mono text-[9px] text-center"
+                style={{ color: C.dim }}
+              >
+                {loading ? "LOADING TOKEN LISTINGS…" : "NO TOKENS FOUND"}
+              </div>
+            ) : (
+              <div className="divide-y" style={{ borderColor: C.border }}>
+                {tokens.map((token) => (
+                  <div
+                    key={token.tokenId}
+                    className="px-4 py-3 flex flex-col gap-2 md:flex-row md:items-center md:justify-between"
+                    style={{ borderColor: C.border }}
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <TokenBadge code={token.symbol} />
+                        <span className="font-mono text-[10px]" style={{ color: C.text }}>
+                          {token.name}
+                        </span>
+                        <span className="font-mono text-[8px]" style={{ color: C.muted }}>
+                          {variantName(token.tokenType)}
+                        </span>
+                      </div>
+                      <div className="font-mono text-[8px] mt-1" style={{ color: C.dim }}>
+                        SUPPLY {fmtCompact(token.circulatingSupply ?? 0)} /{" "}
+                        {fmtCompact(token.maxSupply ?? 0)} · PRICE{" "}
+                        {fmt(token.currentPrice ?? 0, 6)} ICP
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="font-mono text-[8px] tracking-[0.25em] px-2 py-1 border"
+                        style={{
+                          color: token.listedOnExchange ? C.green : C.amber,
+                          borderColor: token.listedOnExchange
+                            ? `${C.green}33`
+                            : `${C.amber}33`,
+                        }}
+                      >
+                        {token.listedOnExchange ? "LISTED" : "DRAFT"}
+                      </span>
+                      {!token.listedOnExchange && (
+                        <button
+                          type="button"
+                          disabled={!isAuthenticated || submitting}
+                          onClick={() => void handleVerifyAndList(token.tokenId)}
+                          className="font-mono text-[8px] tracking-[0.25em] px-2 py-1 border disabled:opacity-40"
+                          style={{ color: C.gold, borderColor: `${C.gold}33` }}
+                        >
+                          VERIFY + LIST
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </PanelBox>
+
+        <PanelBox className="overflow-hidden">
+          <div className="px-4 py-3 border-b" style={{ borderColor: C.border }}>
+            <SectionTitle>TRADEABLE ARTIFACTS</SectionTitle>
+          </div>
+          <div className="max-h-[420px] overflow-auto">
+            {artifacts.length === 0 ? (
+              <div
+                className="px-4 py-6 font-mono text-[9px] text-center"
+                style={{ color: C.dim }}
+              >
+                {loading ? "LOADING ARTIFACTS…" : "NO ARTIFACTS ENABLED"}
+              </div>
+            ) : (
+              artifacts.map((artifact: any) => (
+                <div
+                  key={artifact.artifactId}
+                  className="px-4 py-3 border-b"
+                  style={{ borderColor: C.border }}
+                >
+                  <div className="flex items-center gap-2">
+                    <TokenBadge code={artifact.tokenSymbol ?? "AI"} />
+                    <span className="font-mono text-[10px]" style={{ color: C.text }}>
+                      {artifact.name}
+                    </span>
+                  </div>
+                  <div className="font-mono text-[8px] mt-1" style={{ color: C.dim }}>
+                    {variantName(artifact.artifactType)} · QUALITY{" "}
+                    {fmtShort(artifact.qualityScore ?? 0, 3)}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </PanelBox>
+      </div>
+    </div>
+  );
+}
+
 // ── MAIN ExchangeTab ───────────────────────────────────────────────────────────────
 export function ExchangeTab() {
   const { identity } = useInternetIdentity();
@@ -2044,7 +2492,7 @@ export function ExchangeTab() {
   const eng = useIntelligenceEngine();
   const [selectedPair, setSelectedPair] = useState<TokenCode>("MTC");
   const [subTab, setSubTab] = useState<
-    "SPOT" | "SOVEREIGN" | "MULTI-CHAIN" | "TRANSFER"
+    "SPOT" | "CATALOG" | "SOVEREIGN" | "MULTI-CHAIN" | "TRANSFER"
   >("SPOT");
 
   const {
@@ -2055,7 +2503,13 @@ export function ExchangeTab() {
     settlementStats,
   } = eng;
 
-  const subTabs = ["SPOT", "SOVEREIGN", "MULTI-CHAIN", "TRANSFER"] as const;
+  const subTabs = [
+    "SPOT",
+    "CATALOG",
+    "SOVEREIGN",
+    "MULTI-CHAIN",
+    "TRANSFER",
+  ] as const;
 
   return (
     <div
@@ -2152,6 +2606,17 @@ export function ExchangeTab() {
             />
           </div>
         </div>
+      )}
+
+      {subTab === "CATALOG" && (
+        <CatalogTab
+          actor={actor}
+          isAuthenticated={isAuthenticated}
+          onOpenPair={(pair) => {
+            setSelectedPair(pair);
+            setSubTab("SPOT");
+          }}
+        />
       )}
 
       {/* SOVEREIGN tab */}

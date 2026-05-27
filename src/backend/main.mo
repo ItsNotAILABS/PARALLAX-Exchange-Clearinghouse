@@ -1863,6 +1863,34 @@ actor PARALLAX {
     }
   };
 
+  func categoryForCustomToken(
+    token : TokenFactory.TokenDefinition
+  ) : PhantomExchange.TokenCategory {
+    switch (token.tokenType) {
+      case (
+        #aiCompute or #aiMemory or #aiInference or #aiTraining or #aiData or
+        #aiGPU or #aiTPU or #aiBandwidth or #aiStorage or #aiFineTune or
+        #aiEmbedding or #aiRAG or #aiAgent or #aiOrchestration or
+        #aiReasoningChain or #aiVision or #aiAudio or #aiCodeGen or
+        #aiTranslation or #aiSentiment or #aiAnomaly or #aiPrediction or
+        #aiOptimization or #aiSimulation
+      ) { #aiToken };
+      case (#creatorPersonal) { #creatorToken };
+      case (#artifactBacked or #fractionalNFT) { #aiArtifact };
+      case (
+        #governance or #yield or #aiModelVote or #aiDatasetVote or
+        #aiSafetyAudit or #aiRedTeam or #aiBenchmark or #aiCertification
+      ) { #governanceToken };
+      case (#utility or #rewardPoints) { #sovereignToken };
+    }
+  };
+
+  func tickSizeForToken(token : TokenFactory.TokenDefinition) : Float {
+    if (token.initialPrice <= 0.00001) { 0.000001 }
+    else if (token.initialPrice <= 0.001) { 0.00001 }
+    else { 0.0001 }
+  };
+
   // ══════════════════════════════════════════════════════════════════════
   // AI ARTIFACT REGISTRY — Domain 30
   // Register, verify, trade AI artifacts of value
@@ -2021,6 +2049,26 @@ actor PARALLAX {
     assertCreator(msg.caller);
     let beat = SovereignDB.getBeatCount(db).toInt();
     tokenFactoryState := TokenFactory.verifyAndList(tokenFactoryState, tokenId, beat);
+    switch (TokenFactory.getToken(tokenFactoryState, tokenId)) {
+      case (?token) {
+        switch (token.tradingPairId) {
+          case (?pairId) {
+            phantomExchangeState := PhantomExchange.addTradingPair(
+              phantomExchangeState,
+              pairId,
+              token.symbol,
+              "ICP",
+              categoryForCustomToken(token),
+              #crypto,
+              tickSizeForToken(token),
+              beat,
+            );
+          };
+          case null {};
+        }
+      };
+      case null {};
+    };
     true
   };
 
@@ -2207,5 +2255,4 @@ actor PARALLAX {
   };
 
 };
-
 
