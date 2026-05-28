@@ -69,6 +69,9 @@ actor AlphaConductor {
   // Dead channel threshold: F(5) = 5 consecutive failures
   let DEAD_CHANNEL_THRESHOLD : Nat = 5;
 
+  // Minimum signals before trusting historical success rate
+  let MIN_SIGNALS_FOR_HISTORY : Nat = 5;
+
   // Audit ring: F(10) = 55 entries
   let AUDIT_RING_SIZE : Nat = 55;
 
@@ -219,7 +222,7 @@ actor AlphaConductor {
       priority    = priority;
       strategy    = strategy;
       timestamp   = Time.now();
-      ttl         = FIB[4];  // F(5) = 5 beats TTL
+      ttl         = FIB[4];  // FIB[4] = 5 (the 5th Fibonacci number, F₅) — 5 beats TTL
       hops        = 0;
       maxHops     = clampedHops;
     };
@@ -308,9 +311,9 @@ actor AlphaConductor {
         matching;
       };
       case (#adaptive) {
-        // Use history: prefer high success rate and low fail count
+        // Use history: prefer high success rate; trust new channels with insufficient data
         Array.filter<Channel>(matching, func(c) {
-          c.successRate >= PHI_INV_2 or c.signalCount < 5
+          c.successRate >= PHI_INV_2 or c.signalCount < MIN_SIGNALS_FOR_HISTORY
         });
       };
     };
@@ -390,8 +393,9 @@ actor AlphaConductor {
   // ═══════════════════════════════════════════════════════════════════════════
 
   func pruneDeadChannels() : () {
+    // Remove channels that exceed failure threshold — keep healthy or inactive (preserved for reactivation)
     channels := Array.filter<Channel>(channels, func(c) {
-      c.failCount < DEAD_CHANNEL_THRESHOLD or not c.active
+      c.failCount < DEAD_CHANNEL_THRESHOLD
     });
   };
 

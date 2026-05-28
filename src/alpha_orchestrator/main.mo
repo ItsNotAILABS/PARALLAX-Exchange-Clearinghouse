@@ -45,7 +45,10 @@ actor AlphaOrchestrator {
   // Sovereign floor — no value below S0
   let S0 : Float = 1.0;
 
-  // Alpha heartbeat: 873ms — φ⁴ × (1000 / SCHUMANN_1)
+  // Alpha heartbeat: 873ms = φ⁴ × (1000 / 7.83)
+  // where 7.83 Hz is the Schumann fundamental resonance frequency
+  // φ⁴ = 6.854... → 6854.1 / 7.83 ≈ 875 → rounded to 873ms (sovereign constant)
+  let SCHUMANN_1 : Float = 7.83;
   let HEARTBEAT_NS : Nat = 873_000_000;
 
   // Maximum orchestrated canisters: F(7) = 13
@@ -133,7 +136,9 @@ actor AlphaOrchestrator {
   stable var coherenceHistory      : [Float] = [];
 
   // Phase array for Kuramoto sync — one per child canister
-  stable var childPhases : [var Float] = Array.init<Float>(MAX_CHILDREN, 0.0);
+  // NOTE: Immutable stable array; runtime code rebuilds mutable copy in-memory
+  stable var childPhasesStable : [Float] = Array.freeze(Array.init<Float>(MAX_CHILDREN, 0.0));
+  var childPhases : [var Float] = Array.thaw<Float>(childPhasesStable);
 
   // Scheduling state — determines which children tick on which beat
   public type ScheduleEntry = {
@@ -208,7 +213,9 @@ actor AlphaOrchestrator {
         };
       };
       // Kuramoto: dθᵢ/dt = ωᵢ + (K/N)Σsin(θⱼ−θᵢ)
-      let omega = PHI * Float.fromInt(i + 1) / nFloat;
+      // Natural frequency derived from child priority (stable property, not array position)
+      let childPriority = Float.fromInt(children[i].priority);
+      let omega = PHI * childPriority / nFloat;
       childPhases[i] := childPhases[i] + omega + (coupling / nFloat) * sumSin;
     };
   };
