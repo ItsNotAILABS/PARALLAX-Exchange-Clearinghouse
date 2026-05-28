@@ -429,13 +429,15 @@ actor AlphaConductor {
     let spatialDecay = Float.exp(-WAVE_DECAY_ALPHA * x);
 
     // Oscillatory component: cos(k·x − ω·t + φ₀)
+    // Preserves sign — negative values represent wave troughs
     let oscillation = Float.cos(WAVE_NUMBER_K * x - WAVE_OMEGA * t + signal.phase);
 
-    // Full wave equation: A₀ · decay · oscillation
-    let amplitude = signal.amplitude * spatialDecay * Float.abs(oscillation);
+    // Full wave equation: A₀ · decay · oscillation (signed amplitude)
+    let amplitude = signal.amplitude * spatialDecay * oscillation;
 
-    // Never below minimum signal weight
-    Float.max(amplitude, PHI_INV_3);
+    // Return absolute amplitude for delivery strength, but preserve sign info in phase
+    // Minimum delivery strength is φ⁻³ (signal floor)
+    Float.max(Float.abs(amplitude), PHI_INV_3);
   };
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -659,10 +661,11 @@ actor AlphaConductor {
   // CONDUCTION ENGINE — wave-mechanics-enhanced signal processing
   // ═══════════════════════════════════════════════════════════════════════════
 
-  func conductSignals() : [Text] {
+  func conductSignals() : ([Text], Nat) {
     var conducted : Nat = 0;
     var remaining : [Signal] = [];
     var conductedChannelNames : [Text] = [];
+    var droppedThisBeat : Nat = 0;
 
     // Track signals being conducted simultaneously (for interference computation)
     var inFlightSignals : [Signal] = [];
@@ -671,6 +674,7 @@ actor AlphaConductor {
       // TTL check
       if (signal.ttl == 0) {
         totalSignalsDropped += 1;
+        droppedThisBeat += 1;
       }
       // Coherence gate check
       else if (not passesCoherenceGate(signal.priority, currentCoherence)) {
@@ -704,10 +708,17 @@ actor AlphaConductor {
           netInterferenceEnergy += netInterference;
 
           // Determine if destructive interference cancels the signal
-          let effectiveAmplitude = waveAmp + netInterference;
+          // Interference affects intensity (A²), not amplitude directly
+          // Resultant intensity: I = A² + interference_contribution
+          let baseIntensity = waveAmp * waveAmp;
+          let resultantIntensity = baseIntensity + netInterference;
+          let effectiveAmplitude = if (resultantIntensity > 0.0) {
+            Float.sqrt(resultantIntensity)
+          } else { 0.0 };
           if (effectiveAmplitude < PHI_INV_3) {
             // Signal cancelled by destructive interference
             totalSignalsDropped += 1;
+            droppedThisBeat += 1;
           } else {
             // Compute compression ratio for this signal
             let compression = _estimateCompression(signal);
@@ -766,7 +777,7 @@ actor AlphaConductor {
     };
 
     signalQueue := remaining;
-    conductedChannelNames;
+    (conductedChannelNames, droppedThisBeat);
   };
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -985,7 +996,7 @@ actor AlphaConductor {
     let preDestructive = totalDestructiveEvents;
     let preConducted = totalSignalsConducted;
 
-    let conductedChannelNames = conductSignals();
+    let (conductedChannelNames, droppedThisBeat) = conductSignals();
     let conductedThisBeat = totalSignalsConducted - preConducted;
     let constructiveThisBeat = totalConstructiveEvents - preConstructive;
     let destructiveThisBeat = totalDestructiveEvents - preDestructive;
@@ -1049,7 +1060,7 @@ actor AlphaConductor {
       timestamp             = now;
       coherence             = currentCoherence;
       signalsConducted      = conductedThisBeat;
-      signalsDropped        = 0;
+      signalsDropped        = droppedThisBeat;
       signalsQueued         = signalQueue.size();
       activeChannels        = activeCount;
       netInterference       = netInterferenceEnergy;

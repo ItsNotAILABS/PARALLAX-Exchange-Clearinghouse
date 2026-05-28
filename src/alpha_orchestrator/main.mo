@@ -239,8 +239,8 @@ actor AlphaOrchestrator {
           let wOld = hebbianW[idx];
           oldFrobSq += wOld * wOld;
 
-          // Phase coherence between i and j
-          let phaseDiff = childPhases[i] - childPhases[j];
+          // Phase coherence between i and j (normalized difference)
+          let phaseDiff = _normalizePhase(childPhases[i] - childPhases[j]);
           let phaseCoherence = Float.cos(phaseDiff);
 
           // Success product: normalized health co-occurrence
@@ -428,6 +428,15 @@ actor AlphaOrchestrator {
     if (v < lo) lo else if (v > hi) hi else v;
   };
 
+  // Normalize phase to [−π, π] — prevents unbounded growth and precision loss
+  let TWO_PI : Float = 6.2831853071795864769;
+  func _normalizePhase(theta : Float) : Float {
+    var p = theta;
+    while (p > 3.1415926535897932385) { p -= TWO_PI };
+    while (p < -3.1415926535897932385) { p += TWO_PI };
+    p;
+  };
+
   // ═══════════════════════════════════════════════════════════════════════════
   // KURAMOTO COHERENCE ENGINE — WEIGHTED phase synchronization
   //
@@ -453,7 +462,7 @@ actor AlphaOrchestrator {
     };
 
     let r = Float.sqrt((sumCos * sumCos + sumSin * sumSin)) / Float.fromInt(n);
-    // No sovereign floor on R — allow the system to report true decoherence
+    // Clamp to valid range [0, 1] — R is a normalized order parameter
     _clamp(r, 0.0, S0);
   };
 
@@ -483,10 +492,10 @@ actor AlphaOrchestrator {
       let healthFactor = children[i].health / PHI_SQ;
       let omega = PHI * childPriority * healthFactor / nFloat;
 
-      newPhases[i] := childPhases[i] + omega + (1.0 / nFloat) * couplingSum;
+      newPhases[i] := _normalizePhase(childPhases[i] + omega + (1.0 / nFloat) * couplingSum);
     };
 
-    // Apply new phases
+    // Apply new phases (already normalized)
     for (i in Array.keys(children)) {
       childPhases[i] := newPhases[i];
     };
@@ -511,7 +520,7 @@ actor AlphaOrchestrator {
       for (j in Array.keys(children)) {
         if (i != j) {
           let wij = hebbianW[i * n + j];
-          let phaseDiff = childPhases[i] - childPhases[j];
+          let phaseDiff = _normalizePhase(childPhases[i] - childPhases[j]);
           energy += wij * (1.0 - Float.cos(phaseDiff));
         };
       };
@@ -633,7 +642,7 @@ actor AlphaOrchestrator {
     for (i in Array.keys(children)) {
       for (j in Array.keys(children)) {
         if (i != j) {
-          let phaseCoh = Float.cos(childPhases[i] - childPhases[j]);
+          let phaseCoh = Float.cos(_normalizePhase(childPhases[i] - childPhases[j]));
           let hebbWeight = hebbianW[i * n + j];
           if (phaseCoh >= CLUSTER_THRESHOLD and hebbWeight >= PHI_INV_2) {
             adj[i * n + j] := true;
@@ -676,19 +685,33 @@ actor AlphaOrchestrator {
       { children[i] with clusterLabel = labels[i] };
     });
 
-    // Compute modularity Q (simplified)
+    // Compute modularity Q (Newman formulation simplified for undirected unweighted graph)
+    // Q = (1/2m) Σᵢⱼ [Aᵢⱼ − kᵢ·kⱼ/(2m)] · δ(cᵢ, cⱼ)
     if (edgeCount > 0) {
-      var intraEdges : Nat = 0;
+      let m2 = Float.fromInt(edgeCount);  // 2m (edges counted both directions)
+      var qSum : Float = 0.0;
+
+      // Compute degree of each node
+      let degrees = Array.init<Nat>(n, 0);
+      for (i in Array.keys(children)) {
+        var deg : Nat = 0;
+        for (j in Array.keys(children)) {
+          if (i != j and adj[i * n + j]) { deg += 1 };
+        };
+        degrees[i] := deg;
+      };
+
       for (i in Array.keys(children)) {
         for (j in Array.keys(children)) {
-          if (i != j and adj[i * n + j] and labels[i] == labels[j]) {
-            intraEdges += 1;
+          if (labels[i] == labels[j]) {
+            let aij : Float = if (adj[i * n + j]) { 1.0 } else { 0.0 };
+            let ki = Float.fromInt(degrees[i]);
+            let kj = Float.fromInt(degrees[j]);
+            qSum += aij - (ki * kj / m2);
           };
         };
       };
-      let m = Float.fromInt(edgeCount);
-      let intra = Float.fromInt(intraEdges);
-      modularityQ := intra / m - (intra / m) * (intra / m);
+      modularityQ := _clamp(qSum / m2, -0.5, 1.0);
     } else {
       modularityQ := 0.0;
     };
