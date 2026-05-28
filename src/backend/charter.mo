@@ -452,6 +452,9 @@ module {
     { s with members = updated; lastUpdatedMs = nowNs / 1_000_000 }
   };
 
+  // removeMember — removes a member by principal.
+  // NOTE: Founder members (tier = #Founder) are constitutionally protected by L00
+  // and CANNOT be removed. The function returns state unchanged if attempted.
   public func removeMember(s : CharterState, principal : Text, nowNs : Int) : CharterState {
     let updated = Array.filter<Member>(s.members, func(m) {
       // Cannot remove Founder — L00 Creator Sovereignty
