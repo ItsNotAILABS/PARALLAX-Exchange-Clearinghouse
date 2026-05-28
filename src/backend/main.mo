@@ -40,6 +40,7 @@ import IntelligenceContracts "intelligence_contracts";
 import IntelligenceRouting "intelligence_routing";
 import IntelligenceExtensions "intelligence_extensions";
 import IntelligenceCoupling "intelligence_coupling";
+import Charter "charter";
 
 
 
@@ -140,6 +141,12 @@ actor PARALLAX {
   // Write-back gated at R≥0.618. Message queue depth F(8)=21.
   var intelligenceCouplingState : IntelligenceCoupling.IntelligenceCouplingState = IntelligenceCoupling.genesisIntelligenceCouplingState();
 
+  // ── DOMAIN 38 — CHARTER_STATE ───────────────────────────────────────────
+  // Organizational Charter: governance, membership, voting, treasury, offices.
+  // The supreme governance document of PARALLAX — encoded as executable code.
+  // All proposals voted on-chain. Quorum phi-derived. Founder veto on emergencies.
+  var charterState : Charter.CharterState = Charter.defaultCharterState();
+
 
   // ══════════════════════════════════════════════════════════════════════
   // CREATOR SUPREMACY LAW — assertCreator gate
@@ -237,6 +244,11 @@ actor PARALLAX {
       // ── INTELLIGENCE COUPLING — Domain 37: coupling sync ───────────────────
       // Process message queue, sync coupled systems, compute aggregate coherence.
       intelligenceCouplingState := IntelligenceCoupling.tickCoupling(intelligenceCouplingState, novaCoherence, beat.toInt());
+
+      // ── CHARTER — Domain 38: governance maintenance ────────────────────────
+      // Seal genesis hash on first beat, resolve expired proposals, check term limits.
+      charterState := Charter.sealCharterHash(charterState, nowNs);
+      charterState := Charter.charterHeartbeatTick(charterState, nowNs);
 
       // ── BANKING SSU beat increment — Domain 17 ───────────────────────────
       // PIL loop: upregulate weakest monitoring domain each beat
@@ -1863,6 +1875,34 @@ actor PARALLAX {
     }
   };
 
+  func categoryForCustomToken(
+    token : TokenFactory.TokenDefinition
+  ) : PhantomExchange.TokenCategory {
+    switch (token.tokenType) {
+      case (
+        #aiCompute or #aiMemory or #aiInference or #aiTraining or #aiData or
+        #aiGPU or #aiTPU or #aiBandwidth or #aiStorage or #aiFineTune or
+        #aiEmbedding or #aiRAG or #aiAgent or #aiOrchestration or
+        #aiReasoningChain or #aiVision or #aiAudio or #aiCodeGen or
+        #aiTranslation or #aiSentiment or #aiAnomaly or #aiPrediction or
+        #aiOptimization or #aiSimulation
+      ) { #aiToken };
+      case (#creatorPersonal) { #creatorToken };
+      case (#artifactBacked or #fractionalNFT) { #aiArtifact };
+      case (
+        #governance or #yield or #aiModelVote or #aiDatasetVote or
+        #aiSafetyAudit or #aiRedTeam or #aiBenchmark or #aiCertification
+      ) { #governanceToken };
+      case (#utility or #rewardPoints) { #sovereignToken };
+    }
+  };
+
+  func tickSizeForToken(token : TokenFactory.TokenDefinition) : Float {
+    if (token.initialPrice <= 0.00001) { 0.000001 }
+    else if (token.initialPrice <= 0.001) { 0.00001 }
+    else { 0.0001 }
+  };
+
   // ══════════════════════════════════════════════════════════════════════
   // AI ARTIFACT REGISTRY — Domain 30
   // Register, verify, trade AI artifacts of value
@@ -2021,6 +2061,26 @@ actor PARALLAX {
     assertCreator(msg.caller);
     let beat = SovereignDB.getBeatCount(db).toInt();
     tokenFactoryState := TokenFactory.verifyAndList(tokenFactoryState, tokenId, beat);
+    switch (TokenFactory.getToken(tokenFactoryState, tokenId)) {
+      case (?token) {
+        switch (token.tradingPairId) {
+          case (?pairId) {
+            phantomExchangeState := PhantomExchange.addTradingPair(
+              phantomExchangeState,
+              pairId,
+              token.symbol,
+              "ICP",
+              categoryForCustomToken(token),
+              #crypto,
+              tickSizeForToken(token),
+              beat,
+            );
+          };
+          case null {};
+        }
+      };
+      case null {};
+    };
     true
   };
 
@@ -2206,6 +2266,124 @@ actor PARALLAX {
     IntelligenceCoupling.getPendingWriteBacks(intelligenceCouplingState)
   };
 
+  // ══════════════════════════════════════════════════════════════════════
+  // CHARTER — Domain 38 public endpoints
+  // Organizational governance: membership, proposals, voting, offices
+  // Quorum = PHI_INV (61.8%), Supermajority = 61.8% of cast weight
+  // Constitutional changes require 80.9% quorum
+  // ══════════════════════════════════════════════════════════════════════
+
+  /// getCharter — public query, returns full organizational charter state
+  public query func getCharter() : async Charter.CharterState {
+    charterState
+  };
+
+  /// getCharterMembers — public query, returns all charter members
+  public query func getCharterMembers() : async [Charter.Member] {
+    charterState.members
+  };
+
+  /// getActiveProposals — public query, returns all active governance proposals
+  public query func getActiveProposals() : async [Charter.Proposal] {
+    Charter.getActiveProposals(charterState)
+  };
+
+  /// getProposal — public query, returns a specific proposal by ID
+  public query func getProposal(id : Nat) : async ?Charter.Proposal {
+    Charter.getProposal(charterState, id)
+  };
+
+  /// tallyProposal — public query, returns (cast, favor, against, participationRate)
+  public query func tallyProposal(id : Nat) : async (Float, Float, Float, Float) {
+    Charter.tallyProposal(charterState, id)
+  };
+
+  /// getCharterVersion — public query, returns current charter version
+  public query func getCharterVersion() : async Nat {
+    charterState.charterVersion
+  };
+
+  /// addCharterMember — creator-only, adds a member to the charter
+  public shared(msg) func addCharterMember(
+    principal : Text,
+    name      : Text,
+    tier      : Charter.MemberTier,
+  ) : async () {
+    assertCreator(msg.caller);
+    let nowNs = Time.now();
+    let weight = Charter.tierToWeight(tier);
+    let member : Charter.Member = {
+      principal    = principal;
+      name         = name;
+      tier         = tier;
+      joinedMs     = nowNs / 1_000_000;
+      active       = true;
+      votingWeight = weight;
+      delegateTo   = null;
+    };
+    charterState := Charter.addMember(charterState, member, nowNs);
+  };
+
+  /// removeCharterMember — creator-only, removes a non-Founder member
+  public shared(msg) func removeCharterMember(principal : Text) : async () {
+    assertCreator(msg.caller);
+    let nowNs = Time.now();
+    charterState := Charter.removeMember(charterState, principal, nowNs);
+  };
+
+  /// createProposal — any active member can create a governance proposal
+  public shared(msg) func createCharterProposal(
+    title    : Text,
+    desc     : Text,
+    category : Charter.ProposalCategory,
+  ) : async Nat {
+    let caller = Principal.toText(msg.caller);
+    // Must be active member
+    switch (Charter.getMember(charterState, caller)) {
+      case null { assert false; 0 };
+      case (?m) {
+        assert m.active;
+        let nowNs = Time.now();
+        charterState := Charter.createProposal(charterState, title, desc, category, caller, nowNs);
+        charterState.nextProposalId - 1
+      };
+    }
+  };
+
+  /// castVote — any active member can vote on an active proposal
+  public shared(msg) func castCharterVote(
+    proposalId : Nat,
+    inFavor    : Bool,
+    rationale  : Text,
+  ) : async () {
+    let caller = Principal.toText(msg.caller);
+    let nowNs = Time.now();
+    charterState := Charter.castVote(charterState, proposalId, caller, inFavor, rationale, nowNs);
+  };
+
+  /// vetoProposal — founder-only, vetoes an Emergency proposal
+  public shared(msg) func vetoCharterProposal(proposalId : Nat) : async () {
+    assertCreator(msg.caller);
+    let caller = Principal.toText(msg.caller);
+    let nowNs = Time.now();
+    charterState := Charter.vetoProposal(charterState, proposalId, caller, nowNs);
+  };
+
+  /// appointOffice — creator-only, appoints a holder to a vacant office
+  public shared(msg) func appointCharterOffice(officeId : Text, holder : Text) : async () {
+    assertCreator(msg.caller);
+    let nowNs = Time.now();
+    charterState := Charter.appointOffice(charterState, officeId, holder, nowNs);
+  };
+
+  /// vacateOffice — creator-only, removes a holder from a removable office
+  public shared(msg) func vacateCharterOffice(officeId : Text) : async () {
+    assertCreator(msg.caller);
+    let nowNs = Time.now();
+    charterState := Charter.vacateOffice(charterState, officeId, nowNs);
+  };
+
+
+
+
 };
-
-
