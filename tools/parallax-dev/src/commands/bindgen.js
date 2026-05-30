@@ -4,9 +4,9 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 
 import { readdir, readFile, writeFile, mkdir } from "node:fs/promises";
-import { join, basename } from "node:path";
-import { existsSync } from "node:fs";
-import { execSync } from "node:child_process";
+import { join, basename, isAbsolute } from "node:path";
+import { existsSync, readdirSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { discoverSubstrates } from "../discovery.js";
 
 /**
@@ -81,7 +81,7 @@ function findDid(substrate) {
   const distDir = join(substrate.path, "dist");
   if (existsSync(distDir)) {
     try {
-      const files = require("fs").readdirSync(distDir);
+      const files = readdirSync(distDir);
       const didFile = files.find((f) => f.endsWith(".did"));
       if (didFile) return join(distDir, didFile);
     } catch {}
@@ -94,13 +94,18 @@ function findDid(substrate) {
  * Generate bindings using didc (official Candid compiler)
  */
 async function generateWithDidc(didFile, outDir, name) {
+  // Validate didFile path to prevent injection
+  if (!isAbsolute(didFile) || !existsSync(didFile)) {
+    throw new Error(`Invalid .did file path: ${didFile}`);
+  }
+
   try {
-    // Generate JS bindings
-    const jsOutput = execSync(`didc bind ${didFile} --target js`, { encoding: "utf-8" });
+    // Generate JS bindings using execFileSync (no shell injection possible)
+    const jsOutput = execFileSync("didc", ["bind", didFile, "--target", "js"], { encoding: "utf-8" });
     await writeFile(join(outDir, `${name}.idl.js`), jsOutput);
 
     // Generate TS declarations
-    const tsOutput = execSync(`didc bind ${didFile} --target ts`, { encoding: "utf-8" });
+    const tsOutput = execFileSync("didc", ["bind", didFile, "--target", "ts"], { encoding: "utf-8" });
     await writeFile(join(outDir, `${name}.d.ts`), tsOutput);
 
     // Generate index
@@ -264,7 +269,7 @@ async function generateBarrelIndex(outDir, substrates) {
 
 function isCommandAvailable(cmd) {
   try {
-    execSync(`which ${cmd}`, { stdio: "pipe" });
+    execFileSync("which", [cmd], { stdio: "pipe" });
     return true;
   } catch {
     return false;

@@ -5,7 +5,7 @@
 
 import { readdir, readFile, stat } from "node:fs/promises";
 import { join, basename } from "node:path";
-import { existsSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 
 /**
  * Discover all substrate canisters in src/
@@ -88,8 +88,9 @@ function findDidFile(dir) {
   if (!existsSync(distDir)) return null;
 
   try {
-    const files = require("fs").readdirSync(distDir);
-    return files.find((f) => f.endsWith(".did")) ? join(distDir, files.find((f) => f.endsWith(".did"))) : null;
+    const files = readdirSync(distDir);
+    const didFile = files.find((f) => f.endsWith(".did"));
+    return didFile ? join(distDir, didFile) : null;
   } catch {
     return null;
   }
