@@ -41,6 +41,9 @@ import IntelligenceRouting "intelligence_routing";
 import IntelligenceExtensions "intelligence_extensions";
 import IntelligenceCoupling "intelligence_coupling";
 import Charter "charter";
+import PredictionMarket "prediction_market";
+import PredictionAssets "prediction_assets";
+import PredictionEngines "prediction_engines";
 
 
 
@@ -146,6 +149,12 @@ actor PARALLAX {
   // The supreme governance document of PARALLAX — encoded as executable code.
   // All proposals voted on-chain. Quorum phi-derived. Founder veto on emergencies.
   var charterState : Charter.CharterState = Charter.defaultCharterState();
+
+  // ── DOMAIN 39 — PREDICTION_MARKET_STATE ───────────────────────────────────
+  // Full prediction market: 58 world contract types, LMSR pricing,
+  // multi-oracle resolution, 7 AI prediction engines, zero-gas settlement.
+  // Trade the probability of any world event. Instant payout on resolution.
+  var predictionMarketState : PredictionMarket.PredictionMarketState = PredictionMarket.defaultPredictionMarketState();
 
 
   // ══════════════════════════════════════════════════════════════════════
@@ -2381,6 +2390,154 @@ actor PARALLAX {
     assertCreator(msg.caller);
     let nowNs = Time.now();
     charterState := Charter.vacateOffice(charterState, officeId, nowNs);
+  };
+
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // DOMAIN 39 — PREDICTION MARKET ENDPOINTS
+  // Full prediction market: 58 world contract types, zero-gas, instant settlement
+  // ══════════════════════════════════════════════════════════════════════════
+
+  /// getPredictionMarketMetrics — public query, returns market-wide metrics
+  public query func getPredictionMarketMetrics() : async PredictionMarket.MarketMetrics {
+    predictionMarketState.metrics
+  };
+
+  /// getPredictionAssetRegistry — returns all 58 world contract asset classes
+  public query func getPredictionAssetRegistry() : async [PredictionAssets.PredictionAssetClass] {
+    PredictionAssets.getAssetRegistry()
+  };
+
+  /// getPredictionEngines — returns all 7 AI prediction engines
+  public query func getPredictionEngines() : async [PredictionEngines.PredictionEngine] {
+    PredictionEngines.getAllEngines()
+  };
+
+  /// getPredictionContract — returns a specific prediction contract by ID
+  public query func getPredictionContract(contractId : Nat) : async ?PredictionMarket.PredictionContract {
+    if (contractId >= predictionMarketState.contracts.size()) { return null };
+    predictionMarketState.contracts[contractId]
+  };
+
+  /// getLMSRState — returns LMSR market maker state for a contract
+  public query func getLMSRState(contractId : Nat) : async ?PredictionMarket.LMSRState {
+    if (contractId >= predictionMarketState.lmsrStates.size()) { return null };
+    predictionMarketState.lmsrStates[contractId]
+  };
+
+  /// getLMSRPrice — calculates current LMSR price for a share type
+  public query func getLMSRPrice(contractId : Nat, shareType : PredictionMarket.ShareType) : async Float {
+    if (contractId >= predictionMarketState.lmsrStates.size()) { return 0.5 };
+    switch (predictionMarketState.lmsrStates[contractId]) {
+      case null { 0.5 };
+      case (?state) { PredictionMarket.lmsrPrice(state, shareType) };
+    }
+  };
+
+  /// getLMSRCost — calculates cost to buy shares via LMSR
+  public query func getLMSRCost(contractId : Nat, shareType : PredictionMarket.ShareType, quantity : Float) : async Float {
+    if (contractId >= predictionMarketState.lmsrStates.size()) { return 0.0 };
+    switch (predictionMarketState.lmsrStates[contractId]) {
+      case null { 0.0 };
+      case (?state) { PredictionMarket.lmsrCost(state, shareType, quantity) };
+    }
+  };
+
+  /// getMarketEntropy — returns information entropy of a contract's price
+  public query func getMarketEntropy(contractId : Nat) : async Float {
+    if (contractId >= predictionMarketState.lmsrStates.size()) { return 0.6931471805599453 };
+    switch (predictionMarketState.lmsrStates[contractId]) {
+      case null { 0.6931471805599453 }; // ln(2) — maximum entropy for binary
+      case (?state) { PredictionMarket.marketEntropy(state.currentYesPrice) };
+    }
+  };
+
+  /// getKellySize — calculates optimal Kelly criterion position size
+  public query func getKellySize(estimatedProb : Float, marketPrice : Float, bankroll : Float) : async Float {
+    PredictionMarket.kellySize(estimatedProb, marketPrice, bankroll)
+  };
+
+  /// createPredictionContract — creator creates a new prediction contract
+  public shared(msg) func createPredictionContract(
+    category : PredictionMarket.ContractCategory,
+    title : Text,
+    description : Text,
+    resolutionType : PredictionMarket.ContractResolutionType,
+    outcomes : [Text],
+    expirationBeat : Int,
+    oracleSource : Text,
+    baseLiquidity : Float
+  ) : async Nat {
+    assertCreator(msg.caller);
+    let id = predictionMarketState.contractCount;
+    let contract : PredictionMarket.PredictionContract = {
+      contractId = id;
+      category = category;
+      title = title;
+      description = description;
+      resolutionType = resolutionType;
+      outcomes = outcomes;
+      createdBeat = SovereignDB.getBeatCount(db);
+      expirationBeat = expirationBeat;
+      resolutionBeat = null;
+      resolvedOutcome = null;
+      status = #active;
+      oracleSource = oracleSource;
+      minTradeSize = 1.0;
+      maxPosition = PredictionMarket.maxAllowedPosition(0.5, 1000.0);
+      totalVolume = 0.0;
+      openInterest = 0.0;
+      liquidityDepth = baseLiquidity;
+      creatorPrincipal = Principal.toText(msg.caller);
+    };
+    let lmsr = PredictionMarket.initLMSR(id, baseLiquidity);
+    let newContracts = Array.append(predictionMarketState.contracts, [?contract]);
+    let newLmsr = Array.append(predictionMarketState.lmsrStates, [?lmsr]);
+    predictionMarketState := {
+      predictionMarketState with
+      contracts = newContracts;
+      lmsrStates = newLmsr;
+      contractCount = id + 1;
+      metrics = {
+        predictionMarketState.metrics with
+        totalContracts = predictionMarketState.metrics.totalContracts + 1;
+        activeContracts = predictionMarketState.metrics.activeContracts + 1;
+      };
+    };
+    id
+  };
+
+  /// resolvePredictionContract — creator resolves a contract with outcome
+  public shared(msg) func resolvePredictionContract(contractId : Nat, outcome : Float) : async () {
+    assertCreator(msg.caller);
+    let contracts = predictionMarketState.contracts;
+    if (contractId >= contracts.size()) { assert false; return };
+    switch (contracts[contractId]) {
+      case null { assert false };
+      case (?c) {
+        let resolved : PredictionMarket.PredictionContract = {
+          c with
+          status = #resolved;
+          resolvedOutcome = ?outcome;
+          resolutionBeat = ?SovereignDB.getBeatCount(db);
+        };
+        let newContracts = Array.tabulate<?PredictionMarket.PredictionContract>(
+          contracts.size(),
+          func(i : Nat) : ?PredictionMarket.PredictionContract {
+            if (i == contractId) { ?resolved } else { contracts[i] }
+          }
+        );
+        predictionMarketState := {
+          predictionMarketState with
+          contracts = newContracts;
+          metrics = {
+            predictionMarketState.metrics with
+            resolvedContracts = predictionMarketState.metrics.resolvedContracts + 1;
+            activeContracts = predictionMarketState.metrics.activeContracts - 1;
+          };
+        };
+      };
+    };
   };
 
 
