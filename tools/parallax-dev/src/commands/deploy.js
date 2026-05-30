@@ -3,7 +3,7 @@
 // Multi-canister deployment with dependency ordering and substrate tiers
 // ═══════════════════════════════════════════════════════════════════════════════
 
-import { execSync, spawn } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
 import { join } from "node:path";
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
@@ -49,7 +49,7 @@ export async function deploy(ctx, flags = {}) {
   if (env === "local") {
     console.log(`   ⚡ Starting local network...`);
     try {
-      execSync("icp network start -d", { cwd: root, stdio: "pipe" });
+      execFileSync("icp", ["network", "start", "-d"], { cwd: root, stdio: "pipe" });
       console.log(`   ✓ Local network started\n`);
     } catch (err) {
       // Network might already be running
@@ -65,12 +65,11 @@ export async function deploy(ctx, flags = {}) {
   console.log(`   📦 Creating canisters...\n`);
   for (const substrate of targets) {
     try {
-      const cmd = `icp canister create --environment ${env} ${substrate.name}`;
-      execSync(cmd, { cwd: root, stdio: "pipe" });
+      execFileSync("icp", ["canister", "create", "--environment", env, substrate.name], { cwd: root, stdio: "pipe" });
       console.log(`   ✓ Created: ${substrate.name}`);
     } catch (err) {
       // Canister might already exist
-      if (err.message?.includes("already exists") || err.stderr?.includes("already exists")) {
+      if (err.message?.includes("already exists") || err.stderr?.toString().includes("already exists")) {
         console.log(`   ○ Exists:  ${substrate.name}`);
       } else {
         console.log(`   ⚠ Warning: ${substrate.name} — ${err.message?.split("\n")[0]}`);
@@ -83,8 +82,8 @@ export async function deploy(ctx, flags = {}) {
   const canisterIds = {};
   for (const substrate of targets) {
     try {
-      const id = execSync(
-        `icp canister settings show --environment ${env} --id-only ${substrate.name}`,
+      const id = execFileSync(
+        "icp", ["canister", "settings", "show", "--environment", env, "--id-only", substrate.name],
         { cwd: root, encoding: "utf-8", stdio: "pipe" }
       ).trim();
       canisterIds[substrate.name] = id;
@@ -106,11 +105,10 @@ export async function deploy(ctx, flags = {}) {
 
   // Deploy canisters
   console.log(`\n   🌐 Deploying substrates...\n`);
-  const canisterNames = targets.map((s) => s.name).join(" ");
+  const canisterNames = targets.map((s) => s.name);
 
   try {
-    const cmd = `icp deploy --environment ${env} ${canisterNames}`;
-    execSync(cmd, { cwd: root, env: envVars, stdio: "inherit" });
+    execFileSync("icp", ["deploy", "--environment", env, ...canisterNames], { cwd: root, env: envVars, stdio: "inherit" });
     console.log(`\n   ✅ All substrates deployed successfully!\n`);
   } catch (err) {
     throw new Error(`Deployment failed: ${err.message}`);
@@ -122,7 +120,7 @@ export async function deploy(ctx, flags = {}) {
   console.log(`├─────────────────────────────────────────────┤`);
   for (const substrate of targets) {
     const id = canisterIds[substrate.name] || "pending";
-    const tierLabel = ["", "CORE", "MAJOR", "SUPPORT"][substrate.tier];
+    const tierLabel = ["", "CORE", "MAJOR", "SUPPORT"][substrate.tier] || "OTHER";
     console.log(`│  [${tierLabel}] ${substrate.name.padEnd(20)} ${id.slice(0, 12)}...│`);
   }
   console.log(`└─────────────────────────────────────────────┘\n`);
@@ -130,7 +128,7 @@ export async function deploy(ctx, flags = {}) {
 
 function assertCommand(cmd, errorMsg) {
   try {
-    execSync(`which ${cmd}`, { stdio: "pipe" });
+    execFileSync("which", [cmd], { stdio: "pipe" });
   } catch {
     throw new Error(errorMsg);
   }

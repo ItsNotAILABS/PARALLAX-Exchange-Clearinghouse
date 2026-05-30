@@ -3,7 +3,7 @@
 // Show all canister states, health, and substrate topology
 // ═══════════════════════════════════════════════════════════════════════════════
 
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { join } from "node:path";
 import { existsSync } from "node:fs";
 import { readFile, readdir } from "node:fs/promises";
@@ -61,7 +61,7 @@ export async function status(ctx, flags = {}) {
   if (isCommandAvailable("icp")) {
     console.log(`\n  ── NETWORK STATUS ──────────────────────────────`);
     try {
-      const networkStatus = execSync("icp network status", {
+      const networkStatus = execFileSync("icp", ["network", "status"], {
         cwd: root,
         encoding: "utf-8",
         stdio: "pipe",
@@ -86,7 +86,7 @@ async function countMoFiles(dir) {
 
 function isCommandAvailable(cmd) {
   try {
-    execSync(`which ${cmd}`, { stdio: "pipe" });
+    execFileSync("which", [cmd], { stdio: "pipe" });
     return true;
   } catch {
     return false;
