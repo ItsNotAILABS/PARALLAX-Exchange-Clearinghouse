@@ -7,6 +7,7 @@
 [![Built on ICP](https://img.shields.io/badge/Built_on-Internet_Computer-29abe2?style=for-the-badge&logo=dfinity&logoColor=white)](https://internetcomputer.org/)
 [![License: Sovereign](https://img.shields.io/badge/License-PARALLAX_Sovereign-red.svg?style=for-the-badge)](LICENSE)
 [![Motoko](https://img.shields.io/badge/Language-Motoko-purple?style=for-the-badge)](https://internetcomputer.org/docs/current/motoko/main/motoko)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ItsNotAILABS/PARALLAX-Exchange-Clearinghouse/blob/main/PARALLAX_Software_Notebook.ipynb)
 
 **Trade everything. Pay nothing. Settle instantly.**
 
@@ -171,7 +172,37 @@ public let PHI : Float = 1.6180339887498948482;
 
 ## 🚀 Getting Started
 
-### Prerequisites
+### Quick Start with Docker (recommended)
+
+```bash
+# Clone and run everything in ONE command
+git clone https://github.com/ItsNotAILABS/PARALLAX-Exchange-Clearinghouse.git
+cd PARALLAX-Exchange-Clearinghouse
+docker compose up
+```
+
+This spins up:
+- **ICP Replica** on `http://localhost:8000`
+- **Backend canister** auto-deployed
+- **Frontend** on `http://localhost:5173`
+
+### Try It Now — Zero Install
+
+Run the interactive notebook in your browser:
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ItsNotAILABS/PARALLAX-Exchange-Clearinghouse/blob/main/PARALLAX_Software_Notebook.ipynb)
+
+### Example Notebooks
+
+| Notebook | Description |
+|----------|-------------|
+| [`01_place_order.ipynb`](examples/01_place_order.ipynb) | Place a simulated trade — see the matching engine work |
+| [`02_query_clearinghouse.ipynb`](examples/02_query_clearinghouse.ipynb) | View settlement state — cryptographic proofs & netting |
+| [`03_mint_ai_token.ipynb`](examples/03_mint_ai_token.ipynb) | Mint AI tokens with phi-derived supply caps |
+
+Each notebook has a **Open in Colab** badge — click and run with zero setup.
+
+### Prerequisites (manual setup)
 - [DFINITY SDK](https://internetcomputer.org/docs/current/developer-docs/setup/install) 
 - [pnpm](https://pnpm.io/) (recommended)
 - [mops](https://mops.one/) (Motoko package manager)
