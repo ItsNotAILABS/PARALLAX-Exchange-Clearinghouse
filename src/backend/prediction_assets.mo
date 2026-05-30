@@ -22,10 +22,6 @@
 //
 // Architect: Alfredo Medina Hernandez — The Architect of the Field
 
-import Phi "phi";
-import Float "mo:core/Float";
-import Nat "mo:core/Nat";
-
 module {
 
   // ═══════════════════════════════════════════════════════════════════════════

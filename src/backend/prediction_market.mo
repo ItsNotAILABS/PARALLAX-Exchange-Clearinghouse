@@ -35,14 +35,12 @@
 import Phi "phi";
 import Float "mo:core/Float";
 import Array "mo:core/Array";
-import Int "mo:core/Int";
 import Nat "mo:core/Nat";
-import Nat32 "mo:core/Nat32";
 
 module {
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // PREDICTION CONTRACT TYPES — the 50+ tradeable world event categories
+  // PREDICTION CONTRACT TYPES — the 58 tradeable world event categories
   // Every contract resolves to YES (1.0) or NO (0.0), or a scalar [0.0, 1.0]
   // ═══════════════════════════════════════════════════════════════════════════
 
@@ -415,7 +413,7 @@ module {
       sum += diff * diff;
       i += 1;
     };
-    sum / Float.fromInt(Int.abs(n))
+    sum / Float.fromInt(n)
   };
 
   // Resolution consensus — Schelling point with stake weighting

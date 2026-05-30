@@ -37,12 +37,9 @@
 //
 // Architect: Alfredo Medina Hernandez — The Architect of the Field
 
-import Phi "phi";
 import Float "mo:core/Float";
 import Array "mo:core/Array";
-import Int "mo:core/Int";
 import Nat "mo:core/Nat";
-import Nat32 "mo:core/Nat32";
 
 module {
 
@@ -287,7 +284,7 @@ module {
       models = [
         { architecture = #transformer; name = "BehaviorSequencer"; parameters = 80_000_000;
           purpose = "Attention over trading sequences to detect anomalous participant behavior patterns"; weight = 0.382 },
-        { architecture = #graphNeural; name = "CollisionDetector"; parameters = 45_000_000;
+        { architecture = #graphNeural; name = "CollusionDetector"; parameters = 45_000_000;
           purpose = "Maps participant relationships and detects coordinated trading rings"; weight = 0.236 },
         { architecture = #bayesianNeural; name = "StatisticalAnomalyEngine"; parameters = 30_000_000;
           purpose = "Bayesian changepoint detection for sudden distribution shifts in trading patterns"; weight = 0.236 },
@@ -377,7 +374,7 @@ module {
       sinSum += Float.sin(phases[i]);
       i += 1;
     };
-    let nf = Float.fromInt(Int.abs(n));
+    let nf = Float.fromInt(n);
     let avgCos = cosSum / nf;
     let avgSin = sinSum / nf;
     Float.sqrt(avgCos * avgCos + avgSin * avgSin)
