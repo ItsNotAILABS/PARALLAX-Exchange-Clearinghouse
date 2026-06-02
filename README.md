@@ -246,6 +246,19 @@ cd src/frontend && pnpm dev
 
 ## 📚 Documentation
 
+### Deep DeFi Docs (Public)
+| Document | Description |
+|----------|-------------|
+| [`docs/defi/ONBOARDING.md`](docs/defi/ONBOARDING.md) | Get started trading — connect, fund, trade |
+| [`docs/defi/SUPPORTED_MARKETS.md`](docs/defi/SUPPORTED_MARKETS.md) | All pairs, asset categories, market specs |
+| [`docs/defi/TRADING_PLATFORM.md`](docs/defi/TRADING_PLATFORM.md) | Full trading execution platform architecture |
+| [`docs/defi/DEVELOPER_GUIDE.md`](docs/defi/DEVELOPER_GUIDE.md) | Build on PARALLAX — SDK, Agent Kit, bots |
+| [`docs/defi/TRUST_BOUNDARIES.md`](docs/defi/TRUST_BOUNDARIES.md) | Security model & trust assumptions |
+| [`docs/defi/RISK_DISCLOSURE.md`](docs/defi/RISK_DISCLOSURE.md) | Risks, disclaimers, responsibilities |
+| [`docs/defi/LP_AND_AGENTS.md`](docs/defi/LP_AND_AGENTS.md) | LP incentives & Agent Kit integrations |
+| [`docs/defi/ROADMAP.md`](docs/defi/ROADMAP.md) | Current focus & path to SNS governance |
+
+### Technical Docs
 | Document | Description |
 |----------|-------------|
 | `docs/consciousness-core/` | Nova spherical equation canon |
