@@ -162,8 +162,10 @@ class HeartbeatClock:
             for cb in self._callbacks:
                 try:
                     cb(pulse)
-                except Exception as e:
-                    pass  # Don't let callbacks crash the heartbeat
+                except Exception:
+                    # Swallow callback errors to protect the heartbeat loop.
+                    # In production, pipe to organism telemetry.
+                    continue
 
 
 def derive_heartbeat(phi_power: int = 4, schumann_hz: float = SCHUMANN_FUNDAMENTAL) -> float:
