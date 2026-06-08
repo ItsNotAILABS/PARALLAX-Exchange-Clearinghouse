@@ -44,6 +44,11 @@ import Charter "charter";
 import PredictionMarket "prediction_market";
 import PredictionAssets "prediction_assets";
 import PredictionEngines "prediction_engines";
+import PhantomCrypto "phantom_crypto";
+import ShadowWire "shadow_wire";
+import SovereignVault "sovereign_vault";
+import ReceiptChain "receipt_chain";
+import PhantomKeying "phantom_keying";
 
 
 
@@ -156,6 +161,14 @@ actor PARALLAX {
   // Trade the probability of any world event. Instant payout on resolution.
   var predictionMarketState : PredictionMarket.PredictionMarketState = PredictionMarket.defaultPredictionMarketState();
 
+  // ── DOMAIN 40 — PHANTOM_CRYPTO: Cryptographia Phantasma Infrastructure ────
+  // Shadow Wires, Sovereign Vaults, Receipt Chains, Quantum-Inspired Keying.
+  // Protected cognition layer: proves without exposing, remembers without leaking.
+  var shadowWireState : ShadowWire.ShadowWireState = ShadowWire.defaultShadowWireState();
+  var sovereignVaultState : SovereignVault.SovereignVaultState = SovereignVault.createVault("vault_sovereign_alpha");
+  var receiptChainState : ReceiptChain.ReceiptChainState = ReceiptChain.createChain("parallax.sovereign", 0);
+  var phantomKeyingState : PhantomKeying.PhantomKeyingState = PhantomKeying.defaultKeyingState("PARALLAX_SOVEREIGN_GENESIS_SEED");
+
 
   // ══════════════════════════════════════════════════════════════════════
   // CREATOR SUPREMACY LAW — assertCreator gate
@@ -253,6 +266,13 @@ actor PARALLAX {
       // ── INTELLIGENCE COUPLING — Domain 37: coupling sync ───────────────────
       // Process message queue, sync coupled systems, compute aggregate coherence.
       intelligenceCouplingState := IntelligenceCoupling.tickCoupling(intelligenceCouplingState, novaCoherence, beat.toInt());
+
+      // ── PHANTOM CRYPTO — Domain 40: Cryptographia Phantasma ────────────────
+      // Shadow Wire expiry (replay resistance), Key rotation (ephemeral security),
+      // Vault entry expiry (governed memory lifecycle).
+      shadowWireState := ShadowWire.expireWires(shadowWireState, beat.toInt());
+      phantomKeyingState := PhantomKeying.rotateKeys(phantomKeyingState, beat.toInt());
+      sovereignVaultState := SovereignVault.expireEntries(sovereignVaultState, beat.toInt());
 
       // ── CHARTER — Domain 38: governance maintenance ────────────────────────
       // Seal genesis hash on first beat, resolve expired proposals, check term limits.
@@ -2541,6 +2561,238 @@ actor PARALLAX {
   };
 
 
+  // ══════════════════════════════════════════════════════════════════════════
+  // DOMAIN 40 — CRYPTOGRAPHIA PHANTASMA: Public Endpoints
+  // Protected cognition infrastructure: Shadow Wires, Sovereign Vaults,
+  // Receipt Chains, Quantum-Inspired Keying.
+  // Public-safe: only proof surfaces exposed. Private core stays hidden.
+  // ══════════════════════════════════════════════════════════════════════════
+
+  // ── SHADOW WIRE ENDPOINTS ──────────────────────────────────────────────
+
+  /// Open a shadow wire between two cognitive agents (creator-gated)
+  public shared(msg) func openShadowWire(
+    sourceAgent : Text,
+    targetAgent : Text,
+    payloadData : Text,
+    lifetimeBeats : Nat,
+  ) : async ?PhantomCrypto.ShadowWireEnvelope {
+    assertCreator(msg.caller);
+    let coherence = SovereignDB.getKuramotoR(db);
+    let beat = SovereignDB.getBeatCount(db).toInt();
+    let (newState, envelope, receipt) = ShadowWire.openWire(
+      shadowWireState, sourceAgent, targetAgent, payloadData, coherence, beat, lifetimeBeats
+    );
+    shadowWireState := newState;
+    // Append receipt to main chain if produced
+    switch (receipt) {
+      case (?r) {
+        switch (ReceiptChain.appendReceipt(receiptChainState, r)) {
+          case (?chain) { receiptChainState := chain };
+          case null {};
+        };
+      };
+      case null {};
+    };
+    envelope;
+  };
+
+  /// Acknowledge receipt of a shadow wire message (target-side)
+  public shared(msg) func acknowledgeShadowWire(wireId : Text, actorId : Text) : async Bool {
+    assertCreator(msg.caller);
+    let beat = SovereignDB.getBeatCount(db).toInt();
+    let (newState, receipt) = ShadowWire.acknowledgeWire(shadowWireState, wireId, actorId, beat);
+    shadowWireState := newState;
+    switch (receipt) {
+      case (?r) {
+        switch (ReceiptChain.appendReceipt(receiptChainState, r)) {
+          case (?chain) { receiptChainState := chain };
+          case null {};
+        };
+        true;
+      };
+      case null { false };
+    };
+  };
+
+  /// Get shadow wire public ledger (safe proof surface — no private data)
+  public query func getShadowWirePublicLedger() : async [ShadowWire.WirePublicSummary] {
+    ShadowWire.publicLedger(shadowWireState);
+  };
+
+  /// Get shadow wire statistics
+  public query func getShadowWireStats() : async {
+    activeCount : Nat; expiredCount : Nat; totalSent : Nat; totalReceived : Nat; chainHead : Nat32;
+  } {
+    ShadowWire.getStats(shadowWireState);
+  };
+
+  // ── SOVEREIGN VAULT ENDPOINTS ──────────────────────────────────────────
+
+  /// Write a protected memory entry to the sovereign vault (creator-gated)
+  public shared(msg) func vaultWrite(
+    label : Text,
+    content : Text,
+    expireBeats : ?Nat,
+  ) : async ?Text {
+    assertCreator(msg.caller);
+    let coherence = SovereignDB.getKuramotoR(db);
+    let beat = SovereignDB.getBeatCount(db).toInt();
+    let expiresBeat : ?Int = switch (expireBeats) {
+      case (?n) { ?(beat + n.toInt()) };
+      case null { null };
+    };
+    let (newVault, entryId, receipt) = SovereignVault.writeEntry(
+      sovereignVaultState, "creator.sovereign", label, content,
+      #governed_read, beat, expiresBeat, coherence
+    );
+    sovereignVaultState := newVault;
+    switch (receipt) {
+      case (?r) {
+        switch (ReceiptChain.appendReceipt(receiptChainState, r)) {
+          case (?chain) { receiptChainState := chain };
+          case null {};
+        };
+      };
+      case null {};
+    };
+    entryId;
+  };
+
+  /// Read an entry as abstracted commitment (public-safe — returns hash only)
+  public shared(msg) func vaultReadAbstracted(entryId : Text) : async ?Nat32 {
+    assertCreator(msg.caller);
+    let coherence = SovereignDB.getKuramotoR(db);
+    let beat = SovereignDB.getBeatCount(db).toInt();
+    let (newVault, commitment, receipt) = SovereignVault.readAbstracted(
+      sovereignVaultState, "creator.sovereign", entryId, beat, coherence
+    );
+    sovereignVaultState := newVault;
+    switch (receipt) {
+      case (?r) {
+        switch (ReceiptChain.appendReceipt(receiptChainState, r)) {
+          case (?chain) { receiptChainState := chain };
+          case null {};
+        };
+      };
+      case null {};
+    };
+    commitment;
+  };
+
+  /// Seal a vault entry permanently (one-time read pattern)
+  public shared(msg) func vaultSeal(entryId : Text) : async Bool {
+    assertCreator(msg.caller);
+    let beat = SovereignDB.getBeatCount(db).toInt();
+    let (newVault, receipt) = SovereignVault.sealEntry(
+      sovereignVaultState, "creator.sovereign", entryId, beat
+    );
+    sovereignVaultState := newVault;
+    switch (receipt) {
+      case (?r) {
+        switch (ReceiptChain.appendReceipt(receiptChainState, r)) {
+          case (?chain) { receiptChainState := chain };
+          case null {};
+        };
+        true;
+      };
+      case null { false };
+    };
+  };
+
+  /// Get vault public stats (safe proof surface)
+  public query func getVaultStats() : async {
+    vaultIdHash : Nat32; entryCount : Nat; sealedCount : Nat;
+    totalWrites : Nat; totalReads : Nat; totalSeals : Nat; chainHead : Nat32;
+  } {
+    SovereignVault.getPublicStats(sovereignVaultState);
+  };
+
+  // ── RECEIPT CHAIN ENDPOINTS ────────────────────────────────────────────
+
+  /// Seal a computation into the receipt chain (creator-gated)
+  public shared(msg) func sealComputation(
+    computationClass : Text,
+    inputData : Text,
+    outputData : Text,
+    policyId : Text,
+  ) : async PhantomCrypto.ComputeReceipt {
+    assertCreator(msg.caller);
+    let coherence = SovereignDB.getKuramotoR(db);
+    let beat = SovereignDB.getBeatCount(db).toInt();
+    let (newChain, receipt) = ReceiptChain.sealComputation(
+      receiptChainState, computationClass, inputData, outputData, policyId, coherence, beat
+    );
+    receiptChainState := newChain;
+    receipt;
+  };
+
+  /// Get receipt chain public ledger (safe proof surface)
+  public query func getReceiptChainPublicLedger() : async [ReceiptChain.PublicReceiptSummary] {
+    ReceiptChain.publicLedger(receiptChainState);
+  };
+
+  /// Get receipt chain statistics
+  public query func getReceiptChainStats() : async {
+    chainLength : Nat; activeReceipts : Nat; compactionRoots : Nat;
+    totalCompacted : Nat; chainHead : Nat32; isValid : Bool;
+  } {
+    ReceiptChain.getStats(receiptChainState);
+  };
+
+  /// Verify receipt chain integrity
+  public query func verifyReceiptChain() : async Bool {
+    ReceiptChain.verifyChain(receiptChainState);
+  };
+
+  // ── PHANTOM KEYING ENDPOINTS ───────────────────────────────────────────
+
+  /// Derive a new context-bound ephemeral session key (creator-gated)
+  public shared(msg) func deriveSessionKey(context : Text, boundAgent : Text) : async PhantomCrypto.EphemeralKeySession {
+    assertCreator(msg.caller);
+    let beat = SovereignDB.getBeatCount(db).toInt();
+    let (newState, session, receipt) = PhantomKeying.deriveSessionKey(
+      phantomKeyingState, context, boundAgent, beat
+    );
+    phantomKeyingState := newState;
+    switch (ReceiptChain.appendReceipt(receiptChainState, receipt)) {
+      case (?chain) { receiptChainState := chain };
+      case null {};
+    };
+    session;
+  };
+
+  /// Emergency: compromise all keys bound to a context (creator-gated)
+  public shared(msg) func compromiseKeyContext(context : Text) : async () {
+    assertCreator(msg.caller);
+    let beat = SovereignDB.getBeatCount(db).toInt();
+    phantomKeyingState := PhantomKeying.compromiseContext(phantomKeyingState, context, beat);
+  };
+
+  /// Get keying statistics (safe proof surface — no key material exposed)
+  public query func getPhantomKeyingStats() : async {
+    activeKeys : Nat; rotatedKeys : Nat; totalDerivations : Nat;
+    currentEpoch : Nat; lastRotationBeat : Int; chainHead : Nat32;
+  } {
+    PhantomKeying.getStats(phantomKeyingState);
+  };
+
+  // ── COMBINED PHANTOM CRYPTO DIAGNOSTICS ────────────────────────────────
+
+  /// Get full Cryptographia Phantasma system diagnostics (public-safe)
+  public query func getPhantomCryptoDiagnostics() : async {
+    shadowWires : { activeCount : Nat; expiredCount : Nat; totalSent : Nat; totalReceived : Nat; chainHead : Nat32 };
+    vault : { vaultIdHash : Nat32; entryCount : Nat; sealedCount : Nat; totalWrites : Nat; totalReads : Nat; totalSeals : Nat; chainHead : Nat32 };
+    receiptChain : { chainLength : Nat; activeReceipts : Nat; compactionRoots : Nat; totalCompacted : Nat; chainHead : Nat32; isValid : Bool };
+    keying : { activeKeys : Nat; rotatedKeys : Nat; totalDerivations : Nat; currentEpoch : Nat; lastRotationBeat : Int; chainHead : Nat32 };
+  } {
+    {
+      shadowWires = ShadowWire.getStats(shadowWireState);
+      vault = SovereignVault.getPublicStats(sovereignVaultState);
+      receiptChain = ReceiptChain.getStats(receiptChainState);
+      keying = PhantomKeying.getStats(phantomKeyingState);
+    };
+  };
 
 
 };
