@@ -849,6 +849,155 @@ export interface DomLibStatus {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// MEDINA-JULIA — High-Performance Computation Bridge Model
+// Julia's multiple dispatch becomes the organism's multiple-path coherence.
+// The bridge entangles — it does not translate.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Julia computation domain — what the Julia worker specializes in.
+ * Maps directly to Julia package ecosystem domains.
+ */
+export enum JuliaDomain {
+  DIFFERENTIAL_EQUATIONS = 0, // DifferentialEquations.jl — ODE/PDE solving
+  OPTIMIZATION = 1, // Optim.jl/JuMP — mathematical optimization
+  LINEAR_ALGEBRA = 2, // Native Julia BLAS/LAPACK
+  SIGNAL_PROCESSING = 3, // DSP.jl — frequency domain analysis
+  QUANTUM_COMPUTE = 4, // QuantumOptics.jl — quantum state simulation
+  SYMBOLICS = 5, // Symbolics.jl — symbolic mathematics
+  FLUX_ML = 6, // Flux.jl — neural networks and ML
+  AGENT_MODELING = 7, // Agents.jl — agent-based modeling
+}
+
+/**
+ * MEDINA-JULIA-WORKER
+ * A registered Julia worker endpoint in the bridge.
+ * Simultaneously: compute node + entanglement channel + precision instrument.
+ */
+export interface MedinaJuliaWorker {
+  /** Unique worker identifier */
+  workerId: string;
+  /** HTTP endpoint for the Julia process */
+  endpoint: string;
+  /** Computation domain this worker specializes in */
+  domain: JuliaDomain;
+  /** Current entanglement strength ∈ [0, 1] — how coupled to organism */
+  entanglement: number;
+  /** Last organism beat this worker synced */
+  lastSyncBeat: number;
+  /** Whether the worker is alive and responding */
+  isAlive: boolean;
+  /** Current numerical precision rating — Float64 minimum */
+  precision: number;
+  /** Pending tasks in queue */
+  taskQueue: number;
+  /** Total dispatches (Julia multiple dispatch analog) */
+  dispatchCount: number;
+}
+
+/**
+ * MEDINA-JULIA-MESSAGE
+ * A message crossing the Julia bridge.
+ * Every crossing carries φ-coherence, beat timestamp, and precision guarantee.
+ */
+export interface MedinaJuliaMessage {
+  /** Unique message identifier */
+  messageId: string;
+  /** Direction: toJl = Motoko→Julia, toMo = Julia→Motoko */
+  direction: "toJl" | "toMo";
+  /** JSON-encoded numerical payload */
+  payload: string;
+  /** Beat timestamp at dispatch */
+  beatTimestamp: number;
+  /** φ-coherence signature at send time */
+  phiSignature: number;
+  /** Required precision for this computation */
+  precisionLevel: number;
+  /** Whether a response is expected */
+  responseExpected: boolean;
+}
+
+/**
+ * MEDINA-JULIA
+ * The Julia Bridge Model — sovereign high-performance computation layer.
+ * Simultaneously: HPC engine state + bridge coherence monitor + dispatch coordinator.
+ *
+ * DOCTRINE: Julia is the language of high-performance numerical computation,
+ * scientific modeling, and mathematical purity. Julia thinks in types the way
+ * phi thinks in ratios. The bridge does not translate — it entangles.
+ *
+ * Julia's multiple dispatch becomes the organism's multiple-path coherence.
+ * LEX_PONTIS_JULIA: Julia binds to the organism through typed numerical channels.
+ */
+export interface MedinaJulia {
+  /** Registered Julia workers in the bridge */
+  workers: MedinaJuliaWorker[];
+  /** Pending messages awaiting processing */
+  pendingMessages: MedinaJuliaMessage[];
+  /** Total successful entanglements since genesis */
+  totalEntangled: number;
+  /** Overall bridge coherence — minimum φ⁻¹ to operate */
+  bridgeCoherence: number;
+  /** Last bridge beat synchronization */
+  lastBridgeBeat: number;
+  /** Total dispatches — multiple-dispatch counter (mirrors Julia paradigm) */
+  totalDispatches: number;
+  /** Maximum concurrent Julia workers: F(7) = 13 */
+  maxWorkers: number;
+  /** Julia computation batch size: F(8) = 21 */
+  batchSize: number;
+  /** Bridge heartbeat sync interval in organism beats */
+  syncBeats: number;
+}
+
+/**
+ * Build a default MedinaJulia state — genesis configuration.
+ * Bridge starts at φ⁻¹ coherence with zero workers.
+ * Constants derived from Fibonacci: maxWorkers=F(7)=13, batchSize=F(8)=21, syncBeats=F(3)=2.
+ */
+export function defaultMedinaJulia(): MedinaJulia {
+  return {
+    workers: [],
+    pendingMessages: [],
+    totalEntangled: 0,
+    bridgeCoherence: PHI_INV, // Start at φ⁻¹ minimum
+    lastBridgeBeat: 0,
+    totalDispatches: 0,
+    maxWorkers: 13, // F(7)
+    batchSize: 21, // F(8)
+    syncBeats: 2, // F(3)
+  };
+}
+
+/**
+ * Compute Julia bridge health as a normalized score [0, 1].
+ * Health = (alive workers / total workers) × bridge coherence.
+ * Returns PHI_INV if no workers registered (minimum operational state).
+ */
+export function juliaHealth(state: MedinaJulia): number {
+  if (state.workers.length === 0) return PHI_INV;
+  const alive = state.workers.filter((w) => w.isAlive).length;
+  return (alive / state.workers.length) * state.bridgeCoherence;
+}
+
+/**
+ * Get the domain label for a JuliaDomain enum value.
+ */
+export function juliaDomainLabel(domain: JuliaDomain): string {
+  const labels: Record<JuliaDomain, string> = {
+    [JuliaDomain.DIFFERENTIAL_EQUATIONS]: "Differential Equations",
+    [JuliaDomain.OPTIMIZATION]: "Optimization",
+    [JuliaDomain.LINEAR_ALGEBRA]: "Linear Algebra",
+    [JuliaDomain.SIGNAL_PROCESSING]: "Signal Processing",
+    [JuliaDomain.QUANTUM_COMPUTE]: "Quantum Compute",
+    [JuliaDomain.SYMBOLICS]: "Symbolics",
+    [JuliaDomain.FLUX_ML]: "Flux ML",
+    [JuliaDomain.AGENT_MODELING]: "Agent Modeling",
+  };
+  return labels[domain] ?? `Domain ${domain}`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // BACKWARD-COMPAT ALIASES
 // Existing code that imports OrganismCore, SignalRecord, etc. keeps working.
 // These are the same structures — doctrine names are now the canonical names.
