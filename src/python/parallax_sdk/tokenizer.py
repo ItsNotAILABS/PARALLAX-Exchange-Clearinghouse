@@ -32,6 +32,16 @@ from .constants import (
 )
 
 
+_BYTE_ENTROPY_BITS: float = 8.0
+"""Maximum Shannon entropy for a byte stream (log2(256) = 8 bits)."""
+
+_CHUNK_DIVISOR: int = 16
+"""Number of chunks to divide artifact data into for phi-coherence analysis."""
+
+_MAX_FIBONACCI_INDEX: int = 15
+"""Maximum index into FIBONACCI sequence for supply scaling."""
+
+
 class ArtifactCategory(Enum):
     """Categories of AI artifacts that can be tokenized."""
     MODEL = "model"
@@ -114,7 +124,7 @@ def compute_novelty(data: bytes) -> float:
             entropy -= p * math.log2(p)
 
     # Normalize to [0, 1] (max entropy for bytes = 8 bits)
-    return entropy / 8.0
+    return entropy / _BYTE_ENTROPY_BITS
 
 
 def compute_resonance_score(
@@ -225,7 +235,7 @@ class ArtifactTokenizer:
 
         # Compute phi-coherence from byte distribution
         # Use sliding windows of the data to find structural patterns
-        chunk_size = max(1, len(artifact_data) // 16)
+        chunk_size = max(1, len(artifact_data) // _CHUNK_DIVISOR)
         chunk_sums = []
         for i in range(0, len(artifact_data), chunk_size):
             chunk = artifact_data[i:i + chunk_size]
@@ -251,7 +261,7 @@ class ArtifactTokenizer:
         # Determine supply using Fibonacci scaling
         if supply is None:
             # Scale supply by resonance: higher resonance = rarer token
-            fib_index = min(15, int(score.composite * 15))
+            fib_index = min(_MAX_FIBONACCI_INDEX, int(score.composite * _MAX_FIBONACCI_INDEX))
             supply = FIBONACCI[fib_index]
 
         # Generate token ID

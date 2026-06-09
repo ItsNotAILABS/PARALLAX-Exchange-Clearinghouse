@@ -48,14 +48,22 @@ def _hash_any(obj: Any) -> str:
     return _sha256(serialized)
 
 
+_FNV1A_32_OFFSET_BASIS: int = 2166136261
+"""FNV-1a 32-bit offset basis."""
+
+_FNV1A_32_PRIME: int = 16777619
+"""FNV-1a 32-bit prime."""
+
+_FNV1A_32_MASK: int = 0xFFFFFFFF
+"""32-bit unsigned mask."""
+
+
 def fnv1a(data: str) -> int:
     """FNV-1a hash — fast non-cryptographic hash for doctrine alignment."""
-    FNV_OFFSET = 2166136261
-    FNV_PRIME = 16777619
-    h = FNV_OFFSET
+    h = _FNV1A_32_OFFSET_BASIS
     for byte in data.encode("utf-8"):
         h ^= byte
-        h = (h * FNV_PRIME) & 0xFFFFFFFF
+        h = (h * _FNV1A_32_PRIME) & _FNV1A_32_MASK
     return h
 
 
