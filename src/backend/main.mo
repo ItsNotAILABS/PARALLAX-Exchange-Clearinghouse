@@ -49,6 +49,8 @@ import ShadowWire "shadow_wire";
 import SovereignVault "sovereign_vault";
 import ReceiptChain "receipt_chain";
 import PhantomKeying "phantom_keying";
+import AiProtocols "ai_protocols";
+import MultiModel "multi_model";
 
 
 
@@ -169,6 +171,18 @@ actor PARALLAX {
   var receiptChainState : ReceiptChain.ReceiptChainState = ReceiptChain.createChain("parallax.sovereign", 0);
   var phantomKeyingState : PhantomKeying.PhantomKeyingState = PhantomKeying.defaultKeyingState("PARALLAX_SOVEREIGN_GENESIS_SEED");
 
+  // ── DOMAIN 41 — AI_PROTOCOLS_STATE ──────────────────────────────────────
+  // 10 Major AI Protocols: Cognitive Settlement, Adversarial Reasoning,
+  // Predictive Liquidity, Cross-Asset Valuation, Autonomous Risk Gating,
+  // Multi-Model Consensus, Agent Negotiation, Knowledge Graph Commerce,
+  // Self-Evolving Strategy, Sovereign Audit Intelligence.
+  var aiProtocolsState : AiProtocols.AiProtocolState = AiProtocols.defaultAiProtocolState();
+
+  // ── DOMAIN 42 — MULTI_MODEL_STATE ───────────────────────────────────────
+  // Multi-Model Orchestration Framework: 10 pre-registered AI models across
+  // 7 categories (Foundation, Specialist, Validator, Predictor, Sentinel,
+  // Synthesizer, Sovereign). 7 orchestration strategies. Phi-weighted consensus.
+  var multiModelState : MultiModel.MultiModelState = MultiModel.defaultMultiModelState();
 
   // ══════════════════════════════════════════════════════════════════════
   // CREATOR SUPREMACY LAW — assertCreator gate
@@ -273,6 +287,15 @@ actor PARALLAX {
       shadowWireState := ShadowWire.expireWires(shadowWireState, beat.toInt());
       phantomKeyingState := PhantomKeying.rotateKeys(phantomKeyingState, beat.toInt());
       sovereignVaultState := SovereignVault.expireEntries(sovereignVaultState, beat.toInt());
+
+      // ── AI PROTOCOLS — Domain 41: 10 sovereign AI protocols ────────────────
+      // Expire threats, prune negotiations, update risk gate, decay stress.
+      let protocolCoherence = SovereignDB.getKuramotoR(db);
+      aiProtocolsState := AiProtocols.tickProtocols(aiProtocolsState, protocolCoherence, beat.toInt());
+
+      // ── MULTI-MODEL — Domain 42: model ensemble maintenance ────────────────
+      // Health checks (every F(5)=5 beats), expire pending requests, decay weights.
+      multiModelState := MultiModel.tickMultiModel(multiModelState, protocolCoherence, beat.toInt());
 
       // ── CHARTER — Domain 38: governance maintenance ────────────────────────
       // Seal genesis hash on first beat, resolve expired proposals, check term limits.
@@ -2794,5 +2817,258 @@ actor PARALLAX {
     };
   };
 
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // DOMAIN 41 — AI PROTOCOLS: 10 Major Sovereign AI Protocols
+  // Cognitive Settlement, Adversarial Reasoning, Predictive Liquidity,
+  // Cross-Asset Valuation, Autonomous Risk Gating, Multi-Model Consensus,
+  // Agent Negotiation, Knowledge Graph Commerce, Self-Evolving Strategy,
+  // Sovereign Audit Intelligence.
+  // ══════════════════════════════════════════════════════════════════════════
+
+  // ── PROTOCOL 1: COGNITIVE SETTLEMENT ────────────────────────────────────
+
+  /// Assess settlement risk cognitively before execution (creator-gated)
+  public shared(msg) func assessSettlementRisk(
+    counterpartyId : Text,
+    amount : Float,
+    tokenPair : Text,
+  ) : async AiProtocols.SettlementRiskAssessment {
+    assertCreator(msg.caller);
+    let coherence = SovereignDB.getKuramotoR(db);
+    let beat = SovereignDB.getBeatCount(db).toInt();
+    let (newState, assessment) = AiProtocols.assessSettlementRisk(
+      aiProtocolsState, counterpartyId, amount, tokenPair, coherence, beat
+    );
+    aiProtocolsState := newState;
+    assessment;
+  };
+
+  // ── PROTOCOL 2: ADVERSARIAL MARKET REASONING ───────────────────────────
+
+  /// Scan for market manipulation threats (creator-gated)
+  public shared(msg) func scanMarketThreats(
+    tokenPair : Text,
+    volumeSpike : Float,
+    priceDeviation : Float,
+  ) : async ?AiProtocols.ThreatDetection {
+    assertCreator(msg.caller);
+    let coherence = SovereignDB.getKuramotoR(db);
+    let beat = SovereignDB.getBeatCount(db).toInt();
+    let (newState, detection) = AiProtocols.scanForThreats(
+      aiProtocolsState, tokenPair, volumeSpike, priceDeviation, coherence, beat
+    );
+    aiProtocolsState := newState;
+    detection;
+  };
+
+  // ── PROTOCOL 3: PREDICTIVE LIQUIDITY ───────────────────────────────────
+
+  /// Predict liquidity needs for a token pair (creator-gated)
+  public shared(msg) func predictLiquidity(
+    tokenPair : Text,
+    currentVolume : Float,
+    currentLiquidity : Float,
+  ) : async AiProtocols.LiquidityPrediction {
+    assertCreator(msg.caller);
+    let coherence = SovereignDB.getKuramotoR(db);
+    let beat = SovereignDB.getBeatCount(db).toInt();
+    let (newState, prediction) = AiProtocols.predictLiquidity(
+      aiProtocolsState, tokenPair, currentVolume, currentLiquidity, coherence, beat
+    );
+    aiProtocolsState := newState;
+    prediction;
+  };
+
+  // ── PROTOCOL 4: CROSS-ASSET VALUATION ──────────────────────────────────
+
+  /// Value an asset using cognitive resonance scoring (creator-gated)
+  public shared(msg) func valueAsset(
+    assetId : Text,
+    category : AiProtocols.AssetCategory,
+    marketPrice : Float,
+    utilityScore : Float,
+    scarcityScore : Float,
+  ) : async AiProtocols.CognitiveValuation {
+    assertCreator(msg.caller);
+    let coherence = SovereignDB.getKuramotoR(db);
+    let beat = SovereignDB.getBeatCount(db).toInt();
+    let (newState, valuation) = AiProtocols.valueAsset(
+      aiProtocolsState, assetId, category, marketPrice, utilityScore, scarcityScore, coherence, beat
+    );
+    aiProtocolsState := newState;
+    valuation;
+  };
+
+  // ── PROTOCOL 7: AGENT-TO-AGENT NEGOTIATION ─────────────────────────────
+
+  /// Open a negotiation between two AI agents (creator-gated)
+  public shared(msg) func openNegotiation(
+    agentA : Text,
+    agentB : Text,
+    assetOffered : Text,
+    assetRequested : Text,
+  ) : async ?AiProtocols.AgentNegotiation {
+    assertCreator(msg.caller);
+    let coherence = SovereignDB.getKuramotoR(db);
+    let beat = SovereignDB.getBeatCount(db).toInt();
+    let (newState, negotiation) = AiProtocols.openNegotiation(
+      aiProtocolsState, agentA, agentB, assetOffered, assetRequested, coherence, beat
+    );
+    aiProtocolsState := newState;
+    negotiation;
+  };
+
+  /// Advance a negotiation to a new state (creator-gated)
+  public shared(msg) func advanceNegotiation(
+    negotiationId : Text,
+    newState : AiProtocols.NegotiationState,
+  ) : async () {
+    assertCreator(msg.caller);
+    let beat = SovereignDB.getBeatCount(db).toInt();
+    aiProtocolsState := AiProtocols.advanceNegotiation(aiProtocolsState, negotiationId, newState, beat);
+  };
+
+  // ── PROTOCOL 9: SELF-EVOLVING STRATEGY ─────────────────────────────────
+
+  /// Report strategy performance for Hebbian evolution (creator-gated)
+  public shared(msg) func evolveStrategy(
+    geneId : Text,
+    success : Bool,
+    returnAmount : Float,
+  ) : async () {
+    assertCreator(msg.caller);
+    let beat = SovereignDB.getBeatCount(db).toInt();
+    aiProtocolsState := AiProtocols.evolveStrategies(aiProtocolsState, geneId, success, returnAmount, beat);
+  };
+
+  // ── PROTOCOL 10: SOVEREIGN AUDIT ───────────────────────────────────────
+
+  /// Run a sovereign audit on a domain (creator-gated)
+  public shared(msg) func runSovereignAudit(
+    domain : AiProtocols.AuditDomain,
+    checksPerformed : Nat,
+    anomaliesFound : Nat,
+  ) : async AiProtocols.AuditProof {
+    assertCreator(msg.caller);
+    let beat = SovereignDB.getBeatCount(db).toInt();
+    let (newState, proof) = AiProtocols.runAudit(aiProtocolsState, domain, checksPerformed, anomaliesFound, beat);
+    aiProtocolsState := newState;
+    proof;
+  };
+
+  // ── AI PROTOCOLS DIAGNOSTICS ───────────────────────────────────────────
+
+  /// Get AI protocols system statistics (public-safe)
+  public query func getAiProtocolStats() : async {
+    totalExecutions : Nat;
+    settlementsReasoned : Nat;
+    threatsDetected : Nat;
+    threatsNeutralized : Nat;
+    repositionsExecuted : Nat;
+    assetsValued : Nat;
+    riskLevel : AiProtocols.RiskGateLevel;
+    consensusReached : Nat;
+    negotiationsCompleted : Nat;
+    knowledgeNodes : Nat;
+    evolutionEvents : Nat;
+    currentGeneration : Nat;
+    totalAudits : Nat;
+    lastBeat : Int;
+  } {
+    AiProtocols.getStats(aiProtocolsState);
+  };
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // DOMAIN 42 — MULTI-MODEL ORCHESTRATION FRAMEWORK
+  // 10 pre-registered models, 7 categories, 7 strategies, phi-weighted consensus.
+  // Foundation (GPT-5, Claude Opus 4, Gemini Ultra 2), Specialists (PHI-Finance,
+  // QuantRisk), Validator (RedTeam), Predictor (Harmonic-φ), Sentinel (Sentinel-X),
+  // Synthesizer (MetaSynthesizer-φ), Sovereign (MEDINA-PRIME).
+  // ══════════════════════════════════════════════════════════════════════════
+
+  /// Register a new model in the multi-model ensemble (creator-gated)
+  public shared(msg) func registerModel(
+    modelId : Text,
+    displayName : Text,
+    category : MultiModel.ModelCategory,
+    provider : Text,
+    version : Text,
+    capabilities : [Text],
+    costPerCall : Float,
+  ) : async Bool {
+    assertCreator(msg.caller);
+    let beat = SovereignDB.getBeatCount(db).toInt();
+    let (newState, success) = MultiModel.registerModel(
+      multiModelState, modelId, displayName, category, provider, version, capabilities, costPerCall, beat
+    );
+    multiModelState := newState;
+    success;
+  };
+
+  /// Retire a model from the ensemble (creator-gated)
+  public shared(msg) func retireModel(modelId : Text) : async () {
+    assertCreator(msg.caller);
+    let beat = SovereignDB.getBeatCount(db).toInt();
+    multiModelState := MultiModel.retireModel(multiModelState, modelId, beat);
+  };
+
+  /// Execute a multi-model ensemble decision (creator-gated)
+  public shared(msg) func executeEnsemble(
+    taskType : MultiModel.TaskType,
+    inputData : Text,
+    requiredCapabilities : [Text],
+  ) : async MultiModel.EnsembleResult {
+    assertCreator(msg.caller);
+    let coherence = SovereignDB.getKuramotoR(db);
+    let beat = SovereignDB.getBeatCount(db).toInt();
+    let strategy = MultiModel.selectStrategy(taskType, coherence);
+    let (newState, result) = MultiModel.executeEnsemble(
+      multiModelState, taskType, inputData, strategy, requiredCapabilities, coherence, beat
+    );
+    multiModelState := newState;
+    result;
+  };
+
+  /// Get the public model registry (no internal weights)
+  public query func getModelRegistry() : async [MultiModel.ModelPublicSummary] {
+    MultiModel.getModelRegistry(multiModelState);
+  };
+
+  /// Get multi-model system statistics (public-safe)
+  public query func getMultiModelStats() : async {
+    totalModels : Nat;
+    activeModels : Nat;
+    totalEnsembleCalls : Nat;
+    consensusReached : Nat;
+    consensusFailed : Nat;
+    avgConfidence : Float;
+    avgDisagreement : Float;
+    pendingRequests : Nat;
+    lastBeat : Int;
+  } {
+    MultiModel.getStats(multiModelState);
+  };
+
+  /// Get combined AI & Multi-Model diagnostics (public-safe)
+  public query func getAiInfrastructureDiagnostics() : async {
+    protocols : {
+      totalExecutions : Nat; settlementsReasoned : Nat; threatsDetected : Nat;
+      threatsNeutralized : Nat; repositionsExecuted : Nat; assetsValued : Nat;
+      riskLevel : AiProtocols.RiskGateLevel; consensusReached : Nat;
+      negotiationsCompleted : Nat; knowledgeNodes : Nat; evolutionEvents : Nat;
+      currentGeneration : Nat; totalAudits : Nat; lastBeat : Int;
+    };
+    multiModel : {
+      totalModels : Nat; activeModels : Nat; totalEnsembleCalls : Nat;
+      consensusReached : Nat; consensusFailed : Nat; avgConfidence : Float;
+      avgDisagreement : Float; pendingRequests : Nat; lastBeat : Int;
+    };
+  } {
+    {
+      protocols = AiProtocols.getStats(aiProtocolsState);
+      multiModel = MultiModel.getStats(multiModelState);
+    };
+  };
 
 };
