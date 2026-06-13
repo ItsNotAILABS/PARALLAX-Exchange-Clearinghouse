@@ -89,6 +89,28 @@ from .tokenizer import (
     compute_novelty,
 )
 
+from .tokenomics import (
+    TokenomicsRuntime,
+    SalienceEngine,
+    TaskClass,
+    TaskRisk,
+    TokenValueWeights,
+    TokenValueScore,
+    CognitiveReturnScore,
+    CRPTResult,
+    SalienceItem,
+    SalienceWeights,
+    SalienceResult,
+    CompressionResult,
+    BenchmarkScore,
+    TokenomicGainResult,
+    MeasurementLoopResult,
+    compute_token_value,
+    compute_crpt,
+    compute_compression_efficiency,
+    compute_tokenomic_gain,
+)
+
 __all__ = [
     # Constants
     "PHI", "PHI_SQ", "PHI_CUBE", "PHI_4",
@@ -111,4 +133,14 @@ __all__ = [
     "ArtifactTokenizer", "AIToken", "ArtifactCategory",
     "CognitiveResonanceScore", "compute_resonance_score",
     "compute_phi_coherence", "compute_novelty",
+    # Tokenomics (Measurement & Benchmarking Framework)
+    "TokenomicsRuntime", "SalienceEngine",
+    "TaskClass", "TaskRisk",
+    "TokenValueWeights", "TokenValueScore",
+    "CognitiveReturnScore", "CRPTResult",
+    "SalienceItem", "SalienceWeights", "SalienceResult",
+    "CompressionResult", "BenchmarkScore",
+    "TokenomicGainResult", "MeasurementLoopResult",
+    "compute_token_value", "compute_crpt",
+    "compute_compression_efficiency", "compute_tokenomic_gain",
 ]
