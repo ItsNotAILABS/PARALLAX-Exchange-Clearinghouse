@@ -28,6 +28,17 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
+dependencies = [
+    "torch>=2.2",
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "pandas>=2.1",
+    "scikit-learn>=1.4",
+    "statsmodels>=0.14",
+    "nashpy>=0.0.41",
+    "matplotlib>=3.7",
+    "plotly>=5.0",
+]
 
 [project.urls]
 Homepage = "https://github.com/ItsNotAILABS/PARALLAX-Exchange-Clearinghouse"

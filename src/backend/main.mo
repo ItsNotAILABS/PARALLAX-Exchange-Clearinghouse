@@ -32,8 +32,12 @@ import ContextRouter "context_router";
 import NovaRuntime "nova_runtime";
 import PhantomIntel "phantom_intelligence";
 import PhantomExchange "phantom_exchange";
+import SmartRouting "smart_routing";
+import MarketMaking "market_making";
 import AiArtifactRegistry "ai_artifact_registry";
 import PhantomClearinghouse "phantom_clearinghouse";
+import GraphControl "graph_control";
+import FlowTracker "flow_tracker";
 import TokenFactory "token_factory";
 import ProductionEngines "production_engines";
 import IntelligenceContracts "intelligence_contracts";
@@ -51,6 +55,7 @@ import ReceiptChain "receipt_chain";
 import PhantomKeying "phantom_keying";
 import AiProtocols "ai_protocols";
 import MultiModel "multi_model";
+import QuantTrading "quant_trading";
 
 
 
@@ -112,6 +117,10 @@ actor PARALLAX {
   // Trades ALL tokens: crypto, AI tokens, AI artifacts, sovereign tokens, custom tokens.
   var phantomExchangeState : PhantomExchange.PhantomExchangeState = PhantomExchange.defaultPhantomExchangeState();
 
+  // ── DOMAIN 29B — SMART_ROUTING_STATE ─────────────────────────────────────
+  // Intelligent order routing, execution analytics, stealth and cross-pool logic.
+  var smartRoutingState : SmartRouting.SmartRoutingState = SmartRouting.defaultSmartRoutingState();
+
   // ── DOMAIN 30 — AI_ARTIFACT_REGISTRY_STATE ──────────────────────────────
   // Registry and marketplace for AI artifacts of value.
   // Models, embeddings, reasoning protocols — all tokenized and tradeable.
@@ -121,6 +130,10 @@ actor PARALLAX {
   // Real-time clearing and settlement. Zero fees. Instant finality.
   // Multi-asset netting, cross-chain settlement, organism-guaranteed.
   var phantomClearinghouseState : PhantomClearinghouse.PhantomClearinghouseState = PhantomClearinghouse.defaultPhantomClearinghouseState();
+
+  // ── DOMAIN 31B — FLOW_TRACKER_STATE ──────────────────────────────────────
+  // Directed money-flow graph, synthetic pool surveillance, systemic risk engine.
+  var flowTrackerState : FlowTracker.FlowTrackerState = FlowTracker.defaultFlowTrackerState();
 
   // ── DOMAIN 32 — TOKEN_FACTORY_STATE ─────────────────────────────────────
   // Create and manage custom tokens: AI tokens, creator tokens, artifact tokens.
@@ -252,14 +265,42 @@ actor PARALLAX {
       // Reasons about trades, decays signals, scans arbitrage, updates predictions.
       phantomIntelligenceState := PhantomIntel.tickIntelligence(phantomIntelligenceState, beat.toInt(), novaCoherence);
 
-      // ── PHANTOM EXCHANGE — Domain 29: matching engine ─────────────────────
-      // Runs price-time priority matching across all active order books.
-      // Settlement is INSTANT — fill = settlement (same beat). ZERO GAS.
-      phantomExchangeState := PhantomExchange.tickExchange(phantomExchangeState, beat.toInt());
+      // ── SMART ROUTING + PHANTOM EXCHANGE — Domains 29/29B ─────────────────
+      // Intelligent parent orders release slices into Phantom Exchange before matching.
+      let (nextSmartRoutingState, routedExchangeState, _scheduledOrders) = SmartRouting.tickSmartRouting(
+        smartRoutingState,
+        phantomExchangeState,
+        beat.toInt(),
+        novaCoherence,
+      );
+      smartRoutingState := nextSmartRoutingState;
+      phantomExchangeState := PhantomExchange.tickExchange(routedExchangeState, beat.toInt());
+      smartRoutingState := SmartRouting.syncExecutionQuality(smartRoutingState, phantomExchangeState, beat.toInt());
 
-      // ── PHANTOM CLEARINGHOUSE — Domain 31: netting & clearing ─────────────
-      // Fibonacci-gated netting cycles. Settlement velocity tracking.
-      phantomClearinghouseState := PhantomClearinghouse.tickClearinghouse(phantomClearinghouseState, beat.toInt());
+      // ── FLOW TRACKER + PHANTOM CLEARINGHOUSE — Domains 31/31B ─────────────
+      // Every new fill is settled, graphed, risk-scored, and routed into pool analytics.
+      let (syncedFlowTrackerState, syncedClearinghouseState) = FlowTracker.syncExchangeSettlements(
+        flowTrackerState,
+        phantomClearinghouseState,
+        phantomExchangeState,
+        beat.toInt(),
+      );
+      flowTrackerState := syncedFlowTrackerState;
+      let observedPrice = if (phantomExchangeState.recentFills.size() > 0) {
+        phantomExchangeState.recentFills[phantomExchangeState.recentFills.size() - 1].price
+      } else { 1.0 };
+      let graphControlState = GraphControl.synchronizeState(
+        syncedClearinghouseState.graphControl,
+        FlowTracker.toLiquidityNetwork(syncedFlowTrackerState),
+        observedPrice,
+        1.0,
+        syncedClearinghouseState.guaranteeFund.utilizationRatio,
+        beat.toInt(),
+      );
+      phantomClearinghouseState := PhantomClearinghouse.tickClearinghouse(
+        { syncedClearinghouseState with graphControl = graphControlState },
+        beat.toInt(),
+      );
 
       // ── TOKEN FACTORY — Domain 32: yield distribution ─────────────────────
       // Distribute phi-derived yield to staked token holders (Fibonacci-gated).
@@ -1850,6 +1891,101 @@ actor PARALLAX {
     phantomExchangeState.pairs
   };
 
+  public query func getQuantMarketMicrostructure(pairId : Text, depthLevels : Nat) : async ?QuantTrading.MarketMicrostructureSnapshot {
+    QuantTrading.buildMarketMicrostructureSnapshot(phantomExchangeState, phantomIntelligenceState, pairId, depthLevels)
+  };
+
+  public query func analyzeQuantPair(
+    pairId : Text,
+    depthLevels : Nat,
+    priceSeries : [Float],
+    hedgeSeries : [Float],
+    optionQuotes : [QuantTrading.OptionQuote],
+    ticks : [QuantTrading.TickData],
+    executionQuantity : Float,
+    executionSlices : Nat,
+  ) : async ?QuantTrading.IntegratedQuantSnapshot {
+    QuantTrading.analyzePhantomPair(
+      phantomExchangeState,
+      phantomIntelligenceState,
+      pairId,
+      depthLevels,
+      priceSeries,
+      hedgeSeries,
+      optionQuotes,
+      ticks,
+      executionQuantity,
+      executionSlices,
+    )
+  };
+
+  public query func getMarketMakingState() : async PhantomExchange.MarketMakerState {
+    phantomExchangeState.marketMaker
+  };
+
+  public query func getMarketMakingSnapshot(pairId : Text) : async ?MarketMaking.StrategySnapshot {
+    PhantomExchange.getMarketMakingSnapshot(phantomExchangeState, pairId)
+  };
+
+  public query func getSmartRoutingState() : async SmartRouting.SmartRoutingState {
+    smartRoutingState
+  };
+
+  public shared(msg) func placeSmartOrder(
+    pairId            : Text,
+    side              : Text,
+    smartOrderType    : Text,
+    quantity          : Float,
+    limitPrice        : ?Float,
+    stopPrice         : ?Float,
+    maxSlippageBps    : Float,
+    participationRate : Float,
+    executionStyle    : Text,
+    algorithm         : Text,
+    allowDarkPools    : Bool,
+    allowMultiVenue   : Bool,
+    allowCrossPool    : Bool,
+    postOnly          : Bool,
+  ) : async SmartRouting.OrderRoutingResult {
+    let beat = SovereignDB.getBeatCount(db).toInt();
+    let coherenceR = SovereignDB.getKuramotoR(db);
+    let owner = Principal.toText(msg.caller);
+    let orderSide = parseOrderSide(side);
+    let request : SmartRouting.SmartOrderRequest = {
+      requestId = pairId # "-" # Nat.toText(phantomExchangeState.nextOrderId);
+      pairId = pairId;
+      owner = owner;
+      side = orderSide;
+      smartOrderType = parseSmartOrderType(smartOrderType);
+      quantity = quantity;
+      limitPrice = limitPrice;
+      stopPrice = stopPrice;
+      maxSlippageBps = if (maxSlippageBps <= 0.0) 25.0 else maxSlippageBps;
+      participationRate = if (participationRate <= 0.0) 0.236 else participationRate;
+      benchmarkPrice = limitPrice;
+      targetVenueCount = if (allowMultiVenue) 3 else 1;
+      urgency = if (algorithm == "bestExecution" or executionStyle == "immediate") 1.0 else 0.618;
+      allowDarkPools = allowDarkPools;
+      allowMultiVenue = allowMultiVenue;
+      allowCrossPool = allowCrossPool;
+      postOnly = postOnly or smartOrderType == "postOnly";
+      stealthFactor = if (allowDarkPools) 0.618 else 0.236;
+      executionStyle = parseExecutionStyle(executionStyle);
+      algorithm = parseRoutingAlgorithm(algorithm);
+    };
+    let (nextRoutingState, nextExchangeState, result) = SmartRouting.submitSmartOrder(
+      smartRoutingState,
+      phantomExchangeState,
+      request,
+      beat,
+      coherenceR,
+    );
+    smartRoutingState := nextRoutingState;
+    phantomExchangeState := PhantomExchange.runMatchingEngine(nextExchangeState, beat);
+    smartRoutingState := SmartRouting.syncExecutionQuality(smartRoutingState, phantomExchangeState, beat);
+    result
+  };
+
   /// placeOrder — submit a new order (limit or market) to the Phantom Exchange
   /// ZERO GAS FEES. Settlement is instant (same beat).
   public shared(msg) func placeOrder(
@@ -1881,6 +2017,7 @@ actor PARALLAX {
 
     // Run matching engine immediately after order placement
     phantomExchangeState := PhantomExchange.runMatchingEngine(phantomExchangeState, beat);
+    smartRoutingState := SmartRouting.syncExecutionQuality(smartRoutingState, phantomExchangeState, beat);
 
     order
   };
@@ -1911,6 +2048,46 @@ actor PARALLAX {
     true
   };
 
+  func parseOrderSide(side : Text) : PhantomExchange.OrderSide {
+    switch (side) {
+      case "buy" { #buy };
+      case _ { #sell };
+    }
+  };
+
+  func parseSmartOrderType(orderType : Text) : SmartRouting.SmartOrderType {
+    switch (orderType) {
+      case "market" { #market };
+      case "stop" { #stop };
+      case "iceberg" { #iceberg };
+      case "fok" { #fok };
+      case "ioc" { #ioc };
+      case "postOnly" { #postOnly };
+      case _ { #limit };
+    }
+  };
+
+  func parseExecutionStyle(style : Text) : SmartRouting.SmartExecutionStyle {
+    switch (style) {
+      case "timeSlice" { #timeSlice };
+      case "participationRate" { #participationRate };
+      case "liquidityDriven" { #liquidityDriven };
+      case "adaptive" { #adaptive };
+      case "stealth" { #stealth };
+      case _ { #immediate };
+    }
+  };
+
+  func parseRoutingAlgorithm(algorithm : Text) : SmartRouting.RoutingAlgorithm {
+    switch (algorithm) {
+      case "bestExecution" { #bestExecution };
+      case "multiVenue" { #multiVenue };
+      case "liquiditySeeking" { #liquiditySeeking };
+      case "darkPool" { #darkPool };
+      case _ { #smartOrderRouting };
+    }
+  };
+
   func parseTokenCategory(cat : Text) : PhantomExchange.TokenCategory {
     switch (cat) {
       case "crypto"          { #crypto };
@@ -1923,7 +2100,7 @@ actor PARALLAX {
       case "syntheticAsset"  { #syntheticAsset };
       case "realWorldAsset"  { #realWorldAsset };
       case "governanceToken" { #governanceToken };
-      case _                 { #crypto };
+      case _                  { #crypto };
     }
   };
 
@@ -2019,12 +2196,76 @@ actor PARALLAX {
     phantomClearinghouseState
   };
 
+  public query func getRiskEngineState() : async RiskEngine.RiskEngineState {
+    phantomClearinghouseState.riskEngine
+  };
+
+  public query func getRiskAlerts() : async [RiskEngine.RiskAlert] {
+    phantomClearinghouseState.riskEngine.monitoring.alerts
+  };
+
+  public query func isRiskCircuitBreakerActive() : async Bool {
+    phantomClearinghouseState.riskEngine.operationalRisk.circuitBreakerActive or phantomClearinghouseState.riskEngine.operationalRisk.emergencyShutdownActive
+  };
+
+  public query func getFlowTrackerState() : async FlowTracker.FlowTrackerState {
+    flowTrackerState
+  };
+
+  public query func getFlowVisualization() : async FlowTracker.VisualizationGraph {
+    FlowTracker.getVisualizationData(flowTrackerState)
+  };
+
+  public query func getFlowRiskMetrics() : async FlowTracker.SystemicRiskMetrics {
+    FlowTracker.getSystemicRiskMetrics(flowTrackerState)
+  };
+
+  public query func getFlowPools() : async [FlowTracker.PoolState] {
+    FlowTracker.getPoolStates(flowTrackerState)
+  };
+
   public query func getSettlementVelocity() : async Float {
     phantomClearinghouseState.settlementVelocity
   };
 
   public query func getTotalGasFeesSaved() : async Float {
     phantomClearinghouseState.totalGasFeesSaved
+  };
+
+  public query func getGraphControlState() : async GraphControl.GraphControlState {
+    phantomClearinghouseState.graphControl
+  };
+
+  public query func getOptimalTradeRoute(
+    sourceToken : Text,
+    destToken   : Text,
+    amountIn    : Float,
+  ) : async GraphControl.TradeRoute {
+    GraphControl.optimalTradeRoute(FlowTracker.toLiquidityNetwork(flowTrackerState), sourceToken, destToken, amountIn)
+  };
+
+  public query func detectArbitrageCycles(
+    baseToken : Text,
+    notional  : Float,
+  ) : async [GraphControl.ArbitrageCycle] {
+    GraphControl.detectArbitrageCycles(FlowTracker.toLiquidityNetwork(flowTrackerState), baseToken, notional)
+  };
+
+  public query func optimizeLiquidityNetwork(
+    source : Text,
+    sink   : Text,
+    demand : Float,
+  ) : async GraphControl.LiquidityOptimization {
+    GraphControl.optimizeLiquidityNetwork(FlowTracker.toLiquidityNetwork(flowTrackerState), source, sink, demand)
+  };
+
+  public query func planTokenDistribution(
+    sourceNode  : Text,
+    sourceToken : Text,
+    sinkNodes   : [Text],
+    supply      : Float,
+  ) : async GraphControl.TokenDistributionPlan {
+    GraphControl.designTokenDistributionNetwork(FlowTracker.toLiquidityNetwork(flowTrackerState), sourceNode, sourceToken, sinkNodes, supply)
   };
 
   /// crossChainSettle — settle across chains without bridges (internal reserves)
@@ -2041,6 +2282,10 @@ actor PARALLAX {
     phantomClearinghouseState := PhantomClearinghouse.crossChainSettle(
       phantomClearinghouseState, sourceChain, destChain, sourceToken, destToken, sourceAmt, destAmt, beat
     );
+    if (phantomClearinghouseState.crossChainSettlements.size() > 0) {
+      let latest = phantomClearinghouseState.crossChainSettlements[phantomClearinghouseState.crossChainSettlements.size() - 1];
+      flowTrackerState := FlowTracker.trackCrossChainSettlement(flowTrackerState, latest, beat);
+    };
     true
   };
 
