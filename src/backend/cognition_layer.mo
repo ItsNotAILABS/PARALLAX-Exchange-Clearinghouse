@@ -920,14 +920,14 @@ module {
       state.homeostat_state,
       state.world_model.global_coherence,
       state.world_model.law_compliance_score,
-      state.adre_result.backpass_violations.toFloat(),
+      Float.fromInt(Nat.toInt(state.adre_result.backpass_violations)),
       state.world_model.phase_alignment,
       focus_input
     );
 
     // Update cognition state with new homeostat output
     {
-      beat_index              = state.beat_index + 1;
+      beat_index              = state.beat_index;
       world_model             = state.world_model;
       adre_result             = state.adre_result;
       monologue               = state.monologue # " [" # homeostat_output.recommendation # "]";
