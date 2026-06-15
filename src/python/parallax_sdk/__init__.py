@@ -13,6 +13,7 @@ Modules:
     clearinghouse — Multi-asset bilateral/multilateral netting engine
     provenance   — Hash-based compute receipts and provenance chains
     tokenizer    — AI artifact cognitive resonance scoring and tokenization
+    alpha_engine — Alpha generation, factor research, and backtesting
 
 Publication:
     Zenodo: https://zenodo.org/records/20370721
@@ -89,6 +90,46 @@ from .tokenizer import (
     compute_novelty,
 )
 
+from .tokenomics import (
+    TokenomicsRuntime,
+    SalienceEngine,
+    TaskClass,
+    TaskRisk,
+    TokenValueWeights,
+    TokenValueScore,
+    CognitiveReturnScore,
+    CRPTResult,
+    SalienceItem,
+    SalienceWeights,
+    SalienceResult,
+    CompressionResult,
+    BenchmarkScore,
+    TokenomicGainResult,
+    MeasurementLoopResult,
+    compute_token_value,
+    compute_crpt,
+    compute_compression_efficiency,
+    compute_tokenomic_gain,
+)
+
+from .alpha_engine import (
+    PriceBar,
+    Signal,
+    FactorInput,
+    AlphaCombinationResult,
+    BacktestResult,
+    ResearchReport,
+    SignalFactory,
+    AlphaCombiner,
+    FactorConstructor,
+    Backtester,
+    AlphaResearch,
+    AlphaPipeline,
+)
+
+from . import quant
+from . import timeseries
+
 __all__ = [
     # Constants
     "PHI", "PHI_SQ", "PHI_CUBE", "PHI_4",
@@ -111,4 +152,23 @@ __all__ = [
     "ArtifactTokenizer", "AIToken", "ArtifactCategory",
     "CognitiveResonanceScore", "compute_resonance_score",
     "compute_phi_coherence", "compute_novelty",
+    # Tokenomics (Measurement & Benchmarking Framework)
+    "TokenomicsRuntime", "SalienceEngine",
+    "TaskClass", "TaskRisk",
+    "TokenValueWeights", "TokenValueScore",
+    "CognitiveReturnScore", "CRPTResult",
+    "SalienceItem", "SalienceWeights", "SalienceResult",
+    "CompressionResult", "BenchmarkScore",
+    "TokenomicGainResult", "MeasurementLoopResult",
+    "compute_token_value", "compute_crpt",
+    "compute_compression_efficiency", "compute_tokenomic_gain",
+    # Alpha engine
+    "PriceBar", "Signal", "FactorInput",
+    "AlphaCombinationResult", "BacktestResult", "ResearchReport",
+    "SignalFactory", "AlphaCombiner", "FactorConstructor",
+    "Backtester", "AlphaResearch", "AlphaPipeline",
+    # Quant toolkit
+    "quant",
+    # Time series toolkit
+    "timeseries",
 ]
