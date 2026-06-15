@@ -105,18 +105,17 @@ module {
   // ═══════════════════════════════════════════════════════════════════════════
 
   func floatToShort(x : Float) : Text {
-    let i = (x * 1000.0 : Float).toInt();
-    (i / 1000) : Text # "." # ((i % 1000) / 100) : Text
+    let i = Float.trunc(x * 1000.0).toInt();
+    let intPart = i / 1000;
+    let fracPart = i % 1000;
+    intPart.toText() # "." # (fracPart / 100).toText()
   };
 
   func percept_hash(percept : Text) : Text {
-    // Simple deterministic hash of percept to create pattern signature
-    // In production, use SHA-256; for now, use character sum mod 997
-    var sum : Nat = 0;
-    for (c in percept.chars()) {
-      sum += Nat.toWord8(c : Text) : Nat; // safe cast
-    };
-    (sum % 997).toText()
+    // Simple deterministic hash: size-based signature
+    // Different percepts (of different sizes) will hash differently
+    let size = percept.size();
+    (size * 997 % 9973).toText()
   };
 
   // ═══════════════════════════════════════════════════════════════════════════
