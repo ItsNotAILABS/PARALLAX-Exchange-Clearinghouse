@@ -13,13 +13,14 @@
 [![Ethereum](https://img.shields.io/badge/Ethereum-Solidity-627EEA?style=flat-square)](contracts/)
 [![React](https://img.shields.io/badge/Frontend-React_19-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/Language-TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Alpha](https://img.shields.io/badge/Alpha-Service_Gated-22C55E?style=flat-square)](docs/ALPHA_SERVICE_RUNWAY.md)
 [![Research](https://img.shields.io/badge/Research-Receipts_+_Charters-8B5CF6?style=flat-square)](research/)
 
 # PARALLAX
 
 ### AI-native financial infrastructure for wallets, trading, clearing, settlement receipts, and governed multi-ledger execution.
 
-[Platform Blueprint](docs/PARALLAX_PLATFORM_SURFACE.md) · [Architecture](#platform-architecture) · [First Vertical Slice](#first-vertical-slice) · [Repository Map](#repository-map) · [Deployment Posture](#deployment-posture)
+[Platform Blueprint](docs/PARALLAX_PLATFORM_SURFACE.md) · [Alpha Service Runway](docs/ALPHA_SERVICE_RUNWAY.md) · [Architecture](#platform-architecture) · [First Vertical Slice](#first-vertical-slice) · [Repository Map](#repository-map) · [Deployment Posture](#deployment-posture)
 
 </div>
 
@@ -49,6 +50,24 @@ The current posture is intentionally conservative: **paper trading, testnet cont
 | **Research Mint** | Papers, benchmarks, artifact records | Research metadata to proof artifact receipt |
 | **Proof Room** | Audit exports, release manifests, Merkle records | Query and export receipts |
 | **Governance** | Roles, policies, emergency halt, upgrade posture | Admin halt/resume and role-gated actions |
+
+## Alpha service system
+
+The alpha platform is now represented by a service manifest, frontend registry, and validation gate:
+
+| Artifact | Purpose |
+|---|---|
+| `config/services/parallax.alpha.services.json` | source-of-truth alpha service catalog |
+| `src/frontend/src/config/parallaxAlphaServices.ts` | frontend-ready service registry and readiness helpers |
+| `scripts/validate-alpha-services.mjs` | manifest validator for services, dependencies, gates, and boundaries |
+| `docs/ALPHA_SERVICE_RUNWAY.md` | operator build order and alpha readiness rubric |
+
+Run the alpha gate:
+
+```bash
+pnpm alpha:validate
+pnpm alpha:gate
+```
 
 ## Platform architecture
 
@@ -150,8 +169,9 @@ Every user or machine action should be represented by an explicit contract objec
 ```bash
 git clone https://github.com/ItsNotAILABS/PARALLAX-Exchange-Clearinghouse.git
 cd PARALLAX-Exchange-Clearinghouse
-npm install
-npm run dev
+pnpm install
+pnpm alpha:validate
+pnpm run dev
 ```
 
 Docker path:
@@ -163,18 +183,21 @@ docker compose up
 Test path:
 
 ```bash
-npm test
-npm run typecheck
+pnpm alpha:validate
+pnpm typecheck
+pnpm test
 ```
 
 > The exact commands may differ by package boundary as the monorepo is consolidated. Treat failing tests as the highest-priority product gate before adding live surfaces.
 
 ## Documentation
 
+- [Alpha Service Runway](docs/ALPHA_SERVICE_RUNWAY.md)
 - [Platform Surface Blueprint](docs/PARALLAX_PLATFORM_SURFACE.md)
 - [Product Architecture](docs/PRODUCT_ARCHITECTURE.md)
 - [Platform Federation](docs/PARALLAX_PLATFORM_FEDERATION.md)
 - [Launch Packet](docs/PARALLAX_MAJOR_RUN.md)
+- [Alpha Service Catalog](config/services/parallax.alpha.services.json)
 - [Token Registry](config/tokens/parallax.tokens.json)
 
 ## Public language boundary
@@ -199,14 +222,14 @@ Avoid unproven claims:
 
 ## Near-term roadmap
 
-1. **Control Tower MVP**: wallet login, paper balances, paper order, risk gate, fill receipt, proof export.
-2. **Wallet + Pay MVP**: internal transfer command, simulated ledger, payment receipt, account history.
-3. **Testnet contracts**: token registry, Solidity testnet deployment scripts, ICP canister interfaces.
-4. **Proof Room**: receipt search, export bundles, Merkle root generation, release manifests.
-5. **Research Mint**: paper metadata, benchmark packet records, artifact receipts.
-6. **Operator governance**: role policy, emergency halt, upgrade checklist, compliance boundary.
+1. **Alpha Ops Control Tower**: render service readiness, gates, dependencies, and blocked live actions from the alpha registry.
+2. **Control Tower MVP**: wallet login, paper balances, paper order, risk gate, fill receipt, proof export.
+3. **Wallet + Pay MVP**: internal transfer command, simulated ledger, payment receipt, account history.
+4. **Testnet contracts**: token registry, Solidity testnet deployment scripts, ICP canister interfaces.
+5. **Proof Room**: receipt search, export bundles, Merkle root generation, release manifests.
+6. **Research Mint**: paper metadata, benchmark packet records, artifact receipts.
+7. **Operator governance**: role policy, emergency halt, upgrade checklist, compliance boundary.
 
 ## Status
 
-PARALLAX is being consolidated into a real product platform. The immediate priority is to turn the existing research and code surfaces into a working app loop with tests, receipts, and clear deployment boundaries.
-
+PARALLAX is being consolidated into a real alpha platform. The immediate priority is to turn the existing research and code surfaces into service-gated app loops with tests, receipts, health status, operator controls, and clear deployment boundaries.
