@@ -1,4 +1,7 @@
+import Char "mo:base/Char";
+import Int "mo:base/Int";
 import Nat "mo:base/Nat";
+import Nat32 "mo:base/Nat32";
 import Principal "mo:base/Principal";
 import Text "mo:base/Text";
 import Types "Types";
