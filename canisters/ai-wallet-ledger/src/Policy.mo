@@ -1,5 +1,4 @@
 import Array "mo:base/Array";
-import Principal "mo:base/Principal";
 import Types "Types";
 
 module {
@@ -92,34 +91,32 @@ module {
     }
   };
 
+  private func isRejectReason(reason : Types.ReasonCode) : Bool {
+    switch (reason) {
+      case (#wallet_halted) true;
+      case (#wallet_paused) true;
+      case (#mode_not_allowed) true;
+      case (#live_mode_blocked) true;
+      case (#command_kind_not_allowed) true;
+      case (#asset_not_allowed) true;
+      case (#counterparty_not_allowed) true;
+      case (#notional_limit_exceeded) true;
+      case (#daily_limit_exceeded) true;
+      case (#missing_human_approval) true;
+      case (#invalid_amount) true;
+      case (#invalid_price) true;
+      case (#ai_self_approval_blocked) true;
+      case (#live_money_movement_blocked) true;
+      case (#live_broker_routing_blocked) true;
+      case (#custody_private_keys_blocked) true;
+      case (#autonomous_live_ai_trading_blocked) true;
+      case (#not_found) true;
+      case (_) false;
+    }
+  };
+
   private func decide(reasons : [Types.ReasonCode]) : Types.Decision {
-    let reject = Array.find<Types.ReasonCode>(
-      reasons,
-      func(reason) {
-        switch (reason) {
-          case (#wallet_halted) true;
-          case (#wallet_paused) true;
-          case (#mode_not_allowed) true;
-          case (#live_mode_blocked) true;
-          case (#command_kind_not_allowed) true;
-          case (#asset_not_allowed) true;
-          case (#counterparty_not_allowed) true;
-          case (#notional_limit_exceeded) true;
-          case (#daily_limit_exceeded) true;
-          case (#missing_human_approval) true;
-          case (#invalid_amount) true;
-          case (#invalid_price) true;
-          case (#ai_self_approval_blocked) true;
-          case (#live_money_movement_blocked) true;
-          case (#live_broker_routing_blocked) true;
-          case (#custody_private_keys_blocked) true;
-          case (#autonomous_live_ai_trading_blocked) true;
-          case (#not_found) true;
-          case (_) false;
-        }
-      },
-    );
-    switch (reject) {
+    switch (Array.find<Types.ReasonCode>(reasons, isRejectReason)) {
       case (?_) #rejected;
       case null {
         switch (Array.find<Types.ReasonCode>(reasons, func(reason) { reason == #human_approval_required })) {
