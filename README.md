@@ -13,6 +13,7 @@
 [![Ethereum](https://img.shields.io/badge/Ethereum-Solidity-627EEA?style=flat-square)](contracts/)
 [![React](https://img.shields.io/badge/Frontend-React_19-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/Language-TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Native](https://img.shields.io/badge/C%2FC%2B%2B-Native_Interface-F97316?style=flat-square)](docs/NATIVE_CPP_INTERFACE.md)
 [![Alpha](https://img.shields.io/badge/Alpha-Service_Gated-22C55E?style=flat-square)](docs/ALPHA_SERVICE_RUNWAY.md)
 [![AI Wallet](https://img.shields.io/badge/AI_Wallet-Policy_Gated-38BDF8?style=flat-square)](docs/AI_WALLET_ALPHA.md)
 [![Research](https://img.shields.io/badge/Research-Receipts_+_Charters-8B5CF6?style=flat-square)](research/)
@@ -21,7 +22,7 @@
 
 ### AI-native financial infrastructure for wallets, trading, clearing, settlement receipts, and governed multi-ledger execution.
 
-[Platform Blueprint](docs/PARALLAX_PLATFORM_SURFACE.md) · [AI Wallet Alpha](docs/AI_WALLET_ALPHA.md) · [Alpha Service Runway](docs/ALPHA_SERVICE_RUNWAY.md) · [Architecture](#platform-architecture) · [First Vertical Slice](#first-vertical-slice) · [Deployment Posture](#deployment-posture)
+[Platform Blueprint](docs/PARALLAX_PLATFORM_SURFACE.md) · [Native C/C++ Interface](docs/NATIVE_CPP_INTERFACE.md) · [AI Wallet Alpha](docs/AI_WALLET_ALPHA.md) · [Alpha Service Runway](docs/ALPHA_SERVICE_RUNWAY.md) · [Architecture](#platform-architecture) · [Deployment Posture](#deployment-posture)
 
 </div>
 
@@ -35,7 +36,7 @@
 
 ## What PARALLAX is
 
-**PARALLAX** is a product surface for building a paper-first, proof-forward financial operating system. The platform combines wallet operations, simulated trading, risk-gated execution, clearinghouse receipts, payment flows, research minting, AI-agent wallets, and operator governance into one coherent stack.
+**PARALLAX** is a product surface for building a paper-first, proof-forward financial operating system. The platform combines wallet operations, simulated trading, risk-gated execution, clearinghouse receipts, payment flows, research minting, AI-agent wallets, native C/C++ strategy interfaces, and operator governance into one coherent stack.
 
 The current posture is intentionally conservative: **paper trading, testnet contracts, simulated balances, and receipt-backed proof flows first**. Live money movement, live broker execution, custody, regulated exchange activity, and fund operations require separate legal, security, compliance, and operational readiness gates.
 
@@ -44,6 +45,7 @@ The current posture is intentionally conservative: **paper trading, testnet cont
 | Surface | Role | First usable capability |
 |---|---|---|
 | **Wallet** | Identity, accounts, balances, AI-agent wallets, keys, ledger views | Internet Identity, paper/testnet balances, and policy-gated AI wallets |
+| **Native Interface** | C ABI and C++ wrapper for strategy/runtime workers | Buildable AI-wallet policy evaluation outside Node.js |
 | **Trade** | Order ticket, books, fills, market views | Paper order entry into a real backend contract |
 | **Clearinghouse** | Matching, netting, settlement records | Fill and settlement receipt generation |
 | **Pay** | Transfers, requests, invoices, remittance workflows | Internal paper transfer with receipt trail |
@@ -52,9 +54,35 @@ The current posture is intentionally conservative: **paper trading, testnet cont
 | **Proof Room** | Audit exports, release manifests, Merkle records | Query and export receipts |
 | **Governance** | Roles, policies, emergency halt, upgrade posture | Admin halt/resume and role-gated actions |
 
+## Native C/C++ interface
+
+PARALLAX now includes a standalone native interface for the AI wallet policy engine:
+
+```text
+src/native/ai-wallet/
+```
+
+It includes:
+
+- stable C ABI: `include/parallax/ai_wallet.h`,
+- modern C++17 wrapper: `include/parallax/ai_wallet.hpp`,
+- C implementation: `src/ai_wallet.c`,
+- CMake build and install targets,
+- C and C++ tests,
+- C++ demo executable.
+
+Run the native gate:
+
+```bash
+pnpm native:configure
+pnpm native:build
+pnpm native:test
+pnpm alpha:native
+```
+
 ## AI wallet alpha
 
-PARALLAX now includes a dedicated AI wallet domain package:
+PARALLAX includes a dedicated AI wallet domain package:
 
 ```text
 src/ai-wallet/        @parallax/ai-wallet
@@ -81,23 +109,26 @@ Core exports:
 
 ## Alpha service system
 
-The alpha platform is represented by service manifests, frontend registries, and validation gates:
+The alpha platform is represented by service manifests, frontend registries, native packages, and validation gates:
 
 | Artifact | Purpose |
 |---|---|
 | `config/services/parallax.alpha.services.json` | source-of-truth alpha service catalog |
 | `config/services/parallax.ai-wallet.service.json` | AI wallet service contract manifest |
-| `src/ai-wallet/` | policy-gated AI wallet domain package |
+| `src/ai-wallet/` | policy-gated AI wallet TypeScript package |
+| `src/native/ai-wallet/` | polished C/C++ AI wallet interface package |
 | `src/frontend/src/config/parallaxAlphaServices.ts` | frontend-ready service registry and readiness helpers |
 | `scripts/validate-alpha-services.mjs` | manifest validator for services, dependencies, gates, and boundaries |
 | `docs/ALPHA_SERVICE_RUNWAY.md` | operator build order and alpha readiness rubric |
 | `docs/AI_WALLET_ALPHA.md` | AI wallet operator guide and integration gates |
+| `docs/NATIVE_CPP_INTERFACE.md` | native C/C++ build and usage guide |
 
 Run the alpha gates:
 
 ```bash
 pnpm alpha:validate
 pnpm alpha:wallet
+pnpm alpha:native
 pnpm alpha:gate
 ```
 
@@ -108,10 +139,12 @@ flowchart TD
     A[Apps: Web Control Tower / Mobile Wallet / Desktop Operator / API] --> B[Application Services]
     B --> C[Wallet Service]
     C --> C2[AI Wallet Service]
+    C2 --> C3[Native C/C++ Interface]
     B --> D[Trading Service]
     B --> E[Payment Service]
     B --> F[Research Mint]
     C2 --> G[Risk + Policy Gate]
+    C3 --> G
     C --> G
     D --> G
     E --> G
@@ -130,7 +163,7 @@ flowchart TD
 Build one undeniable product loop before expanding the system:
 
 ```text
-Wallet Login -> AI Wallet Policy -> Paper Order -> Risk Gate -> Match -> Settle -> Receipt -> Proof Export
+Wallet Login -> AI Wallet Policy -> Native/TS Command Evaluation -> Paper Order -> Risk Gate -> Match -> Settle -> Receipt -> Proof Export
 ```
 
 Acceptance criteria:
@@ -139,6 +172,7 @@ Acceptance criteria:
 - paper balance is visible,
 - AI wallet has explicit paper/testnet policy,
 - AI command evaluates before execution,
+- native C/C++ command evaluation matches the alpha wallet boundary,
 - human approval is required above threshold,
 - order ticket submits to the backend contract,
 - halted pairs reject orders,
@@ -146,7 +180,7 @@ Acceptance criteria:
 - matched orders emit settlement receipts,
 - receipts survive reload,
 - operator can export proof records,
-- tests cover invalid orders, duplicate orders, unauthorized halt, halted pair rejection, full fills, partial fills, AI wallet live-mode rejection, and receipt pagination.
+- tests cover invalid orders, duplicate orders, unauthorized halt, halted pair rejection, full fills, partial fills, AI wallet live-mode rejection, native live-mode rejection, and receipt pagination.
 
 ## Runtime stack
 
@@ -155,6 +189,7 @@ Acceptance criteria:
 | Frontend | React, TypeScript, Vite | mobile wallet, desktop operator, SDK app shells |
 | Backend authority | ICP/Motoko canisters | additional canisters by surface and domain |
 | AI wallet domain | `@parallax/ai-wallet` TypeScript package | canister persistence and frontend Control Tower tab |
+| Native strategy/runtime interface | C ABI and C++17 wrapper | strategy workers, simulations, low-latency policy checks |
 | Contract interface | Candid | generated bindings and typed SDKs |
 | External contracts | Solidity/Ethereum testnet contracts | guarded adapters and chain-specific modules |
 | Data/proof | append-only receipt records | Merkle roots, export bundles, audit manifests |
@@ -169,6 +204,7 @@ canisters/   ICP/Motoko authority, wallet, clearinghouse, ledger modules
 contracts/   Ethereum/testnet contracts and external chain adapters
 packages/    shared SDK, UI, types, receipts, policy libraries
 src/ai-wallet/ policy-gated AI wallet package for agents
+src/native/ai-wallet/ C ABI, C++ wrapper, CMake build, native tests
 services/    API, wallet, payment, risk, clearing, indexing services
 workers/     strategy, simulation, benchmark, research, and indexing jobs
 docs/        architecture, deployment, operator, protocol, and product docs
@@ -182,6 +218,10 @@ Every user or machine action should be represented by an explicit contract objec
 
 | Contract | Purpose |
 |---|---|
+| `parallax_aiw_wallet` | native C wallet struct assigned to an AI agent |
+| `parallax_aiw_command` | native C proposed AI wallet action |
+| `parallax_aiw_evaluation` | native C approve/reject/human-approval decision |
+| `parallax_aiw_receipt` | native C receipt proof record |
 | `AiWallet` | wallet assigned to an AI agent |
 | `AiWalletPolicy` | scopes, limits, modes, assets, counterparties, approvals |
 | `AiWalletCommand` | proposed AI wallet action before execution |
@@ -202,10 +242,10 @@ Every user or machine action should be represented by an explicit contract objec
 
 | Stage | Description | Allowed actions |
 |---|---|---|
-| **Local** | developer machine and local canisters | paper orders, fixtures, local receipts, AI wallet tests |
+| **Local** | developer machine and local canisters | paper orders, fixtures, local receipts, AI wallet tests, native C/C++ tests |
 | **Testnet** | public test canisters and external testnet contracts | testnet assets, demos, proof exports, policy-gated AI wallets |
 | **Closed alpha** | controlled users and operator review | paper trading, testnet transfers, research receipts, AI signal approval |
-| **Production candidate** | security, legal, compliance, and observability gate | no live funds without external validation |
+| **Production candidate** | security, legal, compliance, native build matrix, and observability gate | no live funds without external validation |
 | **Live** | regulated, audited, monitored, insured posture | only after complete readiness review |
 
 ## Development
@@ -216,6 +256,7 @@ cd PARALLAX-Exchange-Clearinghouse
 pnpm install
 pnpm alpha:validate
 pnpm alpha:wallet
+pnpm alpha:native
 pnpm run dev
 ```
 
@@ -225,11 +266,20 @@ Docker path:
 docker compose up
 ```
 
+Native path:
+
+```bash
+cmake -S src/native/ai-wallet -B build/native/ai-wallet
+cmake --build build/native/ai-wallet
+ctest --test-dir build/native/ai-wallet --output-on-failure
+```
+
 Test path:
 
 ```bash
 pnpm alpha:validate
 pnpm alpha:wallet
+pnpm alpha:native
 pnpm typecheck
 pnpm test
 ```
@@ -238,6 +288,7 @@ pnpm test
 
 ## Documentation
 
+- [Native C/C++ Interface](docs/NATIVE_CPP_INTERFACE.md)
 - [AI Wallet Alpha](docs/AI_WALLET_ALPHA.md)
 - [Alpha Service Runway](docs/ALPHA_SERVICE_RUNWAY.md)
 - [Platform Surface Blueprint](docs/PARALLAX_PLATFORM_SURFACE.md)
@@ -255,6 +306,7 @@ Use precise language:
 - AI-native financial infrastructure,
 - paper-first trading surface,
 - AI-agent wallet policy engine,
+- native C/C++ policy interface,
 - multi-ledger wallet architecture,
 - receipt-backed settlement research,
 - testnet-ready platform,
@@ -272,15 +324,16 @@ Avoid unproven claims:
 
 ## Near-term roadmap
 
-1. **AI Wallet Backend Gate**: persist AI wallets, policies, commands, evaluations, receipts, and daily usage in canisters.
-2. **Alpha Ops Control Tower**: render service readiness, gates, dependencies, blocked live actions, and AI wallet readiness.
-3. **Control Tower MVP**: wallet login, AI wallet policy, paper balances, paper order, risk gate, fill receipt, proof export.
-4. **Wallet + Pay MVP**: internal transfer command, simulated ledger, payment receipt, account history.
-5. **Testnet contracts**: token registry, Solidity testnet deployment scripts, ICP canister interfaces.
-6. **Proof Room**: receipt search, export bundles, Merkle root generation, release manifests.
-7. **Research Mint**: paper metadata, benchmark packet records, artifact receipts.
-8. **Operator governance**: role policy, emergency halt, upgrade checklist, compliance boundary.
+1. **Native Worker Gate**: use the C/C++ interface inside strategy workers and simulation processes.
+2. **AI Wallet Backend Gate**: persist AI wallets, policies, commands, evaluations, receipts, and daily usage in canisters.
+3. **Alpha Ops Control Tower**: render service readiness, gates, dependencies, blocked live actions, native readiness, and AI wallet readiness.
+4. **Control Tower MVP**: wallet login, AI wallet policy, paper balances, paper order, risk gate, fill receipt, proof export.
+5. **Wallet + Pay MVP**: internal transfer command, simulated ledger, payment receipt, account history.
+6. **Testnet contracts**: token registry, Solidity testnet deployment scripts, ICP canister interfaces.
+7. **Proof Room**: receipt search, export bundles, Merkle root generation, release manifests.
+8. **Research Mint**: paper metadata, benchmark packet records, artifact receipts.
+9. **Operator governance**: role policy, emergency halt, upgrade checklist, compliance boundary.
 
 ## Status
 
-PARALLAX is being consolidated into a real alpha platform. The immediate priority is to turn the existing research and code surfaces into service-gated app loops with tests, receipts, health status, operator controls, AI-wallet policy enforcement, and clear deployment boundaries.
+PARALLAX is being consolidated into a real alpha platform. The immediate priority is to turn the existing research and code surfaces into service-gated app loops with tests, receipts, health status, operator controls, native C/C++ policy enforcement, AI-wallet policy enforcement, and clear deployment boundaries.
