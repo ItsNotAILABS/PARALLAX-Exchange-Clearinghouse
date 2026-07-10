@@ -1,7 +1,6 @@
 import Array "mo:base/Array";
 import Int "mo:base/Int";
 import Nat "mo:base/Nat";
-import Principal "mo:base/Principal";
 import Time "mo:base/Time";
 
 import Bench "Bench";
@@ -76,7 +75,7 @@ actor AiWalletLedger {
   private func putWallet(updated : Types.AiWallet) {
     wallets := Array.map<Types.AiWallet, Types.AiWallet>(
       wallets,
-      func(wallet) { if (wallet.walletId == updated.walletId) updated else wallet },
+      func(wallet) { if (wallet.walletId == updated.walletId) updated else wallet }
     );
   };
 
@@ -87,9 +86,9 @@ actor AiWalletLedger {
       func(usage) {
         if (usage.walletId == updated.walletId and usage.day == updated.day and usage.mode == updated.mode) {
           replaced := true;
-          updated;
-        } else usage;
-      },
+          updated
+        } else usage
+      }
     );
     if (not replaced) dailyUsages := Array.append<Types.AiWalletDailyUsage>(dailyUsages, [updated]);
   };
@@ -97,13 +96,56 @@ actor AiWalletLedger {
   private func getUsage(walletId : Text, mode : Types.NetworkMode, day : Text) : ?Types.AiWalletDailyUsage {
     Array.find<Types.AiWalletDailyUsage>(
       dailyUsages,
-      func(usage) { usage.walletId == walletId and usage.mode == mode and usage.day == day },
+      func(usage) { usage.walletId == walletId and usage.mode == mode and usage.day == day }
     )
   };
 
   private func appendReceipt(receipt : Types.AiWalletReceipt) : Types.AiWalletReceipt {
     receipts := Array.append<Types.AiWalletReceipt>(receipts, [receipt]);
     receipt
+  };
+
+  private func evaluateCommandInternal(command : Types.AiWalletCommand, actorPrincipal : Principal) : Types.Result<Types.AiWalletPolicyEvaluation> {
+    switch (findWallet(command.walletId)) {
+      case null #err([#not_found]);
+      case (?wallet) {
+        let policy = switch (findPolicy(wallet.policyId)) {
+          case (?p) p;
+          case null Policy.defaultPolicy();
+        };
+        let t = now();
+        let day = today(t);
+        let currentUsage = getUsage(wallet.walletId, command.mode, day);
+        let evaluation = Policy.evaluate(wallet, policy, command, currentUsage, t);
+        evaluations := Array.append<Types.AiWalletPolicyEvaluation>(evaluations, [evaluation]);
+
+        if (evaluation.decision == #approved) {
+          let prior = switch (currentUsage) {
+            case (?u) u;
+            case null {
+              walletId = wallet.walletId;
+              mode = command.mode;
+              day = day;
+              notionalUsedE8s = 0;
+              commandCount = 0;
+              updatedAt = t;
+            };
+          };
+          putDailyUsage({
+            walletId = prior.walletId;
+            mode = prior.mode;
+            day = prior.day;
+            notionalUsedE8s = prior.notionalUsedE8s + evaluation.commandNotionalE8s;
+            commandCount = prior.commandCount + 1;
+            updatedAt = t;
+          });
+        };
+
+        let receipt = Receipts.makeEvaluationReceipt(wallet, command, evaluation, actorPrincipal, latestReceiptId(wallet.walletId));
+        ignore appendReceipt(receipt);
+        #ok(evaluation)
+      };
+    }
   };
 
   public query func getVersion() : async Types.Version { version };
@@ -113,7 +155,7 @@ actor AiWalletLedger {
     let policy = switch (input.policy) {
       case (?customPolicy) {
         policies := Array.append<Types.AiWalletPolicy>(policies, [customPolicy]);
-        customPolicy;
+        customPolicy
       };
       case null Policy.defaultPolicy();
     };
@@ -214,7 +256,7 @@ actor AiWalletLedger {
     asset : Text,
     amount : Nat,
     priceE8s : Nat,
-    humanApprovalId : ?Text,
+    humanApprovalId : ?Text
   ) : async Types.Result<Types.AiWalletPolicyEvaluation> {
     switch (findWallet(walletId)) {
       case null #err([#not_found]);
@@ -237,7 +279,7 @@ actor AiWalletLedger {
           createdAt = t;
         };
         commands := Array.append<Types.AiWalletCommand>(commands, [command]);
-        await evaluateAiWalletCommand(command.commandId)
+        evaluateCommandInternal(command, caller)
       };
     }
   };
@@ -245,38 +287,7 @@ actor AiWalletLedger {
   public shared ({ caller }) func evaluateAiWalletCommand(commandId : Text) : async Types.Result<Types.AiWalletPolicyEvaluation> {
     switch (findCommand(commandId)) {
       case null #err([#not_found]);
-      case (?command) {
-        switch (findWallet(command.walletId)) {
-          case null #err([#not_found]);
-          case (?wallet) {
-            let policy = switch (findPolicy(wallet.policyId)) {
-              case (?p) p;
-              case null Policy.defaultPolicy();
-            };
-            let t = now();
-            let day = today(t);
-            let currentUsage = getUsage(wallet.walletId, command.mode, day);
-            let evaluation = Policy.evaluate(wallet, policy, command, currentUsage, t);
-            evaluations := Array.append<Types.AiWalletPolicyEvaluation>(evaluations, [evaluation]);
-
-            if (evaluation.decision == #approved) {
-              let prior = switch (currentUsage) { case (?u) u; case null { walletId = wallet.walletId; mode = command.mode; day = day; notionalUsedE8s = 0; commandCount = 0; updatedAt = t } };
-              putDailyUsage({
-                walletId = prior.walletId;
-                mode = prior.mode;
-                day = prior.day;
-                notionalUsedE8s = prior.notionalUsedE8s + evaluation.commandNotionalE8s;
-                commandCount = prior.commandCount + 1;
-                updatedAt = t;
-              });
-            };
-
-            let receipt = Receipts.makeEvaluationReceipt(wallet, command, evaluation, caller, latestReceiptId(wallet.walletId));
-            ignore appendReceipt(receipt);
-            #ok(evaluation)
-          };
-        }
-      };
+      case (?command) evaluateCommandInternal(command, caller);
     }
   };
 
