@@ -10,59 +10,57 @@
     <main class="shell">
       <header class="hero">
         <div>
-          <p class="eyebrow">PARALLAX Exchange · Universal Trading World</p>
-          <h1>Multi-chain markets, public wallets, and finance agents.</h1>
-          <p class="lead">
-            Front-end launch surface for cross-chain market discovery, external wallet connection, paper/testnet trading, and policy-gated agent deployment.
-          </p>
+          <p class="eyebrow">PARALLAX · Universal Trading Launch Platform</p>
+          <h1>Multi-chain markets, external wallets, and policy-gated finance agents.</h1>
+          <p class="lead">A production-facing launch surface for EVM, Solana, Bitcoin, Cosmos, Sui, Aptos, Polkadot, TRON, and ICP routes. Mainnet execution stays disabled until security, compliance, liquidity, and governance gates pass.</p>
+          <div class="actions">
+            <button onclick="connectEvm()">Connect EVM</button>
+            <button onclick="connectSolana()">Connect Solana</button>
+            <button onclick="connectIcpPlug()">Connect ICP Plug</button>
+            <button class="secondary" onclick="queuePaperRoute()">Queue Paper Route</button>
+          </div>
         </div>
-        <aside class="guardrail">
-          <strong>Alpha boundary</strong>
-          <span>No custody. No private keys. No autonomous live AI trading. No broker routing. Mainnet execution remains disabled until governance, compliance, security, and liquidity gates pass.</span>
-        </aside>
+        <section class="boundary">
+          <strong>Launch boundary</strong>
+          <span>No custody/private keys</span>
+          <span>No broker routing</span>
+          <span>No live money movement</span>
+          <span>Agents are paper/testnet only</span>
+        </section>
       </header>
 
-      <section class="toolbar">
-        <button id="scanWallets">Scan Wallets</button>
-        <button id="connectEvm">Connect EVM</button>
-        <button id="connectSolana">Connect Solana</button>
-        <input id="search" placeholder="Search chains, wallets, assets, agents..." />
+      <section id="status" class="status-grid"></section>
+
+      <section>
+        <h2>Connected wallets</h2>
+        <div id="connections" class="grid"></div>
       </section>
 
-      <section class="grid metrics" id="metrics"></section>
-
-      <section class="panel">
-        <div class="panel-header">
-          <h2>Wallet Hub</h2>
-          <span>external signing only</span>
-        </div>
-        <div class="cards" id="wallets"></div>
+      <section>
+        <h2>Chain routes</h2>
+        <div id="chains" class="grid"></div>
       </section>
 
-      <section class="panel">
-        <div class="panel-header">
-          <h2>Chain Router</h2>
-          <span>multi-chain catalog</span>
-        </div>
-        <div class="cards" id="chains"></div>
+      <section>
+        <h2>Wallet registry</h2>
+        <div id="wallets" class="grid"></div>
       </section>
 
-      <section class="panel">
-        <div class="panel-header">
-          <h2>Asset Universe</h2>
-          <span>paper/testnet-first listings</span>
-        </div>
-        <div class="cards compact" id="assets"></div>
+      <section>
+        <h2>Asset universe</h2>
+        <div id="assets" class="grid wide-grid"></div>
       </section>
 
-      <section class="panel">
-        <div class="panel-header">
-          <h2>Agent Deployment World</h2>
-          <span>AI wallet + policy gate required</span>
-        </div>
-        <div class="cards" id="agents"></div>
+      <section>
+        <h2>Agent finance world</h2>
+        <div id="agents" class="grid"></div>
+      </section>
+
+      <section>
+        <h2>Route preview</h2>
+        <pre id="routePreview">No route queued.</pre>
       </section>
     </main>
-    <script src="./app.js"></script>
+    <script type="module" src="./app.js"></script>
   </body>
 </html>
