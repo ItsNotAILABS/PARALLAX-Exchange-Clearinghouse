@@ -1,11 +1,7 @@
 {
   "name": "@parallax/exchange-clearinghouse",
   "type": "module",
-  "engines": {
-    "node": ">=16.0.0",
-    "pnpm": ">=7.0.0",
-    "npm": "please use pnpm"
-  },
+  "engines": { "node": ">=16.0.0", "pnpm": ">=7.0.0", "npm": "please use pnpm" },
   "scripts": {
     "build": "pnpm -r --if-present run build",
     "typecheck": "pnpm -r --if-present run typecheck",
@@ -38,8 +34,9 @@
     "defi:benchmarks": "dfx canister call defi_exchange list_benchmarks '(null, opt 20)'",
     "alpha:defi": "pnpm defi:deploy && pnpm defi:test",
     "launch:validate": "node scripts/validate-universal-launch.mjs",
+    "terminal:validate": "node scripts/validate-trading-terminal.mjs",
     "launch:serve": "python3 -m http.server 5174 -d .",
-    "alpha:launch": "pnpm launch:validate",
+    "alpha:launch": "pnpm launch:validate && pnpm terminal:validate",
     "bindgen": "caffeine-bindgen --did-file ./src/backend/dist/backend.did --out-dir ./src/frontend/src --actor-interface-file --force",
     "parallax": "node tools/parallax-dev/src/cli.js",
     "scaffold": "node tools/parallax-dev/src/cli.js scaffold",
@@ -49,10 +46,6 @@
     "substrate:list": "node tools/parallax-dev/src/cli.js list",
     "substrate:sync": "node tools/parallax-dev/src/cli.js sync"
   },
-  "devDependencies": {
-    "sharp": "^0.34.4"
-  },
-  "dependencies": {
-    "@caffeineai/core-infrastructure": "^0.2.0"
-  }
+  "devDependencies": { "sharp": "^0.34.4" },
+  "dependencies": { "@caffeineai/core-infrastructure": "^0.2.0" }
 }
