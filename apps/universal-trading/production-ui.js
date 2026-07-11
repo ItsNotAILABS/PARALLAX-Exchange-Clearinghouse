@@ -54,28 +54,32 @@ const agentPanel = createPanel('Finance Agent Runtime', 'deploy paused, activate
 
 function renderAgents() {
   const agents = runtime.agents.listDeployments();
+  const receiptCount = runtime.agents.listReceipts(1000).length;
   const target = agentPanel.querySelector('#productionAgentList');
   target.innerHTML = agents.length ? agents.map((agent) => `
     <article class="card">
       <div class="pill">${escapeHtml(agent.status)}</div>
       <h3>${escapeHtml(agent.name)}</h3>
-      <p>${escapeHtml(agent.strategyId)} · ${escapeHtml(agent.mode)}</p>
-      <small>${escapeHtml(agent.deploymentId)} · receipts ${agent.receipts.length}</small>
+      <p>${escapeHtml(agent.templateId)} · ${escapeHtml(agent.mode)}</p>
+      <small>${escapeHtml(agent.deploymentId)} · runtime receipts ${receiptCount}</small>
     </article>
   `).join('') : '<article class="card muted">No finance agents deployed in this browser workspace.</article>';
 }
 
 agentPanel.querySelector('#deployDemoAgent').addEventListener('click', () => {
-  runtime.agents.deploy({
+  const owner = runtime.wallets.listConnections?.()[0]?.address || 'local-operator';
+  const result = runtime.agents.deploy({
     name: 'PARALLAX Governed Market Observer',
-    strategyId: 'market-observer-v1',
+    templateId: 'market-observer-v1',
+    owner,
     mode: 'paper',
     allowedChains: ['1', '8453', '42161', 'solana-mainnet'],
     allowedAssets: ['ETH', 'USDC', 'BTC', 'SOL'],
-    maxOrderNotional: 1000,
-    dailyNotionalLimit: 5000,
-    humanApprovalThreshold: 250
+    maxOrderValueUsd: 1000,
+    dailyLimitUsd: 5000,
+    humanApprovalAboveUsd: 250
   });
+  if (!result.ok) alert(`Agent deployment blocked: ${result.errors.join(', ')}`);
   renderAgents();
 });
 agentPanel.querySelector('#refreshAgents').addEventListener('click', renderAgents);
