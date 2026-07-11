@@ -3,6 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https: wss:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="description" content="PARALLAX universal multi-chain trading, wallet, routing, and governed finance-agent launch platform." />
     <title>PARALLAX Universal Trading World</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
@@ -14,10 +17,10 @@
           <h1>Multi-chain markets, external wallets, and policy-gated finance agents.</h1>
           <p class="lead">A production-facing launch surface for EVM, Solana, Bitcoin, Cosmos, Sui, Aptos, Polkadot, TRON, and ICP routes. Mainnet execution stays disabled until security, compliance, liquidity, and governance gates pass.</p>
           <div class="actions">
-            <button onclick="connectEvm()">Connect EVM</button>
-            <button onclick="connectSolana()">Connect Solana</button>
-            <button onclick="connectIcpPlug()">Connect ICP Plug</button>
-            <button class="secondary" onclick="queuePaperRoute()">Queue Paper Route</button>
+            <button id="connectEvmButton" type="button">Connect EVM</button>
+            <button id="connectSolanaButton" type="button">Connect Solana</button>
+            <button id="connectIcpButton" type="button">Connect ICP Plug</button>
+            <button id="paperRouteButton" class="secondary" type="button">Queue Paper Route</button>
           </div>
         </div>
         <section class="boundary">
@@ -29,7 +32,7 @@
         </section>
       </header>
 
-      <section id="status" class="status-grid"></section>
+      <section id="status" class="status-grid" aria-label="Platform coverage"></section>
 
       <section>
         <h2>Connected wallets</h2>
@@ -62,5 +65,6 @@
       </section>
     </main>
     <script type="module" src="./app.js"></script>
+    <script type="module" src="./production-ui.js"></script>
   </body>
 </html>
