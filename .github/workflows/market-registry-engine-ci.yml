@@ -1,0 +1,36 @@
+name: market-registry-engine
+
+on:
+  push:
+    paths:
+      - 'market-registry/**'
+      - 'scripts/market-registry-engine.js'
+      - 'tests/market-registry-engine.test.js'
+      - 'src/shared/marketRegistry.ts'
+      - 'src/shared/marketExecutionGate.ts'
+      - 'src/backend/market_registry_types.mo'
+      - '.github/workflows/market-registry-engine-ci.yml'
+  pull_request:
+    paths:
+      - 'market-registry/**'
+      - 'scripts/market-registry-engine.js'
+      - 'tests/market-registry-engine.test.js'
+      - 'src/shared/marketRegistry.ts'
+      - 'src/shared/marketExecutionGate.ts'
+      - 'src/backend/market_registry_types.mo'
+      - '.github/workflows/market-registry-engine-ci.yml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Validate registry
+        run: node scripts/market-registry-engine.js validate
+      - name: Generate registry artifacts
+        run: node scripts/market-registry-engine.js generate
+      - name: Test registry engine
+        run: node tests/market-registry-engine.test.js
