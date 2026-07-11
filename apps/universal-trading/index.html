@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PARALLAX Universal Trading World</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">PARALLAX Exchange · Universal Trading World</p>
+          <h1>Multi-chain markets, public wallets, and finance agents.</h1>
+          <p class="lead">
+            Front-end launch surface for cross-chain market discovery, external wallet connection, paper/testnet trading, and policy-gated agent deployment.
+          </p>
+        </div>
+        <aside class="guardrail">
+          <strong>Alpha boundary</strong>
+          <span>No custody. No private keys. No autonomous live AI trading. No broker routing. Mainnet execution remains disabled until governance, compliance, security, and liquidity gates pass.</span>
+        </aside>
+      </header>
+
+      <section class="toolbar">
+        <button id="scanWallets">Scan Wallets</button>
+        <button id="connectEvm">Connect EVM</button>
+        <button id="connectSolana">Connect Solana</button>
+        <input id="search" placeholder="Search chains, wallets, assets, agents..." />
+      </section>
+
+      <section class="grid metrics" id="metrics"></section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Wallet Hub</h2>
+          <span>external signing only</span>
+        </div>
+        <div class="cards" id="wallets"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Chain Router</h2>
+          <span>multi-chain catalog</span>
+        </div>
+        <div class="cards" id="chains"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Asset Universe</h2>
+          <span>paper/testnet-first listings</span>
+        </div>
+        <div class="cards compact" id="assets"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Agent Deployment World</h2>
+          <span>AI wallet + policy gate required</span>
+        </div>
+        <div class="cards" id="agents"></div>
+      </section>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>
