@@ -113,7 +113,7 @@ actor DeFiExchange {
     for (order in orders.vals()) {
       if (samePairOpen(order, pairId) and order.side != side and crosses(args, order)) {
         switch (best) {
-          case null best := ?order;
+          case null { best := ?order };
           case (?current) {
             switch (side, order.priceE8s, current.priceE8s) {
               case (#buy, ?p, ?cp) { if (p < cp) best := ?order };
@@ -308,10 +308,16 @@ actor DeFiExchange {
       if (samePairOpen(order, pairId)) {
         switch (order.side, order.priceE8s) {
           case (#buy, ?price) {
-            switch (bestBid) { case null bestBid := ?price; case (?p) if (price > p) bestBid := ?price };
+            switch (bestBid) {
+              case null { bestBid := ?price };
+              case (?p) { if (price > p) bestBid := ?price };
+            };
           };
           case (#sell, ?price) {
-            switch (bestAsk) { case null bestAsk := ?price; case (?p) if (price < p) bestAsk := ?price };
+            switch (bestAsk) {
+              case null { bestAsk := ?price };
+              case (?p) { if (price < p) bestAsk := ?price };
+            };
           };
           case (_, null) {};
         };
@@ -341,10 +347,10 @@ actor DeFiExchange {
     page<Types.ExchangeReceipt>(receipts, cursor, limit)
   };
 
-  public shared func record_benchmark(input : Types.BenchmarkInput) : async Types.BenchmarkReceipt {
+  public shared ({ caller }) func record_benchmark(input : Types.BenchmarkInput) : async Types.BenchmarkReceipt {
     let receipt = Bench.record(input, now());
     benchmarks := Array.append<Types.BenchmarkReceipt>(benchmarks, [receipt]);
-    ignore appendReceipt(Receipts.makeReceipt(#benchmark_recorded, null, null, null, Principal.fromActor(DeFiExchange), latestReceiptId(), now()));
+    ignore appendReceipt(Receipts.makeReceipt(#benchmark_recorded, null, null, null, caller, latestReceiptId(), now()));
     receipt
   };
 
