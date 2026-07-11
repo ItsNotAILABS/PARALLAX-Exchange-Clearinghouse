@@ -1,0 +1,51 @@
+name: PARALLAX Trading Terminal
+
+on:
+  pull_request:
+    paths:
+      - 'apps/universal-trading/**'
+      - 'config/assets/**'
+      - 'config/chains/**'
+      - 'config/wallets/**'
+      - 'config/liquidity/**'
+      - 'scripts/validate-trading-terminal.mjs'
+      - 'package.json'
+      - '.github/workflows/trading-terminal.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/universal-trading/**'
+      - 'config/assets/**'
+      - 'config/chains/**'
+      - 'config/wallets/**'
+      - 'config/liquidity/**'
+      - 'scripts/validate-trading-terminal.mjs'
+      - 'package.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm terminal:validate
+      - run: pnpm launch:validate
+      - name: Verify static deployment surface
+        run: |
+          test -f apps/universal-trading/index.html
+          test -f apps/universal-trading/trading-terminal.js
+          test -f apps/universal-trading/market-data.js
+          test -f apps/universal-trading/live-chart.js
+          grep -q "Content-Security-Policy" apps/universal-trading/index.html
+          grep -q "mainnet_execution_blocked" apps/universal-trading/router.js
