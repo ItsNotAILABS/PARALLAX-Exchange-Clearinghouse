@@ -3,19 +3,19 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://api.binance.com https://api.exchange.coinbase.com wss://stream.binance.com:9443 wss://advanced-trade-ws.coinbase.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://api.binance.com https://api.exchange.coinbase.com wss://stream.binance.com:9443 wss://advanced-trade-ws.coinbase.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
-    <meta name="description" content="PARALLAX universal multi-chain trading, wallet, routing, charting, portfolio, and governed finance-agent platform." />
-    <title>PARALLAX Universal Trading World</title>
+    <meta name="description" content="PARALLAX sovereign AI finance platform with live public markets, governed agents, paper execution, policy gates, and tamper-evident receipts." />
+    <title>PARALLAX Sovereign AI Finance</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <main class="shell">
       <header class="hero">
         <div>
-          <p class="eyebrow">PARALLAX · Universal Trading Launch Platform</p>
-          <h1>Multi-chain markets, external wallets, and policy-gated finance agents.</h1>
-          <p class="lead">Live public market data and all-pairs discovery across EVM, Solana, Bitcoin, Cosmos, Sui, Aptos, Polkadot, TRON, and ICP routes. Mainnet execution stays disabled until security, compliance, liquidity, and governance gates pass.</p>
+          <p class="eyebrow">PARALLAX · Sovereign AI Finance Platform</p>
+          <h1>Agents propose. Policy decides. Receipts prove.</h1>
+          <p class="lead">Live public market intelligence, multi-chain identity and routing, governed paper execution, persistent financial state, and tamper-evident audit receipts. Mainnet execution remains disabled until security, legal, compliance, liquidity, and governance gates pass.</p>
           <div class="actions">
             <button id="connectEvmButton" type="button">Connect EVM</button>
             <button id="connectSolanaButton" type="button">Connect Solana</button>
@@ -24,11 +24,11 @@
           </div>
         </div>
         <section class="boundary">
-          <strong>Launch boundary</strong>
-          <span>No custody/private keys</span>
-          <span>No broker routing</span>
-          <span>No live money movement</span>
-          <span>Agents are paper/testnet only</span>
+          <strong>Production boundary</strong>
+          <span>No custody or private-key access</span>
+          <span>No broker routing or live money movement</span>
+          <span>Paper and controlled testnet actions only</span>
+          <span>Every governed action produces a receipt</span>
         </section>
       </header>
       <section id="status" class="status-grid" aria-label="Platform coverage"></section>
@@ -43,5 +43,6 @@
     <script type="module" src="./production-ui.js"></script>
     <script type="module" src="./controls.js"></script>
     <script type="module" src="./trading-terminal.js"></script>
+    <script type="module" src="./action-console.js"></script>
   </body>
 </html>
