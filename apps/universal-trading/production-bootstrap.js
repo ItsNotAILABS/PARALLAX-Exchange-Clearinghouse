@@ -1,6 +1,9 @@
 import { RouteEngine } from './router.js';
 import { WalletAdapterRegistry } from './wallet-adapters.js';
 import { FinanceAgentRuntime } from './agent-runtime.js';
+import { PortfolioEngine } from './portfolio.js';
+import { SovereignReceiptStore } from './receipt-store.js';
+import { SovereignActionRuntime } from './sovereign-action-runtime.js';
 
 const load = async (path) => {
   const response = await fetch(path, { cache: 'no-store' });
@@ -16,30 +19,33 @@ export async function createParallaxProductionRuntime({ fetchImpl = fetch, stora
 
   const router = new RouteEngine({ providers, fetchImpl, now });
   const wallets = new WalletAdapterRegistry({ walletConfig });
-  const receiptLog = [];
+  const receipts = new SovereignReceiptStore({ storage, now });
+  const portfolio = new PortfolioEngine({ storage });
   const agents = new FinanceAgentRuntime({
     routeEngine: router,
     storage,
     now,
-    receiptSink: (receipt) => {
-      receiptLog.push(receipt);
-      if (receiptLog.length > 1000) receiptLog.shift();
-    }
+    receiptSink: (receipt) => receipts.append(receipt.kind, receipt)
   });
+  const actions = new SovereignActionRuntime({ routeEngine: router, portfolio, receiptStore: receipts, now });
 
   return {
-    version: '0.6.0-alpha.0',
+    version: '1.0.0-alpha.0',
     mode: 'paper_testnet_only',
     router,
     wallets,
     agents,
-    receiptLog,
+    portfolio,
+    receipts,
+    actions,
     capabilities: {
       walletDiscovery: true,
       routeSimulation: true,
       testnetRouting: true,
       governedAgentRuntime: true,
-      persistentBrowserWorkspace: Boolean(storage),
+      sovereignActionLifecycle: true,
+      tamperEvidentReceipts: true,
+      persistentPaperLedger: Boolean(storage),
       mainnetExecution: false,
       custody: false,
       brokerRouting: false
