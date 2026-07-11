@@ -38,3 +38,24 @@ export {
 } from './receipts.js';
 
 export { makeAiWalletCommandId, makeAiWalletId, makeAiWalletReceiptId, stableHashSync } from './id.js';
+
+export type {
+  AgentExecutionBoundary,
+  AgentExecutionDemoKind,
+  AgentExecutionDemoResult,
+  ExecutionCredit,
+  PaperTradingDemoInput,
+  ProofRoomRecord,
+} from './execution-demos.js';
+
+export {
+  HFT_SIGNAL_ALPHA_POLICY,
+  createAlphaDemoWallet,
+  runAllAgentExecutionDemos,
+  runAutonomousPaperTradingDemo,
+  runComputeBoundStrategyDemo,
+  runHftSignalApprovalDemo,
+  runInternalTransferSettlementDemo,
+  runResearchMintingDemo,
+  summarizeDemoForIde,
+} from './execution-demos.js';
