@@ -1,0 +1,138 @@
+{
+  "schema": "parallax.runtime.tokenomics.v0.2",
+  "platform": "PARALLAX",
+  "mode": "alpha",
+  "public_posture": "paper_testnet_internal_credit_receipt_first",
+  "extends": "config/tokenomics/parallax.agent-tokenomics.json",
+  "generated_at": "2026-07-10",
+  "summary": "Additive runtime-accounting lane for measured bytes, local NOVA cycles, receipts, team lanes, governed AI work, and research-memory packets. These units are internal paper accounting units only.",
+  "runtime_token_classes": [
+    {
+      "symbol": "PXBYTE",
+      "name": "PARALLAX Byte Unit",
+      "class": "byte_accounting_unit",
+      "mode": "paper",
+      "purpose": "Internal accounting for measured artifact bytes, work-output bytes, packet bytes, and publication-memory bytes.",
+      "mint_source": "artifact_or_execution_receipt",
+      "supply_policy": "minted_by_receipt_ledger_only",
+      "value_claim": "internal_measurement_only",
+      "transferability": "non_transferable_or_internal_accounting_only",
+      "required_gates": ["artifact_hash_present", "byte_count_present", "receipt_exists", "claim_boundary_passed"],
+      "must_not_do": ["claim_cash_value", "sell_to_public", "represent_storage_right", "represent_redeemability"]
+    },
+    {
+      "symbol": "PXNOVA",
+      "name": "PARALLAX NOVA Cycle",
+      "class": "runtime_cycle_unit",
+      "mode": "paper",
+      "purpose": "Internal accounting for local runtime cycles, orchestration effort, protocol calls, worker-routing effort, and measured compute-flow activity.",
+      "mint_source": "local_runtime_accounting_receipt",
+      "supply_policy": "computed_from_receipted_runtime_events",
+      "value_claim": "internal_runtime_accounting_only",
+      "transferability": "internal_agent_economy_only",
+      "required_gates": ["runtime_event_present", "governance_decision_recorded", "receipt_hash_present", "no_live_value_claim"],
+      "must_not_do": ["claim_mainnet_value", "promise_yield", "sell_as_security", "represent_external_compute_capacity"]
+    },
+    {
+      "symbol": "PXRCPT",
+      "name": "PARALLAX Receipt Unit",
+      "class": "proof_receipt_unit",
+      "mode": "paper",
+      "purpose": "Internal accounting for validated proof events, hash-chain appends, execution receipts, research receipts, and release receipts.",
+      "mint_source": "proof_room_or_argos_receipt",
+      "supply_policy": "one_unit_per_validated_receipt_or_weighted_by_receipt_class",
+      "value_claim": "proof_accounting_only",
+      "transferability": "agent_wallets_operator_accounts_and_team_lanes_only",
+      "required_gates": ["receipt_exists", "receipt_chain_valid", "hash_manifest_present", "operator_policy_allows"],
+      "must_not_do": ["mint_without_receipt", "claim_cash_value", "sell_to_public", "represent_audited_status_without_external_audit"]
+    },
+    {
+      "symbol": "PXTEAM",
+      "name": "PARALLAX Team Lane Credit",
+      "class": "team_lane_credit",
+      "mode": "paper",
+      "purpose": "Internal accounting for team workspace artifact lanes, human-plus-agent collaboration lanes, QWorker work, and approved shared outputs.",
+      "mint_source": "team_artifact_lane_receipt",
+      "supply_policy": "operator_or_policy_issued_after_team_lane_receipt",
+      "value_claim": "internal_team_accounting_only",
+      "transferability": "within_team_lane_only_unless_operator_approved",
+      "required_gates": ["team_lane_exists", "membership_policy_allows", "artifact_posted_or_work_completed", "receipt_exists"],
+      "must_not_do": ["grant_private_space_access", "bypass_dual_read_law", "represent_equity_or_compensation"]
+    }
+  ],
+  "runtime_event_inputs": [
+    "GovernedToolCall",
+    "SandboxExecutionReceipt",
+    "ProtocolServerCallReceipt",
+    "QWorkerTaskReceipt",
+    "ResearchArtifactReceipt",
+    "PublicationMemoryPacket",
+    "WasmKernelLaneReceipt",
+    "JuliaPythonComputeLaneReceipt",
+    "CloudflareGatewayReceipt"
+  ],
+  "mint_burn_rules": {
+    "mint_requires": [
+      "receipt_exists",
+      "artifact_hash_present_or_runtime_event_present",
+      "governance_decision_recorded",
+      "operator_policy_allows",
+      "claim_boundary_passed",
+      "ledger_append_success"
+    ],
+    "burn_requires": [
+      "compute_budget_available",
+      "execution_receipt_emitted",
+      "runtime_lane_allowed",
+      "no_external_capacity_claim_without_evidence"
+    ],
+    "hard_blocks": [
+      "missing_receipt",
+      "missing_hash",
+      "live_value_claim",
+      "unapproved_mainnet_route",
+      "unapproved_external_execution",
+      "operator_halt_active"
+    ]
+  },
+  "economic_loops": [
+    {
+      "id": "bytes-to-pxbyte",
+      "description": "Artifact or packet bytes are counted only after a hashable receipt exists. PXBYTE is internal measurement only.",
+      "inputs": ["ArtifactHash", "MeasuredBytes", "Receipt"],
+      "outputs": ["PXBYTE", "ByteAccountingReceipt"],
+      "required_gates": ["artifact_hash_present", "byte_count_present", "receipt_exists", "no_live_value_claim"]
+    },
+    {
+      "id": "runtime-event-to-pxnova",
+      "description": "Governed runtime events produce local NOVA cycle accounting after route, policy, and receipt are recorded.",
+      "inputs": ["RuntimeEvent", "GovernanceDecision", "ReceiptHash"],
+      "outputs": ["PXNOVA", "RuntimeAccountingReceipt"],
+      "required_gates": ["runtime_event_present", "receipt_hash_present", "operator_policy_allows"]
+    },
+    {
+      "id": "receipt-chain-to-pxrcpt",
+      "description": "Validated receipt-chain events may create PXRCPT proof-accounting units.",
+      "inputs": ["Receipt", "HashChainState", "ProofRoomRecord"],
+      "outputs": ["PXRCPT", "ProofAccountingRecord"],
+      "required_gates": ["receipt_exists", "receipt_chain_valid", "hash_manifest_present"]
+    },
+    {
+      "id": "team-lane-to-pxteam",
+      "description": "Team artifact lanes can receive PXTEAM accounting after team membership, artifact posting, and DUAL_READ boundaries are satisfied.",
+      "inputs": ["TeamLane", "ArtifactPost", "MembershipPolicy", "Receipt"],
+      "outputs": ["PXTEAM", "TeamLaneAccountingReceipt"],
+      "required_gates": ["team_lane_exists", "membership_policy_allows", "receipt_exists", "dual_read_boundary_passed"]
+    }
+  ],
+  "public_language": {
+    "safe": "PARALLAX uses paper/testnet/internal-credit tokenomics to measure AI-agent work, compute, research artifacts, and receipt-backed execution events before any live economic or regulated activity.",
+    "unsafe": [
+      "PXBYTE is money",
+      "PXNOVA is redeemable",
+      "PXGPU guarantees external hardware",
+      "PXCRED has cash value",
+      "PARALLAX is a live fund, broker, exchange, bank, custodian, or money transmitter"
+    ]
+  }
+}
