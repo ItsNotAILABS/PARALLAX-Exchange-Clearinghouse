@@ -15,15 +15,15 @@ export const ALPHA_ALLOWED_MODES: readonly NetworkMode[] = ['paper', 'testnet'];
 
 export const DEFAULT_AI_WALLET_POLICY: AiWalletPolicy = {
   policyId: 'parallax-ai-wallet-alpha-policy',
-  version: '0.1.0-alpha.0',
+  version: '0.1.0-alpha.1',
   allowedModes: ALPHA_ALLOWED_MODES,
   allowedCommandKinds: ['transfer', 'order', 'research_mint', 'approve_signal', 'cancel_order', 'operator_note'],
-  allowedAssets: ['PXUSD', 'PXICP', 'PXAI', 'PXGPU', 'PXETH'],
-  allowedCounterparties: ['internal', 'paper-market', 'research-mint', 'operator'],
+  allowedAssets: ['PXUSD', 'PXICP', 'PXAI', 'PXGPU', 'PXETH', 'PXCRED'],
+  allowedCounterparties: ['internal', 'paper-market', 'research-mint', 'operator', 'demo-broker-paper'],
   maxCommandNotional: 10_000,
   dailyNotionalLimit: 50_000,
   requireHumanApprovalAbove: 2_500,
-  requireHumanApprovalFor: ['order', 'transfer'],
+  requireHumanApprovalFor: [],
   scopes: [
     {
       id: 'paper-trade',
@@ -47,7 +47,7 @@ export const DEFAULT_AI_WALLET_POLICY: AiWalletPolicy = {
       id: 'internal-pay',
       description: 'Internal paper/testnet transfer workflows only.',
       allowedCommandKinds: ['transfer'],
-      allowedAssets: ['PXUSD', 'PXICP'],
+      allowedAssets: ['PXUSD', 'PXICP', 'PXAI', 'PXGPU', 'PXCRED'],
       maxCommandNotional: 5_000,
       dailyNotionalLimit: 25_000,
       requireHumanApprovalAbove: 1_000,
