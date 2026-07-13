@@ -1,0 +1,61 @@
+{
+  "schema": "parallax.runtime.agent.v1",
+  "agent_id": "parallax-clearinghouse-agent",
+  "public_name": "PARALLAX Clearinghouse Agent",
+  "internal_name": "ARGOS-CLEAR",
+  "repo": "ItsNotAILABS/PARALLAX-Exchange-Clearinghouse",
+  "role": "Canonical settlement, tokenomics, clearing, receipt, proof-room, governance, and paper/testnet ledger runtime agent.",
+  "platform_position": "canonical_clearing_and_receipt_root",
+  "sibling_agents": [
+    "parallax-hft-fund-agent",
+    "sns-token-governor-agent"
+  ],
+  "inputs": [
+    "agent_command",
+    "paper_order",
+    "risk_decision",
+    "settlement_event",
+    "runtime_tokenomics_event",
+    "receipt_record",
+    "research_artifact"
+  ],
+  "outputs": [
+    "fill_receipt",
+    "settlement_receipt",
+    "proof_room_export",
+    "runtime_accounting_event",
+    "tokenomics_gate_decision",
+    "operator_review_packet"
+  ],
+  "tokenomics_scope": {
+    "canonical_tokens": ["PXUSD", "PXICP", "PXETH", "PXAI", "PXGPU", "PXCRED"],
+    "runtime_extension_tokens": ["PXBYTE", "PXNOVA", "PXRCPT", "PXTEAM"],
+    "allowed_modes": ["paper", "testnet", "internal_credit"],
+    "blocked_claims": [
+      "live_money_movement",
+      "public_token_sale",
+      "yield_or_profit_promise",
+      "custody_claim",
+      "broker_exchange_bank_or_fund_claim",
+      "mainnet_value_claim_without_gate"
+    ]
+  },
+  "governance_gates": [
+    "receipt_exists",
+    "artifact_hash_present",
+    "claim_boundary_passed",
+    "operator_policy_allows",
+    "no_live_value_claim",
+    "ledger_append_success",
+    "human_approval_if_required"
+  ],
+  "runtime_lanes": [
+    "clearinghouse",
+    "multi_ledger_registry",
+    "agent_tokenomics",
+    "ai_wallet_policy",
+    "proof_room",
+    "cloudflare_edge_gateway",
+    "runtime_accounting"
+  ],
+  "oper
