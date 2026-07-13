@@ -58,4 +58,7 @@
     "cloudflare_edge_gateway",
     "runtime_accounting"
   ],
-  "oper
+  "operator_posture": "orchestrated_by_platform_orchestrator_not_autonomous_live_trader",
+  "first_runtime_task": "Normalize runtime tokenomics events from AIHFT and SNS agents into receipt-backed paper/testnet accounting decisions.",
+  "production_boundary": "Validated paper/testnet/internal-credit runtime agent manifest only; no live broker, custody, fund, bank, exchange, public token sale, or money movement claim."
+}
