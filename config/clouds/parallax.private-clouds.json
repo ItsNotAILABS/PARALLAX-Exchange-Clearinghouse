@@ -1,0 +1,9 @@
+{
+  "schema": "parallax.private_clouds.v1",
+  "posture": "paper_testnet_first",
+  "purpose": "Define private, sovereign, and private-blockchain cloud deployment lanes for PARALLAX without enabling live custody or unrestricted live execution.",
+  "globalBoundaries": {
+    "liveMoneyMovementEnabled": false,
+    "liveBrokerExecutionEnabled": false,
+    "custodyEnabled": false,
+    "productionBanking
