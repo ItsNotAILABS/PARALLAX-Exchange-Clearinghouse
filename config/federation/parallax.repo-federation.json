@@ -1,0 +1,142 @@
+{
+  "schema": "parallax.repo_federation.v1",
+  "generatedAt": "2026-07-14T00:00:00.000-05:00",
+  "authorityRepo": "ItsNotAILABS/PARALLAX-Exchange-Clearinghouse",
+  "purpose": "Define how multiple ItsNotAILABS repositories feed PARALLAX without allowing uncontrolled promotion, private-core leakage, or live financial execution.",
+  "doctrine": {
+    "mainRepoRule": "PARALLAX-Exchange-Clearinghouse is the integration, receipt, policy, proof-room, and operator-control repository for the PARALLAX financial system.",
+    "feederRule": "Feeder repositories may contribute signals, protocols, schemas, tools, papers, adapters, or runtime proofs, but they do not automatically become main authority.",
+    "promotionRule": "A feeder output becomes PARALLAX authority only after classification, receipt mapping, policy review, proof attachment, and an explicit integration PR into the authority repo.",
+    "privacyRule": "Private or deep-trunk repositories feed only sanitized manifests, interfaces, hashes, capability summaries, or bridge records unless explicitly approved.",
+    "financialBoundaryRule": "No feeder may enable live money movement, live broker execution, custody, regulated exchange activity, or public mainnet bridge behavior in PARALLAX alpha. Those remain future-gated."
+  },
+  "authoritySurfaces": [
+    "config/ledgers/parallax.multiledger.ecosystem.json",
+    "config/tokenomics/parallax.agent-tokenomics.json",
+    "config/clouds/parallax.private-clouds.json",
+    "docs/AGENT_EXECUTION_PROTOCOL.md",
+    "docs/PRIVATE_SOVEREIGN_CLOUDS.md",
+    "docs/PRIVATE_BLOCKCHAIN_CLOUDS.md",
+    "src/ai-wallet/src/",
+    "src/native/ai-wallet/",
+    "apps/cloudflare-gateway/"
+  ],
+  "feederRepos": [
+    {
+      "repo": "ItsNotAILABS/PARRALAX-AIHFTFUND",
+      "lane": "hft_signal_and_strategy",
+      "visibility": "public",
+      "feedTypes": ["paper_signals", "strategy_research", "hft_risk_models", "backtest_receipts", "demo_broker_adapter_requirements"],
+      "allowedIntoParallax": ["signal schemas", "paper/testnet strategy envelopes", "benchmark summaries", "HFT paper approval requirements", "sanitized strategy receipts"],
+      "blockedIntoParallax": ["live HFT execution claims", "fund performance claims without evidence", "custody or brokerage credential material", "unreviewed live order routing"],
+      "mainRoutes": ["AI Execution", "Trade", "Native Interface", "Proof Room"]
+    },
+    {
+      "repo": "ItsNotAILABS/SNS---TOKEN",
+      "lane": "token_governor_and_sns",
+      "visibility": "private",
+      "feedTypes": ["token_governance", "SNS configuration", "governance thresholds", "token policy", "proposal records"],
+      "allowedIntoParallax": ["sanitized token policy", "governance state summaries", "proposal receipt shapes", "SNS readiness checklists"],
+      "blockedIntoParallax": ["private keys", "unredacted wallet material", "unapproved token-sale language", "live token issuance claims"],
+      "mainRoutes": ["Agent Token Economics", "Governance", "Proof Room"]
+    },
+    {
+      "repo": "ItsNotAILABS/NATIVE-NOVA-PROTOCOL",
+      "lane": "native_protocol_substrate",
+      "visibility": "private",
+      "feedTypes": ["CPL/PULSE protocol candidates", "Motoko interfaces", "native protocol laws", "canister proof patterns"],
+      "allowedIntoParallax": ["public-safe protocol summaries", "interface contracts", "proof-trace schemas", "policy-gate patterns"],
+      "blockedIntoParallax": ["private root law", "unapproved memory internals", "secrets", "unreviewed production canister claims"],
+      "mainRoutes": ["Native Interface", "Governance", "Private Blockchain Clouds", "Proof Room"]
+    },
+    {
+      "repo": "ItsNotAILABS/MedinaMemorySystems",
+      "lane": "memory_and_product_surface",
+      "visibility": "public",
+      "feedTypes": ["memory receipts", "operator surfaces", "proof-room UI requirements", "runtime state patterns"],
+      "allowedIntoParallax": ["memory-link schemas", "operator UI requirements", "proof-room display contracts", "sanitized runtime state summaries"],
+      "blockedIntoParallax": ["private user data", "raw memory exports", "unclassified conversation logs"],
+      "mainRoutes": ["Proof Room", "Control Tower", "Research Mint", "Governance"]
+    },
+    {
+      "repo": "ItsNotAILABS/nexus",
+      "lane": "federation_mcp_control_plane",
+      "visibility": "public",
+      "feedTypes": ["MCP federation", "tool routing", "repo catalog", "connector control", "NEXUS receipts"],
+      "allowedIntoParallax": ["federation catalog entries", "tool routing schemas", "connector capability summaries", "receipt bridge requirements"],
+      "blockedIntoParallax": ["tool secrets", "connector credentials", "unapproved external automation claims"],
+      "mainRoutes": ["Cloudflare Edge Gateway", "Control Tower", "Federation Registry"]
+    },
+    {
+      "repo": "ItsNotAILABS/nova-intelligence",
+      "lane": "nova_runtime_intelligence",
+      "visibility": "public",
+      "feedTypes": ["runtime agent doctrine", "Alpha agent interface candidates", "NOVA state envelopes", "Auro/Origo/Thesis integration patterns"],
+      "allowedIntoParallax": ["public-safe runtime interfaces", "agent capability manifests", "state-envelope schema candidates", "operator routing rules"],
+      "blockedIntoParallax": ["private root memory", "unapproved identity internals", "secret runtime keys"],
+      "mainRoutes": ["AI Execution", "Governance", "Control Tower"]
+    },
+    {
+      "repo": "ItsNotAILABS/PhantomSDK",
+      "lane": "phantom_simulation_and_sdk",
+      "visibility": "public",
+      "feedTypes": ["Monte Carlo simulation primitives", "SDK adapters", "simulation receipts", "strategy runner inputs"],
+      "allowedIntoParallax": ["simulation SDK contracts", "paper backtest receipts", "benchmark result schemas", "compute-worker requirements"],
+      "blockedIntoParallax": ["unsupported performance claims", "live trading automation", "unvalidated optimization claims"],
+      "mainRoutes": ["Compute-Bound Strategy Runner", "Research Mint", "Proof Room"]
+    },
+    {
+      "repo": "ItsNotAILABS/x-mcp-skills",
+      "lane": "external_ai_connector_control",
+      "visibility": "public",
+      "feedTypes": ["MCP skill manifests", "external model connector rules", "tool invocation constraints", "skill receipts"],
+      "allowedIntoParallax": ["skill manifest pointers", "connector policy summaries", "receipt schemas", "operator approval requirements"],
+      "blockedIntoParallax": ["API keys", "tool secrets", "unapproved autonomous external execution"],
+      "mainRoutes": ["AI Execution", "Control Tower", "Cloudflare Edge Gateway"]
+    }
+  ],
+  "excludedRepos": [
+    {
+      "repo": "ItsNotAILABS/demo-repository",
+      "reason": "ignored test repository"
+    },
+    {
+      "repo": "ItsNotAILABS/organism-bots-mcp-server",
+      "reason": "explicitly not pushed in this pass"
+    }
+  ],
+  "ingestionStates": [
+    "discovered",
+    "feeder_manifest_present",
+    "source_signal_collected",
+    "classified",
+    "proof_mapped",
+    "policy_reviewed",
+    "integration_pr_opened",
+    "integrated_to_authority_repo",
+    "rejected_or_private_vault"
+  ],
+  "requiredRecord": {
+    "schema": "parallax.feeder_record.v1",
+    "repo": "owner/name",
+    "lane": "string",
+    "sourceCommit": "sha_or_null",
+    "sourcePath": "path_or_null",
+    "artifactHash": "sha256_or_null",
+    "feedType": "string",
+    "classification": "public_safe | private_summary | internal_only | blocked",
+    "targetSurface": "string",
+    "policyDecision": "allowed | review_required | blocked",
+    "receiptRef": "string_or_null",
+    "notes": "string"
+  },
+  "promotionGates": [
+    "source repo is registered",
+    "feeder manifest exists or source is explicitly classified",
+    "private/public boundary is assigned",
+    "target PARALLAX surface is declared",
+    "live/custody/mainnet claims are blocked unless future readiness gates exist",
+    "artifact hash or source commit is recorded",
+    "integration PR into authority repo is explicit"
+  ]
+}
