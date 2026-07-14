@@ -1,0 +1,102 @@
+{
+  "schema": "parallax.private_clouds.v1",
+  "posture": "paper_testnet_first",
+  "purpose": "Define private, sovereign, and private-blockchain cloud deployment lanes for PARALLAX without enabling live custody or unrestricted live execution.",
+  "globalBoundaries": {
+    "liveMoneyMovementEnabled": false,
+    "liveBrokerExecutionEnabled": false,
+    "custodyEnabled": false,
+    "regulatedExchangeActivityEnabled": false,
+    "publicMainnetBridgeEnabled": false,
+    "defaultExecutionMode": "paper_or_testnet",
+    "requiresOperatorHalt": true,
+    "requiresReceiptLedger": true,
+    "requiresTenantIsolation": true,
+    "requiresSecretExternalization": true
+  },
+  "cloudClasses": [
+    {
+      "id": "px-cloud-local-sovereign-dev",
+      "name": "Local Sovereign Dev Cloud",
+      "class": "private_cloud",
+      "maturity": "local_alpha",
+      "networkBoundary": "single_operator_private_network",
+      "allowedExecutionModes": ["local", "paper", "testnet"],
+      "allowedLedgers": ["parallax-paper-ledger", "agent-credit-ledger", "icp-local-ledger"],
+      "allowedActors": ["operator", "approved_agent", "developer"],
+      "requiredControls": ["local_secrets", "receipt_ledger", "operator_halt", "daily_usage_limits"],
+      "blockedControls": ["live_custody", "public_mainnet_bridge", "unrestricted_agent_execution"],
+      "proofRooms": ["local-private-proof-room"],
+      "notes": "Local/private development lane for controlled demos, canister experiments, and receipt-visible command loops."
+    },
+    {
+      "id": "px-cloud-team-private-alpha",
+      "name": "Team Private Alpha Cloud",
+      "class": "private_cloud",
+      "maturity": "closed_alpha",
+      "networkBoundary": "team_vpn_or_zero_trust_private_route",
+      "allowedExecutionModes": ["paper", "testnet"],
+      "allowedLedgers": ["parallax-paper-ledger", "agent-credit-ledger", "icp-local-ledger", "ethereum-testnet-ledger"],
+      "allowedActors": ["operator", "approved_agent", "team_member", "auditor"],
+      "requiredControls": ["cloudflare_access", "waf", "tenant_namespace", "receipt_ledger", "proof_room_export", "operator_halt"],
+      "blockedControls": ["live_broker_execution", "custody", "fiat_onramp"],
+      "proofRooms": ["team-alpha-proof-room"],
+      "notes": "Closed team lane for private demos, internal agent economies, paper trading, and testnet settlement receipts."
+    },
+    {
+      "id": "px-cloud-enterprise-sovereign",
+      "name": "Enterprise Sovereign Cloud",
+      "class": "sovereign_cloud",
+      "maturity": "design_gate",
+      "networkBoundary": "customer_controlled_vpc_or_on_prem",
+      "allowedExecutionModes": ["paper", "testnet", "restricted_live_design_only"],
+      "allowedLedgers": ["tenant-paper-ledger", "tenant-agent-credit-ledger", "tenant-private-chain", "tenant-icp-local"],
+      "allowedActors": ["operator", "tenant_admin", "approved_agent", "auditor", "compliance_reviewer"],
+      "requiredControls": ["tenant_keys", "private_dns", "private_registry", "policy_as_code", "audit_log_export", "receipt_ledger", "emergency_halt", "backup_restore_runbook"],
+      "blockedControls": ["default_shared_tenant_memory", "unapproved_public_egress", "unreviewed_live_execution"],
+      "proofRooms": ["tenant-private-proof-room", "tenant-audit-export-room"],
+      "notes": "Enterprise/on-prem/VPC lane for tenant-owned data, private proof rooms, private chain settlement experiments, and deployment-ready governance."
+    },
+    {
+      "id": "px-cloud-private-blockchain",
+      "name": "Private Blockchain Cloud",
+      "class": "private_blockchain_cloud",
+      "maturity": "protocol_design",
+      "networkBoundary": "permissioned_chain_private_network",
+      "allowedExecutionModes": ["paper", "testnet"],
+      "allowedLedgers": ["permissioned-pxusd-ledger", "permissioned-pxai-ledger", "permissioned-pxgpu-ledger", "permissioned-pxcred-ledger"],
+      "allowedActors": ["operator", "approved_agent", "validator_node", "auditor"],
+      "requiredControls": ["validator_allowlist", "chain_config_manifest", "genesis_receipt", "receipt_bridge", "merkle_export", "node_key_rotation", "halt_contract"],
+      "blockedControls": ["public_token_sale", "unpermissioned_validator_join", "mainnet_value_bridge"],
+      "proofRooms": ["permissioned-chain-proof-room"],
+      "notes": "Permissioned blockchain lane for internal/token-accounting ledgers, agent settlement receipts, and private audit trails."
+    },
+    {
+      "id": "px-cloud-airgapped-research",
+      "name": "Air-Gapped Research Cloud",
+      "class": "sovereign_cloud",
+      "maturity": "design_gate",
+      "networkBoundary": "offline_or_no_public_egress",
+      "allowedExecutionModes": ["local", "paper"],
+      "allowedLedgers": ["offline-paper-ledger", "offline-research-ledger", "offline-proof-room"],
+      "allowedActors": ["operator", "research_agent", "auditor"],
+      "requiredControls": ["offline_manifest", "signed_import_export", "local_receipts", "hash_manifest", "operator_halt", "media_scan"],
+      "blockedControls": ["external_broker_api", "public_rpc", "cloud_secret_sync", "live_funds"],
+      "proofRooms": ["offline-research-proof-room"],
+      "notes": "Air-gapped lane for private research, model evaluation, sensitive strategy tests, and exportable proof packets."
+    }
+  ],
+  "requiredArtifacts": [
+    "cloud_manifest",
+    "tenant_manifest",
+    "policy_manifest",
+    "ledger_manifest",
+    "receipt_ledger_manifest",
+    "proof_room_manifest",
+    "operator_halt_runbook",
+    "backup_restore_runbook",
+    "egress_policy",
+    "secrets_policy"
+  ],
+  "status": "repo_ready_design_registry_not_deployed"
+}
