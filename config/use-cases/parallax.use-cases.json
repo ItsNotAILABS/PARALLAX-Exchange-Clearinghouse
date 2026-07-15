@@ -1,0 +1,81 @@
+{
+  "schema": "parallax.use_cases.v1",
+  "authorityRepo": "ItsNotAILABS/PARALLAX-Exchange-Clearinghouse",
+  "posture": "paper_testnet_first",
+  "globalBoundaries": {
+    "liveMoneyMovementEnabled": false,
+    "liveBrokerExecutionEnabled": false,
+    "custodyEnabled": false,
+    "publicMainnetBridgeEnabled": false,
+    "requiresReceiptLedger": true,
+    "requiresOperatorHalt": true
+  },
+  "useCases": [
+    {
+      "id": "uc-paper-signal-order",
+      "title": "Autonomous paper trading signal to order",
+      "userStory": "An AI strategy agent receives a market signal and proposes a paper order through PXUSD.",
+      "feederLane": "hft_signal_and_strategy",
+      "primaryModel": "parallax.execution_router",
+      "requiredInputs": ["signal_id", "symbol", "side", "notional", "price", "wallet_policy"],
+      "allowedActions": ["classify_signal", "evaluate_policy", "create_paper_order", "emit_receipt", "mint_pxcred"],
+      "blockedActions": ["live_order_route", "broker_credential_use", "custody_transfer"],
+      "targetSurfaces": ["AI Execution", "Trade", "Proof Room"]
+    },
+    {
+      "id": "uc-hft-signal-approval",
+      "title": "HFT signal approval loop",
+      "userStory": "A high-frequency signal is checked for freshness, rate limit, slippage, exposure, and paper/testnet boundary before any order is accepted.",
+      "feederLane": "hft_signal_and_strategy",
+      "primaryModel": "parallax.risk_gatekeeper",
+      "requiredInputs": ["signal_freshness_ms", "rate_bucket", "max_slippage_bps", "daily_notional", "human_approval_id"],
+      "allowedActions": ["reject_stale_signal", "require_human_approval", "approve_paper_order", "emit_policy_receipt"],
+      "blockedActions": ["unreviewed_live_hft", "performance_guarantee", "fund_return_claim"],
+      "targetSurfaces": ["AI Execution", "Native Interface", "Proof Room"]
+    },
+    {
+      "id": "uc-research-mint",
+      "title": "Research artifact minting",
+      "userStory": "A research agent hashes a paper or benchmark artifact, registers it, and earns internal PXAI work credit after policy approval.",
+      "feederLane": "memory_and_product_surface",
+      "primaryModel": "parallax.research_mint_classifier",
+      "requiredInputs": ["artifact_hash", "title", "confidence", "claim_class", "evidence_class"],
+      "allowedActions": ["classify_artifact", "emit_research_receipt", "credit_pxai", "add_to_proof_room"],
+      "blockedActions": ["claim_external_publication", "claim_peer_review", "credit_without_receipt"],
+      "targetSurfaces": ["Research Mint", "Proof Room", "Governance"]
+    },
+    {
+      "id": "uc-private-cloud-proof-room",
+      "title": "Private sovereign proof room",
+      "userStory": "A private or sovereign cloud tenant exports receipt hashes, Merkle roots, and sanitized proof summaries without exposing private data.",
+      "feederLane": "native_protocol_substrate",
+      "primaryModel": "parallax.boundary_classifier",
+      "requiredInputs": ["tenant_id", "receipt_root", "classification", "export_target", "operator_approval"],
+      "allowedActions": ["sanitize_summary", "emit_private_receipt", "export_merkle_root", "block_raw_private_data"],
+      "blockedActions": ["raw_memory_export", "secret_export", "public_private_core_leak"],
+      "targetSurfaces": ["Private Blockchain Clouds", "Proof Room", "Governance"]
+    },
+    {
+      "id": "uc-mcp-feeder-ingestion",
+      "title": "MCP feeder ingestion",
+      "userStory": "Nexus and MCP skill repos feed tool manifests into PARALLAX as connector policies and operator-controlled routing records.",
+      "feederLane": "federation_mcp_control_plane",
+      "primaryModel": "parallax.feeder_classifier",
+      "requiredInputs": ["repo", "tool_manifest", "capability_summary", "mutation_boundary", "secret_boundary"],
+      "allowedActions": ["classify_tool", "require_operator_approval", "emit_connector_receipt", "route_to_control_tower"],
+      "blockedActions": ["silent_mutation", "secret_ingestion", "unbounded_tool_dispatch"],
+      "targetSurfaces": ["Control Tower", "Cloudflare Edge Gateway", "Federation Registry"]
+    },
+    {
+      "id": "uc-phantom-simulation-credit",
+      "title": "Phantom simulation and compute credit",
+      "userStory": "A simulation agent runs a Monte Carlo or benchmark batch, burns PXGPU budget, and mints PXCRED only after a benchmark receipt exists.",
+      "feederLane": "phantom_simulation_and_sdk",
+      "primaryModel": "parallax.simulation_receipt_model",
+      "requiredInputs": ["simulation_id", "dataset_hash", "pxgpu_budget", "benchmark_summary", "receipt_id"],
+      "allowedActions": ["run_paper_simulation", "emit_benchmark_receipt", "credit_pxcred", "route_to_research_mint"],
+      "blockedActions": ["unsupported_performance_claim", "live_strategy_execution", "unvalidated_optimization_claim"],
+      "targetSurfaces": ["Compute-Bound Strategy Runner", "Research Mint", "Proof Room"]
+    }
+  ]
+}

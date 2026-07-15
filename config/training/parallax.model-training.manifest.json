@@ -1,0 +1,52 @@
+{
+  "schema": "parallax.model_training_manifest.v1",
+  "authorityRepo": "ItsNotAILABS/PARALLAX-Exchange-Clearinghouse",
+  "posture": "paper_testnet_first",
+  "purpose": "Define model families, training objectives, labels, datasets, and blocked outputs for PARALLAX feeder-to-authority intelligence.",
+  "datasets": {
+    "seedExamples": "datasets/training/parallax.federation.training.jsonl",
+    "generatedOutput": "dist/training/parallax-training-dataset.jsonl",
+    "buildReceipt": "dist/training/parallax-training-receipt.json"
+  },
+  "modelFamilies": [
+    {
+      "id": "parallax.feeder_classifier",
+      "job": "Classify feeder repo artifacts into allowed, review_required, internal_only, or blocked records.",
+      "inputFields": ["repo", "lane", "feedType", "candidateText", "targetSurface"],
+      "outputFields": ["classification", "policyDecision", "blockedReasons", "targetSurface"],
+      "positiveLabels": ["public_safe", "private_summary", "review_required"],
+      "negativeLabels": ["secret", "live_execution", "custody", "mainnet_bridge", "unsupported_claim"]
+    },
+    {
+      "id": "parallax.risk_gatekeeper",
+      "job": "Evaluate agent commands, HFT signals, cloud exports, and connector actions against alpha boundaries.",
+      "inputFields": ["commandKind", "mode", "asset", "notional", "approval", "boundary"],
+      "outputFields": ["decision", "reasonCodes", "humanApprovalRequired", "receiptRequired"],
+      "positiveLabels": ["approved_paper", "approved_testnet", "requires_human_approval"],
+      "negativeLabels": ["live_order", "custody_transfer", "stale_signal", "limit_exceeded"]
+    },
+    {
+      "id": "parallax.execution_router",
+      "job": "Route a valid use case to wallet, native, edge, proof-room, research, cloud, or governance surfaces.",
+      "inputFields": ["useCaseId", "feederLane", "policyDecision", "artifactType"],
+      "outputFields": ["route", "nextAction", "requiredReceipt", "operatorPrompt"],
+      "positiveLabels": ["route_trade", "route_research_mint", "route_proof_room", "route_control_tower"],
+      "negativeLabels": ["route_live_without_gate", "route_private_raw_data"]
+    },
+    {
+      "id": "parallax.receipt_writer",
+      "job": "Produce receipt-ready records from approved paper/testnet events and feeder classifications.",
+      "inputFields": ["event", "sourceCommit", "artifactHash", "policyDecision", "operatorApproval"],
+      "outputFields": ["receiptType", "receiptPayload", "hashInputs", "proofRoomRoute"],
+      "positiveLabels": ["policy_receipt", "research_receipt", "benchmark_receipt", "feeder_receipt"],
+      "negativeLabels": ["receipt_without_source", "receipt_without_policy", "receipt_for_blocked_action"]
+    }
+  ],
+  "trainingBoundaries": [
+    "Do not train models to produce live execution instructions during alpha.",
+    "Do not include secrets, API keys, wallet keys, private user data, or raw private memory in datasets.",
+    "Do not turn feeder content into authority without source repo, lane, classification, and target surface.",
+    "Do not label notarization, receipt, or hash records as proof of truth, legal ownership, performance, or regulatory approval.",
+    "All training examples must preserve paper/testnet-first language unless future readiness gates explicitly exist."
+  ]
+}
