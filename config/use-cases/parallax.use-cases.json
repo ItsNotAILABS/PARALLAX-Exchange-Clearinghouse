@@ -1,0 +1,8 @@
+{
+  "schema": "parallax.use_cases.v1",
+  "authorityRepo": "ItsNotAILABS/PARALLAX-Exchange-Clearinghouse",
+  "posture": "paper_testnet_first",
+  "purpose": "Define concrete PARALLAX use cases that can be routed, simulated, receipt-backed, and converted into model-training examples without enabling live/custody behavior.",
+  "globalBoundaries": {
+    "liveMoneyMovementEnabled": false,
+   
