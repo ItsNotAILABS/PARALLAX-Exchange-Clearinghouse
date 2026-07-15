@@ -59,3 +59,9 @@ export {
   runResearchMintingDemo,
   summarizeDemoForIde,
 } from './execution-demos.js';
+
+export type { LatinEngineName, MarketSignal, LatinEngineTrace, LatinEngineRun } from './latin-engines.js';
+export { runLatinEngines } from './latin-engines.js';
+
+export type { NativeLatinAgentName, NativeLatinAgentTrace, TradingWorkflowResult } from './trading-agents.js';
+export { runDefaultLatinAgentSuite, runNativeLatinPaperTradingWorkflow } from './trading-agents.js';
