@@ -1,0 +1,37 @@
+{
+  "schema": "parallax.release_readiness_receipt.v1",
+  "generatedAt": "2026-07-15T00:00:00-05:00",
+  "repo": "ItsNotAILABS/PARALLAX-Exchange-Clearinghouse",
+  "status": "commercial_alpha_ready_after_gates",
+  "basis": [
+    "trading terminal and paper route preview",
+    "sovereign action lifecycle and receipt chain",
+    "AI wallet policy engine",
+    "native Latin trading engines and agents",
+    "multi-repo feeder federation",
+    "private sovereign cloud runway",
+    "model-training dataset builder and validator",
+    "commercial readiness validator"
+  ],
+  "requiredCommands": [
+    "pnpm commercial:validate",
+    "pnpm alpha:models",
+    "pnpm alpha:product",
+    "pnpm alpha:launch"
+  ],
+  "boundaries": {
+    "liveMoneyMovement": false,
+    "liveBrokerExecution": false,
+    "custody": false,
+    "regulatedExchangeActivity": false,
+    "publicMainnetBridge": false,
+    "externalAuditClaim": false
+  },
+  "openFollowUps": [
+    {
+      "id": "PR-34",
+      "name": "PARALLAX three-agent orchestration layer",
+      "decision": "review_or_rebase_before_merge"
+    }
+  ]
+}
