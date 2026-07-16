@@ -65,3 +65,6 @@ export { runLatinEngines } from './latin-engines.js';
 
 export type { NativeLatinAgentName, NativeLatinAgentTrace, TradingWorkflowResult } from './trading-agents.js';
 export { runDefaultLatinAgentSuite, runNativeLatinPaperTradingWorkflow } from './trading-agents.js';
+
+export type { MultiModelRole, MultiAgentId, MultiAgentInput, MultiAgentStep, MultiAgentRun } from './multi-model-agents.js';
+export { runParallaxMultiAgentRoute, summarizeMultiAgentRun } from './multi-model-agents.js';
