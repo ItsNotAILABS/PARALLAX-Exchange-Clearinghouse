@@ -29,6 +29,7 @@ async function boot() {
   renderWallets();
   renderAssets();
   renderAgents();
+  renderConnections();
 }
 
 function installEip6963Listener() {
@@ -82,6 +83,11 @@ async function connectIcpPlug() {
   state.connected.push({ ecosystem: 'icp', wallet: 'Plug', address: principal?.toText?.() || 'connected' });
   renderStatus();
   renderConnections();
+}
+
+function queuePaperRoute() {
+  const route = { id: `paper_route_${Date.now()}`, mode: 'paper', symbol: 'BTC-PAPER/PXUSD', notional: 2400, requires: ['policy', 'receipt', 'human threshold check'], liveExecution: false };
+  $('routePreview').textContent = JSON.stringify(route, null, 2);
 }
 
 function renderStatus() {
@@ -138,22 +144,8 @@ function renderAgents() {
     </article>`).join('');
 }
 
-function queuePaperRoute() {
-  const payload = {
-    mode: 'paper',
-    route: 'universal-market-router',
-    status: 'queued_for_policy_gate',
-    note: 'No live execution. Route must pass wallet policy, market policy, compliance, liquidity, and receipt gates.'
-  };
-  $('routePreview').textContent = JSON.stringify(payload, null, 2);
-}
-
-window.connectEvm = () => connectEvm().catch((err) => alert(err.message));
-window.connectSolana = () => connectSolana().catch((err) => alert(err.message));
-window.connectIcpPlug = () => connectIcpPlug().catch((err) => alert(err.message));
+window.connectEvm = connectEvm;
+window.connectSolana = connectSolana;
+window.connectIcpPlug = connectIcpPlug;
 window.queuePaperRoute = queuePaperRoute;
-
-boot().catch((error) => {
-  console.error(error);
-  document.body.innerHTML = `<main class="shell"><h1>PARALLAX launch app failed to boot</h1><pre>${esc(error.message)}</pre></main>`;
-});
+boot().catch((error) => { console.error(error); if ($('routePreview')) $('routePreview').textContent = error.message; });
