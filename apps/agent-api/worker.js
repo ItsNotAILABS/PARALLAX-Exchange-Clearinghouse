@@ -1,44 +1,28 @@
-const now = () => new Date().toISOString();
-const hash = (value) => {
-  let h = 2166136261;
-  for (const c of JSON.stringify(value)) h = Math.imul(h ^ c.charCodeAt(0), 16777619);
-  return `px_${(h >>> 0).toString(16).padStart(8, '0')}`;
-};
-
-const state = {
-  ledgers: [
-    { id: 'parallax-paper-ledger', mode: 'paper', assets: ['PXUSD', 'PXAI', 'PXCRED'], live: false },
-    { id: 'agent-credit-ledger', mode: 'paper', assets: ['PXCRED', 'PXGPU'], live: false },
-    { id: 'icp-local-ledger', mode: 'testnet', assets: ['PXICP'], live: false }
-  ],
-  wallets: [{ walletId: 'pxw_demo_external_agent', agentId: 'external-demo-agent', owner: 'sample-principal', mode: 'paper', balances: { PXUSD: 50000, PXAI: 10000, PXCRED: 0 }, createdAt: now() }],
-  agents: [
-    { id: 'agent-market-sentinel', status: 'running', cadence: 'simulated-30s', lastTick: null },
-    { id: 'agent-risk-gatekeeper', status: 'idle', cadence: 'on-demand', lastTick: null },
-    { id: 'agent-receipt-writer', status: 'running', cadence: 'event-driven', lastTick: null },
-    { id: 'agent-ledger-reconciler', status: 'running', cadence: 'simulated-60s', lastTick: null }
-  ],
-  receipts: []
-};
-
-const json = (body, status = 200) => new Response(JSON.stringify(body, null, 2), { status, headers: { 'content-type': 'application/json; charset=utf-8', 'access-control-allow-origin': '*', 'access-control-allow-methods': 'GET,POST,OPTIONS', 'access-control-allow-headers': 'content-type,authorization' } });
-const readJson = async (request) => { try { return await request.json(); } catch { return {}; } };
-const receipt = (type, payload) => { const r = { receiptId: hash({ type, payload, at: now(), n: state.receipts.length }), type, payloadHash: hash(payload), createdAt: now(), boundary: 'paper_testnet_only' }; state.receipts.push(r); return r; };
-
-async function route(request) {
-  const url = new URL(request.url);
-  if (request.method === 'OPTIONS') return json({ ok: true });
-  if (url.pathname === '/api/status') return json({ ok: true, platform: 'PARALLAX Agent API', posture: 'paper_testnet_first', servers: ['agent-control', 'wallet-ledger', 'proof-room'], boundaries: ['no custody', 'no live broker', 'no private keys'] });
-  if (url.pathname === '/api/agents' && request.method === 'GET') return json({ agents: state.agents });
-  if (url.pathname === '/api/agents/tick' && request.method === 'POST') { const body = await readJson(request); const agent = state.agents.find((a) => a.id === body.agentId) || state.agents[0]; agent.status = 'running'; agent.lastTick = now(); return json({ agent, receipt: receipt('agent.tick', agent) }); }
-  if (url.pathname === '/api/ledgers' && request.method === 'GET') return json({ ledgers: state.ledgers });
-  if (url.pathname === '/api/wallets' && request.method === 'GET') return json({ wallets: state.wallets });
-  if (url.pathname === '/api/wallets' && request.method === 'POST') { const body = await readJson(request); const wallet = { walletId: `pxw_${hash(body).slice(3)}`, agentId: body.agentId || 'external-agent', owner: body.owner || 'external-owner', mode: 'paper', balances: { PXUSD: Number(body.pxusd ?? 10000), PXAI: Number(body.pxai ?? 1000), PXCRED: 0 }, createdAt: now() }; state.wallets.push(wallet); return json({ wallet, receipt: receipt('wallet.created', wallet) }, 201); }
-  if (url.pathname === '/api/ledger/transfer' && request.method === 'POST') { const body = await readJson(request); const from = state.wallets.find((w) => w.walletId === body.fromWalletId); const to = state.wallets.find((w) => w.walletId === body.toWalletId); const asset = body.asset || 'PXUSD'; const amount = Number(body.amount || 0); if (!from || !to || amount <= 0) return json({ error: 'invalid_transfer_request' }, 400); if ((from.balances[asset] || 0) < amount) return json({ error: 'insufficient_paper_balance' }, 409); from.balances[asset] -= amount; to.balances[asset] = (to.balances[asset] || 0) + amount; return json({ transfer: { from: from.walletId, to: to.walletId, asset, amount, mode: 'paper' }, receipt: receipt('ledger.transfer', body) }); }
-  if (url.pathname === '/api/receipts' && request.method === 'GET') return json({ receipts: state.receipts });
-  if (url.pathname === '/api/samples' && request.method === 'GET') return json({ walletCreate: { agentId: 'marketing-demo-agent', owner: 'demo-operator', pxusd: 25000 }, transfer: { fromWalletId: 'pxw_demo_external_agent', toWalletId: 'pxw_target', asset: 'PXUSD', amount: 250 } });
-  return json({ error: 'not_found', path: url.pathname }, 404);
-}
-
-export { route, state };
-export default { fetch: route };
+const now=()=>new Date().toISOString();
+const hash=(value)=>{let h=2166136261;for(const c of JSON.stringify(value))h=Math.imul(h^c.charCodeAt(0),16777619);return `px_${(h>>>0).toString(16).padStart(8,'0')}`};
+const mkWallet=(body={})=>({walletId:`pxw_${hash(body).slice(3)}`,agentId:body.agentId||'external-agent',owner:body.owner||'external-owner',mode:'paper',balances:{PXUSD:Number(body.pxusd??10000),PXAI:Number(body.pxai??1000),PXCRED:0},connectors:body.connectors||[],limits:{dailyPXUSD:Number(body.dailyPXUSD??5000),requiresHumanAbove:Number(body.requiresHumanAbove??1000)},createdAt:now()});
+const mkVault=(body={})=>{const vaultId=`pxv_${hash({body,at:now()}).slice(3)}`;const wallet=mkWallet({agentId:body.agentId||'vault-agent',owner:body.owner||'vault-owner',pxusd:body.pxusd??50000,pxai:body.pxai??10000,connectors:['evm','solana','icp','bitcoin','cosmos']});return{vaultId,name:body.name||'Agent Swarm Vault',owner:body.owner||'vault-owner',mode:'paper',status:'active_sample',walletSystem:{primaryWallet:wallet,wallets:[wallet],outsideConnectors:[{id:'evm',status:'ready_to_connect',networks:['ethereum','base','polygon']},{id:'solana',status:'ready_to_connect',networks:['solana']},{id:'icp',status:'ready_to_connect',networks:['icp-local','icp-testnet']},{id:'bitcoin',status:'watch_only_ready',networks:['bitcoin']},{id:'cosmos',status:'ready_to_connect',networks:['cosmos','osmosis']}],policy:{agentAllowlist:[body.agentId||'vault-agent','agent-risk-gatekeeper','agent-receipt-writer'],humanThresholdPXUSD:1000,liveExecution:false,custody:false}},prebuilt:{tools:['policy-pack-alpha','receipt-room','ledger-reconciler','market-sentinel','billing-meter','connector-health'],ledgers:['parallax-paper-ledger','agent-credit-ledger','icp-local-ledger'],permissions:['read_balances','propose_transfer','request_receipt','tick_agent'],sampleApiKey:`pk_demo_${hash(vaultId).slice(3)}`},monetization:{plan:body.plan||'vault_api_subscription',metered:true,units:['vault/month','api_call','receipt','connector']},createdAt:now()}};
+const state={ledgers:[{id:'parallax-paper-ledger',mode:'paper',assets:['PXUSD','PXAI','PXCRED'],live:false},{id:'agent-credit-ledger',mode:'paper',assets:['PXCRED','PXGPU'],live:false},{id:'icp-local-ledger',mode:'testnet',assets:['PXICP'],live:false}],wallets:[{walletId:'pxw_demo_external_agent',agentId:'external-demo-agent',owner:'sample-principal',mode:'paper',balances:{PXUSD:50000,PXAI:10000,PXCRED:0},createdAt:now()}],vaults:[],agents:[{id:'agent-market-sentinel',status:'running',cadence:'simulated-30s',lastTick:null},{id:'agent-risk-gatekeeper',status:'idle',cadence:'on-demand',lastTick:null},{id:'agent-receipt-writer',status:'running',cadence:'event-driven',lastTick:null},{id:'agent-ledger-reconciler',status:'running',cadence:'simulated-60s',lastTick:null},{id:'agent-connector-health',status:'running',cadence:'simulated-120s',lastTick:null},{id:'agent-billing-meter',status:'idle',cadence:'event-driven',lastTick:null}],receipts:[]};
+state.vaults.push(mkVault({name:'Demo Agent Swarm Vault',owner:'demo-operator',agentId:'external-demo-agent'}));state.wallets.push(state.vaults[0].walletSystem.primaryWallet);
+const json=(body,status=200)=>new Response(JSON.stringify(body,null,2),{status,headers:{'content-type':'application/json; charset=utf-8','access-control-allow-origin':'*','access-control-allow-methods':'GET,POST,OPTIONS','access-control-allow-headers':'content-type,authorization'}});
+const readJson=async(request)=>{try{return await request.json()}catch{return{}}};
+const receipt=(type,payload)=>{const r={receiptId:hash({type,payload,at:now(),n:state.receipts.length}),type,payloadHash:hash(payload),createdAt:now(),boundary:'paper_testnet_only'};state.receipts.push(r);return r};
+async function route(request){const url=new URL(request.url);const path=url.pathname;if(request.method==='OPTIONS')return json({ok:true});
+if(path==='/api/status')return json({ok:true,platform:'PARALLAX Agent Vault API',posture:'paper_testnet_first',servers:['agent-control','vault-wallet-ledger','proof-room','billing-meter'],boundaries:['no custody','no live broker','no private keys']});
+if(path==='/api/monetization')return json({paths:['vault_api_subscription','agent_wallet_metering','receipt_room_enterprise','connector_marketplace','managed_agent_ops','white_label_vaults'],boundary:'pricing_not_set_in_code'});
+if(path==='/api/agents'&&request.method==='GET')return json({agents:state.agents});
+if(path==='/api/agents/tick'&&request.method==='POST'){const body=await readJson(request);const agent=state.agents.find(a=>a.id===body.agentId)||state.agents[0];agent.status='running';agent.lastTick=now();return json({agent,receipt:receipt('agent.tick',agent)})}
+if(path==='/api/ledgers'&&request.method==='GET')return json({ledgers:state.ledgers});
+if(path==='/api/wallets'&&request.method==='GET')return json({wallets:state.wallets});
+if(path==='/api/wallets'&&request.method==='POST'){const body=await readJson(request);const wallet=mkWallet(body);state.wallets.push(wallet);return json({wallet,receipt:receipt('wallet.created',wallet),upgradePath:'POST /api/vaults creates a full vault around the wallet system'},201)}
+if(path==='/api/vaults'&&request.method==='GET')return json({vaults:state.vaults});
+if(path==='/api/vaults'&&request.method==='POST'){const body=await readJson(request);const vault=mkVault(body);state.vaults.push(vault);state.wallets.push(vault.walletSystem.primaryWallet);return json({vault,receipt:receipt('vault.created',vault)},201)}
+const vaultMatch=path.match(/^\/api\/vaults\/([^/]+)$/);if(vaultMatch&&request.method==='GET'){const vault=state.vaults.find(v=>v.vaultId===vaultMatch[1]);return vault?json({vault}):json({error:'vault_not_found'},404)}
+const connMatch=path.match(/^\/api\/vaults\/([^/]+)\/connectors$/);if(connMatch&&request.method==='POST'){const body=await readJson(request);const vault=state.vaults.find(v=>v.vaultId===connMatch[1]);if(!vault)return json({error:'vault_not_found'},404);const connector={id:body.id||'custom_connector',status:'linked_sample',networks:body.networks||['paper']};vault.walletSystem.outsideConnectors.push(connector);return json({connector,receipt:receipt('vault.connector.linked',{vaultId:vault.vaultId,connector})})}
+const agentMatch=path.match(/^\/api\/vaults\/([^/]+)\/agents$/);if(agentMatch&&request.method==='POST'){const body=await readJson(request);const vault=state.vaults.find(v=>v.vaultId===agentMatch[1]);if(!vault)return json({error:'vault_not_found'},404);const agentId=body.agentId||`agent-${hash(body).slice(3)}`;vault.walletSystem.policy.agentAllowlist.push(agentId);return json({agentId,allowlist:vault.walletSystem.policy.agentAllowlist,receipt:receipt('vault.agent.added',{vaultId:vault.vaultId,agentId})})}
+if(path==='/api/ledger/transfer'&&request.method==='POST'){const body=await readJson(request);const from=state.wallets.find(w=>w.walletId===body.fromWalletId);const to=state.wallets.find(w=>w.walletId===body.toWalletId);const asset=body.asset||'PXUSD';const amount=Number(body.amount||0);if(!from||!to||amount<=0)return json({error:'invalid_transfer_request'},400);if((from.balances[asset]||0)<amount)return json({error:'insufficient_paper_balance'},409);from.balances[asset]-=amount;to.balances[asset]=(to.balances[asset]||0)+amount;return json({transfer:{from:from.walletId,to:to.walletId,asset,amount,mode:'paper'},receipt:receipt('ledger.transfer',body)})}
+const vaultTransfer=path.match(/^\/api\/vaults\/([^/]+)\/ledger\/transfer$/);if(vaultTransfer&&request.method==='POST'){const body=await readJson(request);const vault=state.vaults.find(v=>v.vaultId===vaultTransfer[1]);if(!vault)return json({error:'vault_not_found'},404);body.fromWalletId=body.fromWalletId||vault.walletSystem.primaryWallet.walletId;return route(new Request(`${url.origin}/api/ledger/transfer`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}))}
+if(path==='/api/receipts'&&request.method==='GET')return json({receipts:state.receipts});
+if(path==='/api/samples'&&request.method==='GET')return json({vaultCreate:{name:'Customer AI Ops Vault',agentId:'customer-agent-001',owner:'customer-operator',plan:'vault_api_subscription'},walletCreate:{agentId:'marketing-demo-agent',owner:'demo-operator',pxusd:25000},transfer:{fromWalletId:'pxw_demo_external_agent',toWalletId:'pxw_target',asset:'PXUSD',amount:250}});
+return json({error:'not_found',path},404)}
+export{route,state};export default{fetch:route};

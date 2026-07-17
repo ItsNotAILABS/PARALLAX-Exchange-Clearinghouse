@@ -1,55 +1,5 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://api.binance.com https://api.exchange.coinbase.com wss://stream.binance.com:9443 wss://advanced-trade-ws.coinbase.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests" />
-    <meta name="referrer" content="strict-origin-when-cross-origin" />
-    <meta name="description" content="PARALLAX sovereign AI finance platform with live public markets, governed agents, paper execution, policy gates, and tamper-evident receipts." />
-    <title>PARALLAX Sovereign AI Finance</title>
-    <link rel="stylesheet" href="./styles.css" />
-  </head>
-  <body>
-    <main class="shell">
-      <header class="hero">
-        <div>
-          <p class="eyebrow">PARALLAX · Sovereign AI Finance Platform</p>
-          <h1>Agents propose. Policy decides. Receipts prove.</h1>
-          <p class="lead">Live public market intelligence, multi-chain identity and routing, governed paper execution, persistent financial state, background agents, virtual servers, external agent APIs, and tamper-evident audit receipts. Mainnet execution remains disabled until security, legal, compliance, liquidity, and governance gates pass.</p>
-          <div class="actions">
-            <button id="connectEvmButton" type="button">Connect EVM</button>
-            <button id="connectSolanaButton" type="button">Connect Solana</button>
-            <button id="connectIcpButton" type="button">Connect ICP Plug</button>
-            <button id="paperRouteButton" class="secondary" type="button">Queue Paper Route</button>
-          </div>
-        </div>
-        <section class="boundary">
-          <strong>Production boundary</strong>
-          <span>No custody or private-key access</span>
-          <span>No broker routing or live money movement</span>
-          <span>Paper and controlled testnet actions only</span>
-          <span>Every governed action produces a receipt</span>
-        </section>
-      </header>
-      <section id="status" class="status-grid" aria-label="Platform coverage"></section>
-      <section class="platform-console">
-        <div class="panel-header"><h2>Platform control plane</h2><div class="actions"><button type="button" onclick="createDemoWallet()">Create agent wallet</button><button class="secondary" type="button" onclick="tickBackgroundAgent()">Tick background agent</button><button class="secondary" type="button" onclick="sampleLedgerTransfer()">Sample ledger transfer</button></div></div>
-        <div class="grid"><div><h3>Virtual servers</h3><div id="virtualServers" class="grid"></div></div><div><h3>Background agents</h3><div id="backgroundAgents" class="grid"></div></div></div>
-        <div class="grid"><div><h3>Multi-ledger API</h3><div id="ledgerApi" class="grid"></div></div><div><h3>Agent wallets</h3><div id="apiWallets" class="grid"></div></div></div>
-        <h3>API output / receipts</h3><pre id="apiOutput">Loading platform API...</pre>
-      </section>
-      <section><h2>Connected wallets</h2><div id="connections" class="grid"></div></section>
-      <section><h2>Chain routes</h2><div id="chains" class="grid"></div></section>
-      <section><h2>Wallet registry</h2><div id="wallets" class="grid"></div></section>
-      <section><h2>Asset universe</h2><div id="assets" class="grid wide-grid"></div></section>
-      <section><h2>Agent finance world</h2><div id="agents" class="grid"></div></section>
-      <section><h2>Route preview</h2><pre id="routePreview">No route queued.</pre></section>
-    </main>
-    <script type="module" src="./app.js"></script>
-    <script type="module" src="./production-ui.js"></script>
-    <script type="module" src="./controls.js"></script>
-    <script type="module" src="./trading-terminal.js"></script>
-    <script type="module" src="./action-console.js"></script>
-    <script type="module" src="./platform-control.js"></script>
-  </body>
-</html>
+<html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://api.binance.com https://api.exchange.coinbase.com wss://stream.binance.com:9443 wss://advanced-trade-ws.coinbase.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests" /><meta name="referrer" content="strict-origin-when-cross-origin" /><meta name="description" content="PARALLAX sovereign AI finance platform with agent vaults, external wallet connectors, multi-ledger APIs, governed paper execution, and receipts." /><title>PARALLAX Sovereign AI Finance</title><link rel="stylesheet" href="./styles.css" /></head>
+<body><main class="shell"><header class="hero"><div><p class="eyebrow">PARALLAX · Agent Vault Finance Platform</p><h1>Vaults hold the agent swarm. Wallets execute inside the vault.</h1><p class="lead">Agent vaults create a professional wallet system, outside-wallet connector map, multi-ledger accounts, policy tools, background agents, billing meters, and receipt rooms for external AI agents. Mainnet execution remains disabled until security, legal, compliance, liquidity, and governance gates pass.</p><div class="actions"><button id="connectEvmButton" type="button">Connect EVM</button><button id="connectSolanaButton" type="button">Connect Solana</button><button id="connectIcpButton" type="button">Connect ICP Plug</button><button id="paperRouteButton" class="secondary" type="button">Queue Paper Route</button></div></div><section class="boundary"><strong>Production boundary</strong><span>No custody or private-key access</span><span>No broker routing or live money movement</span><span>Paper and controlled testnet actions only</span><span>Every governed action produces a receipt</span></section></header>
+<section id="status" class="status-grid" aria-label="Platform coverage"></section><section class="platform-console"><div class="panel-header"><h2>Platform control plane</h2><div class="actions"><button type="button" onclick="createDemoVault()">Create agent vault</button><button type="button" onclick="createDemoWallet()" class="secondary">Create legacy wallet</button><button class="secondary" type="button" onclick="tickBackgroundAgent()">Tick background agent</button><button class="secondary" type="button" onclick="sampleLedgerTransfer()">Sample ledger transfer</button></div></div><h3>Agent vaults</h3><div id="apiVaults" class="grid wide-grid"></div><div class="grid"><div><h3>Virtual servers</h3><div id="virtualServers" class="grid"></div></div><div><h3>Background agents</h3><div id="backgroundAgents" class="grid"></div></div></div><div class="grid"><div><h3>Multi-ledger API</h3><div id="ledgerApi" class="grid"></div></div><div><h3>Wallets inside vaults</h3><div id="apiWallets" class="grid"></div></div></div><h3>Monetization paths</h3><div id="monetizationPaths" class="grid"></div><h3>API output / receipts</h3><pre id="apiOutput">Loading platform API...</pre></section>
+<section><h2>Connected wallets</h2><div id="connections" class="grid"></div></section><section><h2>Chain routes</h2><div id="chains" class="grid"></div></section><section><h2>Wallet registry</h2><div id="wallets" class="grid"></div></section><section><h2>Asset universe</h2><div id="assets" class="grid wide-grid"></div></section><section><h2>Agent finance world</h2><div id="agents" class="grid"></div></section><section><h2>Route preview</h2><pre id="routePreview">No route queued.</pre></section></main><script type="module" src="./app.js"></script><script type="module" src="./production-ui.js"></script><script type="module" src="./controls.js"></script><script type="module" src="./trading-terminal.js"></script><script type="module" src="./action-console.js"></script><script type="module" src="./platform-control.js"></script></body></html>
