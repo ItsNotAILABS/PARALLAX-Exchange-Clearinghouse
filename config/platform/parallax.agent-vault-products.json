@@ -1,0 +1,1 @@
+{"schema":"parallax.agent_vault_products.v1","posture":"paper_testnet_first","defaultVaultTemplate":"agent-swarm-vault-pro","vaultIncludes":["professional_wallet_system","outside_wallet_connector_map","agent_swarm_permissions","multi_ledger_accounts","prebuilt_policy_tools","receipt_room","billing_profile","sample_api_keys"],"walletSystem":{"name":"PARALLAX Vault
