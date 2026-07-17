@@ -15,7 +15,7 @@
         <div>
           <p class="eyebrow">PARALLAX · Sovereign AI Finance Platform</p>
           <h1>Agents propose. Policy decides. Receipts prove.</h1>
-          <p class="lead">Live public market intelligence, multi-chain identity and routing, governed paper execution, persistent financial state, and tamper-evident audit receipts. Mainnet execution remains disabled until security, legal, compliance, liquidity, and governance gates pass.</p>
+          <p class="lead">Live public market intelligence, multi-chain identity and routing, governed paper execution, persistent financial state, background agents, virtual servers, external agent APIs, and tamper-evident audit receipts. Mainnet execution remains disabled until security, legal, compliance, liquidity, and governance gates pass.</p>
           <div class="actions">
             <button id="connectEvmButton" type="button">Connect EVM</button>
             <button id="connectSolanaButton" type="button">Connect Solana</button>
@@ -32,6 +32,12 @@
         </section>
       </header>
       <section id="status" class="status-grid" aria-label="Platform coverage"></section>
+      <section class="platform-console">
+        <div class="panel-header"><h2>Platform control plane</h2><div class="actions"><button type="button" onclick="createDemoWallet()">Create agent wallet</button><button class="secondary" type="button" onclick="tickBackgroundAgent()">Tick background agent</button><button class="secondary" type="button" onclick="sampleLedgerTransfer()">Sample ledger transfer</button></div></div>
+        <div class="grid"><div><h3>Virtual servers</h3><div id="virtualServers" class="grid"></div></div><div><h3>Background agents</h3><div id="backgroundAgents" class="grid"></div></div></div>
+        <div class="grid"><div><h3>Multi-ledger API</h3><div id="ledgerApi" class="grid"></div></div><div><h3>Agent wallets</h3><div id="apiWallets" class="grid"></div></div></div>
+        <h3>API output / receipts</h3><pre id="apiOutput">Loading platform API...</pre>
+      </section>
       <section><h2>Connected wallets</h2><div id="connections" class="grid"></div></section>
       <section><h2>Chain routes</h2><div id="chains" class="grid"></div></section>
       <section><h2>Wallet registry</h2><div id="wallets" class="grid"></div></section>
@@ -44,5 +50,6 @@
     <script type="module" src="./controls.js"></script>
     <script type="module" src="./trading-terminal.js"></script>
     <script type="module" src="./action-console.js"></script>
+    <script type="module" src="./platform-control.js"></script>
   </body>
 </html>
