@@ -3,350 +3,331 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/parallax-logo.svg">
   <source media="(prefers-color-scheme: light)" srcset="assets/parallax-logo-dark.svg">
-  <img alt="PARALLAX Exchange Clearinghouse" src="assets/parallax-logo.svg" width="680">
+  <img alt="PARALLAX Exchange Clearinghouse" src="assets/parallax-logo.svg" width="720">
 </picture>
 
 <br />
 
 [![CI](https://github.com/ItsNotAILABS/PARALLAX-Exchange-Clearinghouse/actions/workflows/ci.yml/badge.svg)](https://github.com/ItsNotAILABS/PARALLAX-Exchange-Clearinghouse/actions/workflows/ci.yml)
-[![ICP](https://img.shields.io/badge/ICP-Motoko-29abe2?style=flat-square)](https://internetcomputer.org/)
-[![Ethereum](https://img.shields.io/badge/Ethereum-Solidity-627EEA?style=flat-square)](contracts/)
-[![React](https://img.shields.io/badge/Frontend-React_19-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/Language-TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Cloudflare](https://img.shields.io/badge/Cloudflare-Edge_Gateway-F38020?style=flat-square&logo=cloudflare&logoColor=white)](docs/CLOUDFLARE_EDGE_RUNWAY.md)
-[![Native](https://img.shields.io/badge/C%2FC%2B%2B-Native_Interface-F97316?style=flat-square)](docs/NATIVE_CPP_INTERFACE.md)
-[![Alpha](https://img.shields.io/badge/Alpha-Service_Gated-22C55E?style=flat-square)](docs/ALPHA_SERVICE_RUNWAY.md)
-[![AI Wallet](https://img.shields.io/badge/AI_Wallet-Policy_Gated-38BDF8?style=flat-square)](docs/AI_WALLET_ALPHA.md)
-[![Research](https://img.shields.io/badge/Research-Receipts_+_Charters-8B5CF6?style=flat-square)](research/)
+[![Universal Launch](https://github.com/ItsNotAILABS/PARALLAX-Exchange-Clearinghouse/actions/workflows/universal-launch.yml/badge.svg)](https://github.com/ItsNotAILABS/PARALLAX-Exchange-Clearinghouse/actions/workflows/universal-launch.yml)
+[![Trading Terminal](https://github.com/ItsNotAILABS/PARALLAX-Exchange-Clearinghouse/actions/workflows/trading-terminal.yml/badge.svg)](https://github.com/ItsNotAILABS/PARALLAX-Exchange-Clearinghouse/actions/workflows/trading-terminal.yml)
+[![Sovereign Finance](https://github.com/ItsNotAILABS/PARALLAX-Exchange-Clearinghouse/actions/workflows/sovereign-finance.yml/badge.svg)](https://github.com/ItsNotAILABS/PARALLAX-Exchange-Clearinghouse/actions/workflows/sovereign-finance.yml)
+[![Commercial Gate](https://github.com/ItsNotAILABS/PARALLAX-Exchange-Clearinghouse/actions/workflows/commercial-grade.yml/badge.svg)](https://github.com/ItsNotAILABS/PARALLAX-Exchange-Clearinghouse/actions/workflows/commercial-grade.yml)
 
-# PARALLAX
+[![Last Commit](https://img.shields.io/github/last-commit/ItsNotAILABS/PARALLAX-Exchange-Clearinghouse?style=for-the-badge&logo=github)](https://github.com/ItsNotAILABS/PARALLAX-Exchange-Clearinghouse/commits/main)
+[![Top Language](https://img.shields.io/github/languages/top/ItsNotAILABS/PARALLAX-Exchange-Clearinghouse?style=for-the-badge)](https://github.com/ItsNotAILABS/PARALLAX-Exchange-Clearinghouse)
+[![Repo Size](https://img.shields.io/github/repo-size/ItsNotAILABS/PARALLAX-Exchange-Clearinghouse?style=for-the-badge)](https://github.com/ItsNotAILABS/PARALLAX-Exchange-Clearinghouse)
+[![License](https://img.shields.io/badge/license-PARALLAX%20Sovereign-blueviolet?style=for-the-badge)](LICENSE)
+[![Posture](https://img.shields.io/badge/posture-paper%2Ftestnet%20first-22c55e?style=for-the-badge)](docs/OPERATOR_BOUNDARY_READINESS.md)
+[![Live Gate](https://img.shields.io/badge/live%20gate-disabled%20until%20approved-f59e0b?style=for-the-badge)](docs/LIVE_GATE_ENGINE.md)
 
-### AI-native financial infrastructure for multi-ledger agents, token economics, trading, clearing, settlement receipts, and governed edge execution.
+# PARALLAX Exchange Clearinghouse
 
-[Platform Blueprint](docs/PARALLAX_PLATFORM_SURFACE.md) · [Cloudflare Edge](docs/CLOUDFLARE_EDGE_RUNWAY.md) · [Multi-Ledger Ecosystem](docs/MULTI_LEDGER_ECOSYSTEM.md) · [Agent Token Economics](docs/AGENT_TOKEN_ECONOMICS.md) · [Showcase Gate](docs/PRODUCT_SHOWCASE_GATE.md) · [Native C/C++ Interface](docs/NATIVE_CPP_INTERFACE.md)
+### Governed financial infrastructure for external AI-agent swarms.
+
+**Agent Vaults are the jurisdictional boundary. Wallets are execution organs. Broker adapters and internal token rails remain policy-gated. Receipts are the evidence layer.**
+
+[Agent Vault API](docs/BACKGROUND_AGENTS_AGENT_API.md) · [Vault Persistence Gate](docs/VAULT_PERSISTENCE_GATE.md) · [Operator Boundary](docs/OPERATOR_BOUNDARY_READINESS.md) · [Regulated-Live Readiness](docs/REGULATED_LIVE_READINESS.md) · [Live Gate Engine](docs/LIVE_GATE_ENGINE.md) · [Platform Federation](docs/PARALLAX_PLATFORM_FEDERATION.md)
 
 </div>
 
 ---
 
 <div align="center">
-  <img alt="PARALLAX Platform Architecture" src="assets/parallax-platform-infographic.svg" width="100%">
+  <img alt="PARALLAX Agent Vault platform hero" src="assets/readme/parallax-hero-hd.svg" width="100%">
 </div>
 
 ---
 
-## What PARALLAX is
+## Executive summary
 
-**PARALLAX** is a paper-first, proof-forward financial operating system for AI agents. The platform combines multi-ledger registries, token-economics policy, AI-agent wallets, simulated trading, risk-gated execution, clearinghouse receipts, Cloudflare edge access, native C/C++ strategy interfaces, and operator governance into one coherent alpha product.
+**PARALLAX** is an AI-native financial operating layer for external agents, vaults, ledgers, broker-adapter readiness, internal token rails, clearinghouse receipts, and regulated-live approval workflows.
 
-The current posture is intentionally conservative: **paper trading, testnet contracts, simulated balances, internal credits, and receipt-backed proof flows first**. Live money movement, live broker execution, custody, regulated exchange activity, and fund operations require separate legal, security, compliance, and operational readiness gates.
-
-## Product surfaces
-
-| Surface | Role | First usable capability |
-|---|---|---|
-| **Cloudflare Edge Gateway** | Worker API, auth guard, CORS, tunnel proxy | `/health`, ledger registry, token registry, agent-command precheck |
-| **Multi-Ledger Registry** | Paper, ICP local/test, EVM testnet, agent-credit ledgers | Source-of-truth ledger manifest |
-| **Agent Token Economics** | PXUSD, PXICP, PXETH, PXAI, PXGPU, PXCRED | Internal/testnet token class registry |
-| **Wallet** | Identity, accounts, balances, AI-agent wallets, keys, ledger views | Internet Identity, paper/testnet balances, policy-gated AI wallets |
-| **Native Interface** | C ABI and C++ wrapper for strategy/runtime workers | Buildable AI-wallet policy evaluation outside Node.js |
-| **Trade** | Order ticket, books, fills, market views | Paper order entry into a backend contract |
-| **Clearinghouse** | Matching, netting, settlement records | Fill and settlement receipt generation |
-| **Pay** | Transfers, requests, invoices, remittance workflows | Internal paper transfer with receipt trail |
-| **AI Execution** | Signals, strategy proposals, guarded automation | Signal cards that require operator approval |
-| **Research Mint** | Papers, benchmarks, artifact records | Research metadata to proof artifact receipt |
-| **Proof Room** | Audit exports, release manifests, Merkle records | Query and export receipts |
-| **Governance** | Roles, policies, emergency halt, upgrade posture | Admin halt/resume and role-gated actions |
-
-## Cloudflare edge layer
-
-PARALLAX now includes a Cloudflare Worker gateway package:
+The platform is built around a simple production doctrine:
 
 ```text
-apps/cloudflare-gateway/
+Vault boundary -> wallet execution -> policy gate -> broker/token proposal -> receipt evidence -> recovery proof
 ```
 
-Routes:
+PARALLAX is currently **paper/testnet first**. It can register vaults, API-key principals, secret references, broker connector contracts, internal token rails, paper broker proposals, paper/testnet transfers, live approval packets, recovery snapshots, and hash-linked receipts.
 
-| Route | Method | Purpose |
-|---|---:|---|
-| `/health` | GET | gateway health, alpha gates, expected tunnel host |
-| `/v1/ledgers` | GET | multi-ledger registry |
-| `/v1/tokens` | GET | token class registry |
-| `/v1/agents/classes` | GET | AI-agent wallet classes |
-| `/v1/alpha/gates` | GET | alpha safety gates |
-| `/v1/agent-command/evaluate` | POST | edge-side policy precheck for AI-agent commands |
-| `/v1/proxy/*` | any | guarded proxy to PARALLAX core origin through tunnel/private origin |
+It does **not** enable custody, raw private-key storage, seed capture, raw secret storage, live broker execution, live money movement, token sales, redeemability/yield claims, or public mainnet bridge execution.
 
-Run the edge gateway locally:
+---
 
-```bash
-pnpm edge:dev
-```
+## Current product surface
 
-Deploy when Cloudflare account, zone, token, and route are configured:
-
-```bash
-pnpm edge:deploy
-```
-
-## Multi-ledger ecosystem
-
-Source of truth:
-
-```text
-config/ledgers/parallax.multiledger.ecosystem.json
-```
-
-Ledgers:
-
-| Ledger | Mode | Purpose |
-|---|---:|---|
-| `parallax-paper-ledger` | paper | simulated balances, orders, transfers, and alpha settlement receipts |
-| `icp-local-ledger` | testnet | ICP local/test canister integration |
-| `ethereum-testnet-ledger` | testnet | EVM testnet contract and adapter experiments |
-| `agent-credit-ledger` | paper | internal credits for agent work, compute, research, and proof artifacts |
-
-## Agent token economics
-
-Source of truth:
-
-```text
-config/tokenomics/parallax.agent-tokenomics.json
-```
-
-Token classes:
-
-| Symbol | Class | Mode |
+| Layer | What it does | Current state |
 |---|---|---:|
-| `PXUSD` | paper stable unit | paper |
-| `PXICP` | ICP test unit | testnet |
-| `PXETH` | EVM test unit | testnet |
-| `PXAI` | agent work credit | paper |
-| `PXGPU` | compute credit | paper |
-| `PXCRED` | receipt credit | paper |
+| **Agent Vault API** | Creates vaults containing wallet systems, connector maps, ledgers, policy tools, billing meters, and receipts | Built |
+| **Canonical Vault State** | Persists vaults, wallets, receipts, principals, recovery snapshots, and receipt heads | Built |
+| **Boundary Gate** | Exposes `/api/boundaries` and denies unsafe capability paths | Built |
+| **Regulated-Live Readiness** | Registers secret references, broker adapters, and token rails without enabling live regulated activity | Built |
+| **Live Gate Engine** | Evaluates missing evidence and builds approval packets before any future manual live cutover | Built |
+| **Cloudflare Edge Gateway** | Worker gateway and edge posture for API exposure | Built |
+| **Native AI Wallet** | C/C++ policy interface for external strategy/runtime workers | Built |
+| **Proof Room** | Receipt-first audit posture for agent, vault, transfer, and approval events | Built |
 
-## Cloudflare Tunnel
+---
 
-Templates:
+## Operator boundaries
 
-```text
-infra/cloudflare/tunnel/config.example.yml
-infra/cloudflare/tunnel/docker-compose.tunnel.yml
+PARALLAX is deliberately gated. These rules are enforced in code, documentation, and validation receipts:
+
+| Boundary | Status |
+|---|---:|
+| No custody | Enforced |
+| No private keys | Enforced |
+| No raw secret storage | Enforced |
+| No live broker execution | Enforced |
+| No live money movement | Enforced |
+| No token sale | Enforced |
+| No public mainnet bridge | Enforced |
+| Paper/testnet only | Active posture |
+
+Unsafe paths return a denial object such as:
+
+```json
+{
+  "error": "regulated_live_gate_required",
+  "posture": "regulated_live_disabled_until_approved"
+}
 ```
 
-The intended path:
+---
+
+## HD architecture view
+
+<div align="center">
+  <img alt="PARALLAX platform architecture" src="assets/parallax-platform-infographic.svg" width="100%">
+</div>
+
+---
+
+## API surface
+
+### Agent Vaults
 
 ```text
-Cloudflare Worker
--> authenticated edge route
--> Cloudflare Tunnel / private origin
--> PARALLAX core service
--> receipt ledger
+GET  /api/vaults
+POST /api/vaults
+GET  /api/vaults/:id
+POST /api/vaults/:id/connectors
+POST /api/vaults/:id/agents
+POST /api/vaults/:id/ledger/transfer
 ```
 
-Do not commit tunnel credentials. Real tunnel deployment requires your Cloudflare account, tunnel id, credentials file, zone, and chosen hostnames.
-
-## Native C/C++ interface
-
-PARALLAX includes a standalone native interface for the AI wallet policy engine:
+### Persistence, recovery, and proof
 
 ```text
-src/native/ai-wallet/
+GET /api/snapshot
+GET /api/recovery
+GET /api/receipts
 ```
 
-It includes:
+### Boundaries and regulated-live readiness
 
-- stable C ABI: `include/parallax/ai_wallet.h`,
-- modern C++17 wrapper: `include/parallax/ai_wallet.hpp`,
-- C implementation: `src/ai_wallet.c`,
-- CMake build and install targets,
-- C and C++ tests,
-- C++ demo executable.
+```text
+GET  /api/boundaries
+GET  /api/regulated-live
+GET  /api/live/gate
+POST /api/live/approval-packet
+```
 
-Run the native gate:
+### Secret references, broker adapters, and token rails
+
+```text
+GET  /api/secrets
+POST /api/secrets
+GET  /api/brokers
+POST /api/brokers
+GET  /api/brokers/adapters
+POST /api/brokers/paper-order
+GET  /api/token-rails
+POST /api/token-rails
+POST /api/token-rails/proposal
+```
+
+### Explicitly denied live routes
+
+```text
+POST /api/brokers/execute
+POST /api/live/execute
+POST /api/live-money/transfer
+POST /api/token-sale
+POST /api/token-rails/live-transfer
+```
+
+---
+
+## Quick start
 
 ```bash
-pnpm alpha:native
+pnpm platform:dev
 ```
 
-## AI wallet alpha
-
-PARALLAX includes a dedicated AI wallet domain package:
+Open the local platform surface:
 
 ```text
-src/ai-wallet/        @parallax/ai-wallet
+http://localhost:8787/platform
 ```
 
-The AI wallet gives approved agents policy-gated paper/testnet wallets. It supports deterministic wallet creation, command evaluation, human approval thresholds, asset/counterparty allowlists, daily notional limits, receipt creation, and live-mode blocking.
+Use the demo API key for local paper/testnet flows:
 
-Run the wallet gate:
+```text
+Authorization: Bearer pk_demo_operator
+```
+
+Run the platform gate:
 
 ```bash
-pnpm alpha:wallet
+pnpm platform:validate
 ```
 
-## Product validation
-
-Run the product gate:
-
-```bash
-pnpm product:validate
-pnpm alpha:product
-```
-
-Full alpha validation path:
+Full alpha path:
 
 ```bash
 pnpm alpha:validate
 pnpm alpha:wallet
-pnpm alpha:native
+pnpm alpha:platform
 pnpm alpha:product
-pnpm alpha:gate
+pnpm alpha:launch
 ```
 
-## Platform architecture
+---
 
-```mermaid
-flowchart TD
-    A[Cloudflare Worker Edge Gateway] --> B[Cloudflare Tunnel / Private Origin]
-    B --> C[PARALLAX Core Services]
-    C --> D[AI Wallet Service]
-    C --> E[Multi-Ledger Registry]
-    C --> F[Agent Token Economics]
-    C --> G[Trading Service]
-    C --> H[Risk Policy Gate]
-    D --> H
-    E --> H
-    F --> H
-    G --> H
-    H --> I[Matching Engine]
-    I --> J[Clearinghouse + Paper/Testnet Ledgers]
-    J --> K[Receipt Ledger]
-    K --> L[Proof Room + Audit Export]
-    D --> M[Native C/C++ Interface]
-    M --> H
-    J --> N[ICP Local/Test Canisters]
-    J --> O[EVM Testnet Contracts]
-```
+## Validation receipts
 
-## First showcase loop
+PARALLAX emits explicit validation receipts under `dist/platform/` when the platform gate runs:
 
 ```text
-Cloudflare Worker Health
--> Ledger Registry
--> Token Registry
--> AI-Agent Wallet Class
--> Edge Command Evaluation
--> Tunnel/Core Route
--> Paper/Testnet Settlement
--> Receipt Export
+agent-vault-platform-validation-receipt.json
+vault-persistence-gate-receipt.json
+operator-boundary-readiness-receipt.json
+regulated-live-readiness-receipt.json
+live-gate-engine-receipt.json
 ```
 
-Showcase-ready means this works through a deployed Worker, verified tunnel, Control Tower UI, and receipt-visible command flow.
+These receipts exist to prove the repo has the expected architecture surfaces, gate terms, denial paths, and operator boundaries.
+
+---
+
+## Broker readiness families
+
+PARALLAX models broker integration as adapter readiness until regulated-live gates are satisfied:
+
+```text
+alpaca_sandbox
+interactive_brokers_paper
+tradier_sandbox
+schwab_developer_sandbox
+tastytrade_sandbox
+coinbase_sandbox
+kraken_sandbox
+binance_testnet
+oanda_practice
+dxtrade_demo
+mt5_demo_bridge
+```
+
+The platform supports paper/sandbox broker proposal flows. It does not submit live broker orders.
+
+---
+
+## Internal token rails
+
+Internal rails are modeled as credit/testnet units only:
+
+| Symbol | Role | Current mode |
+|---|---|---:|
+| `PXUSD` | paper stable unit | paper/testnet |
+| `PXAI` | agent work credit | internal credit |
+| `PXCRED` | receipt credit | internal credit |
+| `PXGPU` | compute credit | internal credit |
+| `PXRCPT` | receipt proof unit | internal credit |
+
+Disabled claims: cash redeemability, yield, deposit account behavior, security-token sale, and public mainnet value transfer.
+
+---
+
+## Live gate evidence
+
+Future manual live cutover requires a complete evidence packet:
+
+```text
+legal_entity_verified
+kyc_aml_program
+broker_terms_review
+licensed_operator_attestation
+compliance_officer_attestation
+production_secret_provider_bound
+risk_limits_approved
+human_approval_workflow
+kill_switch_enabled
+audit_log_enabled
+receipt_chain_enabled
+daily_reconciliation_job
+incident_response_runbook
+```
+
+Until all gates are satisfied, live execution remains denied.
+
+---
 
 ## Repository map
 
 ```text
-apps/cloudflare-gateway/ Cloudflare Worker gateway and Wrangler config
-config/ledgers/          multi-ledger ecosystem manifest
-config/tokenomics/       AI-agent token economics manifest
-infra/cloudflare/        tunnel templates and Cloudflare runbooks
-src/ai-wallet/           policy-gated AI wallet package for agents
-src/native/ai-wallet/    C ABI, C++ wrapper, CMake build, native tests
-docs/                    architecture, deployment, operator, protocol, and product docs
+apps/agent-api/              Agent Vault API, canonical state, regulated-live gate helpers
+apps/universal-trading/      Browser platform surface and control plane
+apps/cloudflare-gateway/     Cloudflare Worker gateway and Wrangler package
+config/platform/             Vault, boundary, regulated-live, and live-gate registries
+config/ledgers/              Multi-ledger ecosystem manifests
+config/tokenomics/           Agent token economics manifests
+src/ai-wallet/               TypeScript AI wallet policy package
+src/native/ai-wallet/        C ABI, C++ wrapper, CMake build, native tests
+docs/                        Architecture, deployment, operator, and proof documents
+assets/                      Brand, HD vector visuals, architecture panels
 ```
 
-## Contracts and command families
+---
 
-Every user, agent, or machine action should be represented by an explicit contract object before execution.
+## Core documents
 
-| Contract | Purpose |
+| Document | Purpose |
 |---|---|
-| `LedgerRegistryEntry` | ledger id, mode, assets, authority, and safety boundary |
-| `TokenClass` | token symbol, class, mode, value claim, and transfer boundary |
-| `AgentWalletClass` | AI-agent wallet capability and ledger policy |
-| `EdgePolicyDecision` | Worker-side approve/reject/human-review decision |
-| `CloudflareTunnelRoute` | hostname to private origin mapping |
-| `parallax_aiw_wallet` | native C wallet struct assigned to an AI agent |
-| `parallax_aiw_command` | native C proposed AI wallet action |
-| `parallax_aiw_evaluation` | native C approve/reject/human-approval decision |
-| `parallax_aiw_receipt` | native C receipt proof record |
-| `AiWallet` | wallet assigned to an AI agent |
-| `AiWalletPolicy` | scopes, limits, modes, assets, counterparties, approvals |
-| `AiWalletCommand` | proposed AI wallet action before execution |
-| `AiWalletReceipt` | wallet creation/evaluation/action proof record |
-| `FillReceipt` | matched order record |
-| `SettlementReceipt` | clearing and ledger record |
-| `ResearchArtifactReceipt` | paper, benchmark, and artifact minting record |
-| `GovernancePolicy` | role, mode, and system boundary rules |
-| `SystemMode` | local, paper, testnet, restricted-live, live |
+| [Background Agents and Agent API](docs/BACKGROUND_AGENTS_AGENT_API.md) | Vault API, external agent API, and product path |
+| [Vault Persistence Gate](docs/VAULT_PERSISTENCE_GATE.md) | Canonical state, persistence, auth, spend limits, receipt chain, recovery |
+| [Operator Boundary Readiness](docs/OPERATOR_BOUNDARY_READINESS.md) | Enforced no-custody/no-live-execution posture |
+| [Regulated-Live Readiness](docs/REGULATED_LIVE_READINESS.md) | Secret references, broker adapters, internal token rails |
+| [Live Gate Engine](docs/LIVE_GATE_ENGINE.md) | Gate evaluation, approval packets, and denial posture |
+| [Cloudflare Edge Runway](docs/CLOUDFLARE_EDGE_RUNWAY.md) | Edge deployment runway |
+| [Native C/C++ Interface](docs/NATIVE_CPP_INTERFACE.md) | Native policy engine interface |
+| [Platform Federation](docs/PARALLAX_PLATFORM_FEDERATION.md) | Multi-repo federation model |
 
-## Deployment posture
+---
 
-| Stage | Description | Allowed actions |
-|---|---|---|
-| **Local** | developer machine and local canisters | paper orders, fixtures, local receipts, native tests, Worker dev |
-| **Edge preview** | Cloudflare Worker preview/dev route | health, registry reads, authenticated alpha policy prechecks |
-| **Testnet** | public test canisters and external testnet contracts | testnet assets, demos, proof exports, policy-gated AI wallets |
-| **Closed alpha** | controlled users and operator review | paper trading, testnet transfers, research receipts, AI signal approval |
-| **Production candidate** | security, legal, compliance, native build matrix, Cloudflare route, tunnel verification, observability gate | no live funds without external validation |
-| **Live** | regulated, audited, monitored, insured posture | only after complete readiness review |
+## Commercial posture
 
-## Documentation
+PARALLAX is positioned for:
 
-- [Cloudflare Edge Runway](docs/CLOUDFLARE_EDGE_RUNWAY.md)
-- [Multi-Ledger Ecosystem](docs/MULTI_LEDGER_ECOSYSTEM.md)
-- [Agent Token Economics](docs/AGENT_TOKEN_ECONOMICS.md)
-- [Product Showcase Gate](docs/PRODUCT_SHOWCASE_GATE.md)
-- [Native C/C++ Interface](docs/NATIVE_CPP_INTERFACE.md)
-- [AI Wallet Alpha](docs/AI_WALLET_ALPHA.md)
-- [Alpha Service Runway](docs/ALPHA_SERVICE_RUNWAY.md)
-- [Platform Surface Blueprint](docs/PARALLAX_PLATFORM_SURFACE.md)
-- [Product Architecture](docs/PRODUCT_ARCHITECTURE.md)
-- [Platform Federation](docs/PARALLAX_PLATFORM_FEDERATION.md)
-- [Launch Packet](docs/PARALLAX_MAJOR_RUN.md)
-- [Alpha Service Catalog](config/services/parallax.alpha.services.json)
-- [AI Wallet Service Manifest](config/services/parallax.ai-wallet.service.json)
-- [Token Registry](config/tokens/parallax.tokens.json)
+```text
+Agent Vault API subscriptions
+enterprise receipt rooms
+broker-readiness integration packages
+regulated-live readiness packets
+white-label vault control planes
+managed agent operations
+connector marketplace lanes
+```
 
-## Public language boundary
+This repository does not claim to be a bank, broker-dealer, custodian, exchange, money transmitter, investment adviser, token issuer, or live settlement network.
 
-Use precise language:
+---
 
-- AI-native financial infrastructure,
-- paper-first multi-ledger agent economy,
-- Cloudflare edge gateway,
-- AI-agent token economics,
-- internal agent credits,
-- testnet-ready platform,
-- native C/C++ policy interface,
-- receipt-backed settlement research,
-- governed execution layer.
+<div align="center">
 
-Avoid unproven claims:
+**PARALLAX is the governed financial envelope for AI agents.**
 
-- guaranteed settlement,
-- live HFT fund,
-- production bank replacement,
-- risk-free trading,
-- externally audited status,
-- real money movement,
-- autonomous live AI trading,
-- public token sale,
-- mainnet bridge.
+Paper/testnet first. Receipt-forward. Boundary-enforced. Live-gated.
 
-## Near-term roadmap
-
-1. **Cloudflare Deployment Gate**: deploy Worker preview/custom route and set `PARALLAX_EDGE_TOKEN`.
-2. **Tunnel Verification Gate**: connect Cloudflare Tunnel to local/core service without exposing raw origin.
-3. **Control Tower Edge Binding**: read ledgers, tokens, agent classes, and alpha gates from Worker routes.
-4. **Receipt-Visible Command Loop**: POST edge command evaluation, route to core, emit receipt, show proof.
-5. **Native Worker Gate**: use the C/C++ interface inside strategy workers and simulation processes.
-6. **AI Wallet Backend Gate**: persist AI wallets, policies, commands, evaluations, receipts, and daily usage in canisters.
-7. **Token Economics Gate**: issue/burn PXAI, PXGPU, and PXCRED only from receipt-backed internal events.
-8. **Operator Governance**: role policy, emergency halt, upgrade checklist, compliance boundary.
-
-## Status
-
-PARALLAX is being consolidated into a real alpha product. The repo now has AI-wallet policy, native C/C++ policy enforcement, multi-ledger registry, AI-agent token economics, Cloudflare Worker gateway, tunnel templates, product validation, and showcase gates. It is not yet showcase-ready until the Worker is deployed, the tunnel is verified, the Control Tower consumes edge routes, and one receipt-visible paper/testnet command loop is working end-to-end.
+</div>
