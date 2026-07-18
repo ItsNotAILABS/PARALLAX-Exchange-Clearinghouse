@@ -1,0 +1,11 @@
+const RUNTIMES={browser_ai:['embed','teach','memory','local_infer'],python_orchestration:['brief','index','research','api','plan'],julia_compute:['risk','monte_carlo','var','cvar','optimize','simulate'],node_wasm_mesh:['wasm','portable','compile','bridge'],cloudflare_edge_agents:['fleet','edge','tick','dashboard','mcp'],solidity_law:['policy','receipt','vault','settlement','ownership']};
+const DENIED=['unsafe_cloud_mutation','unguarded_signing','live_financial_execution','public_value_bridge'];
+const now=()=>new Date().toISOString();
+const hash=v=>{let h=2166136261;for(const c of JSON.stringify(v))h=Math.imul(h^c.charCodeAt(0),16777619);return`px_${(h>>>0).toString(16).padStart(8,'0')}`};
+const deniedReason=t=>DENIED.find(d=>JSON.stringify(t).toLowerCase().includes(d.replaceAll('_',' ')))||null;
+const chooseRuntime=t=>{const s=JSON.stringify(t).toLowerCase();for(const [rt,keys]of Object.entries(RUNTIMES))if(keys.some(k=>s.includes(k)))return rt;return'python_orchestration'};
+const receipt=(type,payload)=>({receiptId:`pxr_${hash({type,payload,at:now()}).slice(3)}`,type,hash:hash(payload),createdAt:now()});
+const planTask=(body={})=>{const denied=deniedReason(body);if(denied)return{ok:false,error:'polyglot_policy_denied',denied,receipt:receipt('polyglot.policy.denied',body)};const runtime=chooseRuntime(body);const plan={planId:`pxplan_${hash(body).slice(3)}`,runtime,task:body.task||'builder_task',mode:'paper_testnet_first',requiresReceipt:true,createdAt:now()};return{ok:true,plan,receipt:receipt('polyglot.plan.created',plan)}};
+const dispatchTask=(body={})=>{const planned=body.plan||planTask(body).plan;if(!planned)return planTask(body);const dispatch={dispatchId:`pxdispatch_${hash(planned).slice(3)}`,runtime:planned.runtime,status:'accepted_for_governed_execution',executesLive:false,createdAt:now()};return{ok:true,dispatch,receipt:receipt('polyglot.dispatch.accepted',dispatch)}};
+const prepareMonadSettlement=(body={})=>{const tx={settlementId:`pxmonad_${hash(body).slice(3)}`,chain:'monad_evm',mode:'unsigned_proposal',contract:body.contract||'ReceiptChain',method:body.method||'recordReceipt',args:body.args||[],broadcast:false,createdAt:now()};return{ok:true,settlement:tx,receipt:receipt('monad.settlement.prepared',tx)}};
+export{RUNTIMES,DENIED,chooseRuntime,planTask,dispatchTask,prepareMonadSettlement,receipt};
