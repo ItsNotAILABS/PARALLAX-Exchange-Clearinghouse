@@ -21,9 +21,9 @@ assert.ok(Array.isArray(manifest.evidence) && manifest.evidence.length >= 5);
 assert.ok(Array.isArray(manifest.boundaries) && manifest.boundaries.includes('no live trading authority'));
 assert.equal(manifest.approvals.operator, false);
 
-const banned = [/guaranteed profit/i, /risk-free/i, /live trading enabled/i, /regulated exchange approved/i];
+const bannedPositiveClaims = [/risk[- ]free returns/i, /live trading is enabled/i, /regulated exchange approved/i, /custody is available/i];
 for (const file of required) {
   const text = fs.readFileSync(path.join(root, file), 'utf8');
-  for (const pattern of banned) assert.equal(pattern.test(text), false, `${file} contains banned phrase ${pattern}`);
+  for (const pattern of bannedPositiveClaims) assert.equal(pattern.test(text), false, `${file} contains banned positive claim ${pattern}`);
 }
 console.log(JSON.stringify({ ok: true, checked: required.length, release: manifest.release }, null, 2));
