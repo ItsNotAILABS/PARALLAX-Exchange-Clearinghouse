@@ -1,0 +1,5 @@
+import{RUNTIMES,DENIED,planTask,dispatchTask,prepareMonadSettlement,receipt}from'./engine.js';
+const REQUIRED=['browser_ai','python_orchestration','julia_compute','node_wasm_mesh','cloudflare_edge_agents','solidity_law'];
+const alphaStatus=()=>({stage:'alpha',posture:'paper_testnet_first',anchor:'monad_evm_settlement',ready:REQUIRED.every(r=>RUNTIMES[r]),runtimes:REQUIRED,denied:DENIED,checks:['route_selection','policy_denial','dispatch_envelope','unsigned_settlement','receipt_output']});
+const alphaCheck=(body={})=>{const plan=planTask(body);if(!plan.ok)return{ok:false,stage:'alpha',plan};const dispatch=dispatchTask({plan:plan.plan});const settlement=prepareMonadSettlement({contract:'ReceiptChain',method:'recordReceipt',args:[plan.receipt.receiptId,dispatch.receipt.receiptId]});return{ok:true,stage:'alpha',status:alphaStatus(),plan:plan.plan,dispatch:dispatch.dispatch,settlement:settlement.settlement,receipts:[plan.receipt,dispatch.receipt,settlement.receipt,receipt('polyglot.alpha.check',{plan:plan.plan.planId})]}};
+export{alphaStatus,alphaCheck};
