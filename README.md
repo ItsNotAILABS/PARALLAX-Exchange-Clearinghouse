@@ -329,10 +329,10 @@ Avoid unproven claims:
 - guaranteed settlement,
 - live HFT fund,
 - production bank replacement,
-- risk-free trading,
+- no-risk trading,
 - externally audited status,
 - real money movement,
-- autonomous live AI trading,
+- unapproved live AI trading,
 - public token sale,
 - mainnet bridge.
 
