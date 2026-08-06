@@ -21,7 +21,7 @@ jobs:
           node-version: 24
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps --no-audit --no-fund
+        run: npm install --legacy-peer-deps --no-audit --no-fund --ignore-scripts
 
       - name: Typecheck
         run: npm run typecheck
@@ -46,7 +46,7 @@ jobs:
           node-version: 24
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps --no-audit --no-fund
+        run: npm install --legacy-peer-deps --no-audit --no-fund --ignore-scripts
 
       - name: Run tests
         run: npm run test
