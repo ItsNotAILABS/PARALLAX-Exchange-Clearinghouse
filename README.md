@@ -25,9 +25,9 @@
 
 ### Governed financial infrastructure for external AI-agent swarms.
 
-**Agent Vaults are the jurisdictional boundary. Wallets are execution organs. Broker adapters and internal token rails remain policy-gated. Receipts are the evidence layer.**
+**Agent Vaults are the jurisdictional boundary. Wallets are execution organs. User funding intents, broker adapters, internal token rails, and crypto purchase rails remain policy-gated. Receipts are the evidence layer.**
 
-[Agent Vault API](docs/BACKGROUND_AGENTS_AGENT_API.md) · [Vault Persistence Gate](docs/VAULT_PERSISTENCE_GATE.md) · [Operator Boundary](docs/OPERATOR_BOUNDARY_READINESS.md) · [Regulated-Live Readiness](docs/REGULATED_LIVE_READINESS.md) · [Live Gate Engine](docs/LIVE_GATE_ENGINE.md) · [Platform Federation](docs/PARALLAX_PLATFORM_FEDERATION.md)
+[Agent Vault API](docs/BACKGROUND_AGENTS_AGENT_API.md) · [Crypto User Funding](docs/CRYPTO_USER_FUNDING_RUNWAY.md) · [Vault Persistence Gate](docs/VAULT_PERSISTENCE_GATE.md) · [Operator Boundary](docs/OPERATOR_BOUNDARY_READINESS.md) · [Regulated-Live Readiness](docs/REGULATED_LIVE_READINESS.md) · [Live Gate Engine](docs/LIVE_GATE_ENGINE.md) · [Platform Federation](docs/PARALLAX_PLATFORM_FEDERATION.md)
 
 </div>
 
@@ -41,15 +41,15 @@
 
 ## Executive summary
 
-**PARALLAX** is an AI-native financial operating layer for external agents, vaults, ledgers, broker-adapter readiness, internal token rails, clearinghouse receipts, and regulated-live approval workflows.
+**PARALLAX** is an AI-native financial operating layer for external agents, vaults, ledgers, user-funded purchase intents, broker-adapter readiness, internal token rails, clearinghouse receipts, and regulated-live approval workflows.
 
 The platform is built around a simple production doctrine:
 
 ```text
-Vault boundary -> wallet execution -> policy gate -> broker/token proposal -> receipt evidence -> recovery proof
+Vault boundary -> user funding intent -> wallet execution -> policy gate -> broker/token/purchase proposal -> receipt evidence -> recovery proof
 ```
 
-PARALLAX is currently **paper/testnet first**. It can register vaults, API-key principals, secret references, broker connector contracts, internal token rails, paper broker proposals, paper/testnet transfers, live approval packets, recovery snapshots, and hash-linked receipts.
+PARALLAX is currently **paper/testnet first**. It can register vaults, API-key principals, secret references, broker connector contracts, crypto funding intents, external provider session references, wallet-transfer references, funding confirmations, internal token rails, paper broker proposals, paper/testnet transfers, live approval packets, recovery snapshots, and hash-linked receipts.
 
 It does **not** enable custody, raw private-key storage, seed capture, raw secret storage, live broker execution, live money movement, token sales, redeemability/yield claims, or public mainnet bridge execution.
 
@@ -60,13 +60,14 @@ It does **not** enable custody, raw private-key storage, seed capture, raw secre
 | Layer | What it does | Current state |
 |---|---|---:|
 | **Agent Vault API** | Creates vaults containing wallet systems, connector maps, ledgers, policy tools, billing meters, and receipts | Built |
+| **Crypto User Funding** | Models external provider sessions, wallet-transfer references, confirmations, balance credit proposals, and purchase authorization receipts | Built |
 | **Canonical Vault State** | Persists vaults, wallets, receipts, principals, recovery snapshots, and receipt heads | Built |
 | **Boundary Gate** | Exposes `/api/boundaries` and denies unsafe capability paths | Built |
 | **Regulated-Live Readiness** | Registers secret references, broker adapters, and token rails without enabling live regulated activity | Built |
 | **Live Gate Engine** | Evaluates missing evidence and builds approval packets before any future manual live cutover | Built |
 | **Cloudflare Edge Gateway** | Worker gateway and edge posture for API exposure | Built |
 | **Native AI Wallet** | C/C++ policy interface for external strategy/runtime workers | Built |
-| **Proof Room** | Receipt-first audit posture for agent, vault, transfer, and approval events | Built |
+| **Proof Room** | Receipt-first audit posture for agent, vault, transfer, funding, purchase, and approval events | Built |
 
 ---
 
@@ -117,6 +118,16 @@ POST /api/vaults/:id/agents
 POST /api/vaults/:id/ledger/transfer
 ```
 
+### Crypto user funding and purchases
+
+```text
+GET  /api/crypto/funding/policy
+POST /api/crypto/funding/intents
+POST /api/crypto/funding/confirmations
+POST /api/crypto/purchases/authorize
+GET  /api/crypto/funding/receipts
+```
+
 ### Persistence, recovery, and proof
 
 ```text
@@ -160,6 +171,40 @@ POST /api/token-rails/live-transfer
 
 ---
 
+## Crypto funding flow
+
+```text
+user purchase intent
+  -> quote and disclosures
+  -> user consent
+  -> funding intent
+  -> provider session or wallet-transfer reference
+  -> transaction/webhook observation
+  -> confirmation
+  -> KYC/AML and operator review if required
+  -> balance credit proposal
+  -> purchase authorization
+  -> purchase receipt
+  -> proof-room append
+```
+
+Runtime functions:
+
+```text
+getCryptoFundingPolicy()
+createFundingIntent(input)
+recordFundingConfirmation(input)
+evaluatePurchaseAuthorization(input)
+```
+
+The runtime lives at:
+
+```text
+apps/crypto-funding-gateway/src/index.js
+```
+
+---
+
 ## Quick start
 
 ```bash
@@ -178,10 +223,11 @@ Use the demo API key for local paper/testnet flows:
 Authorization: Bearer pk_demo_operator
 ```
 
-Run the platform gate:
+Run the platform and crypto funding gates:
 
 ```bash
 pnpm platform:validate
+pnpm crypto:funding:validate
 ```
 
 Full alpha path:
@@ -198,7 +244,7 @@ pnpm alpha:launch
 
 ## Validation receipts
 
-PARALLAX emits explicit validation receipts under `dist/platform/` when the platform gate runs:
+PARALLAX emits explicit validation receipts under `dist/platform/`, `dist/commercial/`, and `dist/crypto/` when gates run:
 
 ```text
 agent-vault-platform-validation-receipt.json
@@ -206,9 +252,10 @@ vault-persistence-gate-receipt.json
 operator-boundary-readiness-receipt.json
 regulated-live-readiness-receipt.json
 live-gate-engine-receipt.json
+crypto-user-funding-validation-receipt.json
 ```
 
-These receipts exist to prove the repo has the expected architecture surfaces, gate terms, denial paths, and operator boundaries.
+These receipts exist to prove the repo has the expected architecture surfaces, gate terms, denial paths, crypto funding contracts, purchase authorization terms, and operator boundaries.
 
 ---
 
@@ -277,16 +324,18 @@ Until all gates are satisfied, live execution remains denied.
 ## Repository map
 
 ```text
-apps/agent-api/              Agent Vault API, canonical state, regulated-live gate helpers
-apps/universal-trading/      Browser platform surface and control plane
-apps/cloudflare-gateway/     Cloudflare Worker gateway and Wrangler package
-config/platform/             Vault, boundary, regulated-live, and live-gate registries
-config/ledgers/              Multi-ledger ecosystem manifests
-config/tokenomics/           Agent token economics manifests
-src/ai-wallet/               TypeScript AI wallet policy package
-src/native/ai-wallet/        C ABI, C++ wrapper, CMake build, native tests
-docs/                        Architecture, deployment, operator, and proof documents
-assets/                      Brand, HD vector visuals, architecture panels
+apps/agent-api/                Agent Vault API, canonical state, regulated-live gate helpers
+apps/crypto-funding-gateway/  Crypto funding intent, confirmation, and purchase authorization runtime
+apps/universal-trading/        Browser platform surface and control plane
+apps/cloudflare-gateway/       Cloudflare Worker gateway and Wrangler package
+config/crypto/                 Crypto user funding and purchase rail configuration
+config/platform/               Vault, boundary, regulated-live, and live-gate registries
+config/ledgers/                Multi-ledger ecosystem manifests
+config/tokenomics/             Agent token economics manifests
+src/ai-wallet/                 TypeScript AI wallet policy package
+src/native/ai-wallet/          C ABI, C++ wrapper, CMake build, native tests
+docs/                          Architecture, deployment, operator, and proof documents
+assets/                        Brand, HD vector visuals, architecture panels
 ```
 
 ---
@@ -296,6 +345,7 @@ assets/                      Brand, HD vector visuals, architecture panels
 | Document | Purpose |
 |---|---|
 | [Background Agents and Agent API](docs/BACKGROUND_AGENTS_AGENT_API.md) | Vault API, external agent API, and product path |
+| [Crypto User Funding Runway](docs/CRYPTO_USER_FUNDING_RUNWAY.md) | User funding, wallet/provider references, confirmations, and purchase authorization rails |
 | [Vault Persistence Gate](docs/VAULT_PERSISTENCE_GATE.md) | Canonical state, persistence, auth, spend limits, receipt chain, recovery |
 | [Operator Boundary Readiness](docs/OPERATOR_BOUNDARY_READINESS.md) | Enforced no-custody/no-live-execution posture |
 | [Regulated-Live Readiness](docs/REGULATED_LIVE_READINESS.md) | Secret references, broker adapters, internal token rails |
@@ -312,6 +362,8 @@ PARALLAX is positioned for:
 
 ```text
 Agent Vault API subscriptions
+user-funded purchase authorization rails
+crypto funding receipt rooms
 enterprise receipt rooms
 broker-readiness integration packages
 regulated-live readiness packets
