@@ -1,0 +1,97 @@
+{
+  "schema": "parallax.crypto_user_funding.v1",
+  "posture": "user_funded_purchase_rails_gated",
+  "authorityRepo": "ItsNotAILABS/PARALLAX-Exchange-Clearinghouse",
+  "purpose": "Let users fund PARALLAX purchase intents through external wallet/onramp/exchange-provider rails while PARALLAX records authorization, balances, receipts, and proof-room evidence without taking custody by default.",
+  "supportedFundingModes": [
+    {
+      "mode": "external_checkout_provider",
+      "description": "A third-party checkout/onramp/processor creates the payment session, performs provider-side compliance checks, and returns a provider reference. PARALLAX stores only the session reference and receipt metadata."
+    },
+    {
+      "mode": "self_custody_wallet_transfer",
+      "description": "A user sends crypto from a wallet they control to an operator-approved receiving rail or provider-managed address. PARALLAX records tx hashes, confirmations, and accounting receipts only after verification."
+    },
+    {
+      "mode": "sandbox_exchange_or_testnet",
+      "description": "A sandbox/testnet exchange or chain rail can be used for demo and alpha testing before any live value handling."
+    }
+  ],
+  "supportedAssetClasses": [
+    "stablecoin",
+    "native_crypto",
+    "testnet_token",
+    "internal_credit"
+  ],
+  "supportedChains": [
+    "icp",
+    "bitcoin",
+    "ethereum",
+    "base",
+    "polygon",
+    "solana",
+    "testnet"
+  ],
+  "purchaseIntentLifecycle": [
+    "quote_requested",
+    "user_consent_recorded",
+    "funding_intent_created",
+    "provider_or_wallet_reference_created",
+    "funding_pending",
+    "funding_observed",
+    "funding_confirmed",
+    "balance_credit_proposed",
+    "purchase_authorization_evaluated",
+    "purchase_executed_or_rejected",
+    "receipt_emitted",
+    "proof_room_appended"
+  ],
+  "requiredUserConsent": [
+    "asset_and_chain_selected",
+    "network_fee_disclosed",
+    "refund_policy_disclosed",
+    "purchase_terms_accepted",
+    "risk_and_volatility_notice_acknowledged",
+    "no_deposit_account_acknowledged"
+  ],
+  "riskControls": {
+    "custodyDefault": false,
+    "privateKeysAccepted": false,
+    "seedPhrasesAccepted": false,
+    "rawSecretsStored": false,
+    "livePurchaseAutoExecution": false,
+    "operatorApprovalRequiredAboveUsd": 2500,
+    "kycAmlReviewRequiredAboveUsd": 1000,
+    "sanctionsScreeningRequired": true,
+    "chargebackOrRefundWorkflowRequired": true,
+    "receiptRequired": true,
+    "proofRoomAppendRequired": true
+  },
+  "blockedClaims": [
+    "PARALLAX is a bank",
+    "PARALLAX provides custody by default",
+    "Funds are FDIC insured",
+    "Purchases are risk free",
+    "Crypto deposits earn yield",
+    "Live purchases execute autonomously without approval",
+    "Public token sale is active"
+  ],
+  "providerSecrets": {
+    "policy": "secret_reference_only",
+    "allowedEnvironmentReferences": [
+      "PARALLAX_CRYPTO_PROVIDER_REF",
+      "PARALLAX_CRYPTO_WEBHOOK_SECRET_REF",
+      "PARALLAX_CRYPTO_TREASURY_WALLET_REF",
+      "PARALLAX_CRYPTO_COMPLIANCE_PROVIDER_REF"
+    ]
+  },
+  "receiptKinds": [
+    "crypto_funding_intent",
+    "crypto_provider_session",
+    "wallet_transfer_observed",
+    "funding_confirmation",
+    "purchase_authorization",
+    "purchase_receipt",
+    "refund_or_reversal_receipt"
+  ]
+}
