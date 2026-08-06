@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://itsnotailabs.dev/schemas/parallax-market-release.schema.json",
+  "title": "PARALLAX Market Release",
+  "type": "object",
+  "required": ["market_id", "instruments", "receipt_boundary", "operator_approval_required"],
+  "properties": {
+    "market_id": { "type": "string" },
+    "instruments": { "type": "array", "items": { "type": "string" } },
+    "receipt_boundary": { "type": "string" },
+    "operator_approval_required": { "type": "boolean" }
+  }
+}
