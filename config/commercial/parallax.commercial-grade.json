@@ -1,1 +1,81 @@
-{"schema":"parallax.commercial_grade.v1","posture":"paper_testnet_first","authorityRepo":"ItsNotAILABS/PARALLAX-Exchange-Clearinghouse","standard":"commercial_alpha_not_live_financial_institution","generatedAt":"2026-07-15T00:00:00-05:00","hardBoundaries":{"liveMoneyMovement":false,"liveBrokerExecution":false,"custody":false,"regulatedExchangeActivity":false,"publicMainnetBridge":false,"externalAuditClaim":false,"financialPerformanceClaim":false},"requiredSurfaces":["README.md","package.json","config/ledgers/parallax.multiledger.ecosystem.json","config/tokenomics/parallax.agent-tokenomics.json","config/clouds/parallax.private-clouds.json","config/federation/parallax.repo-federation.json","config/use-cases/parallax.use-cases.json","config/training/parallax.model-training.manifest.json","docs/AGENT_EXECUTION_PROTOCOL.md","docs/AGENT_EXECUTION_DEMOS.md","docs/PRIVATE_SOVEREIGN_CLOUDS.md","docs/PRIVATE_BLOCKCHAIN_CLOUDS.md","docs/MULTI_REPO_FEDERATION.md","docs/PARALLAX_USE_CASES.md","docs/MODEL_TRAINING_RUNWAY.md","docs/LATIN_TRADING_ENGINES.md","scripts/validate-alpha-services.mjs","scripts/validate-parallax-product.mjs","scripts/validate-private-clouds.mjs","scripts/validate-repo-federation.mjs","scripts/validate-model-training.mjs","src/ai-wallet/src/latin-engines.ts","src/ai-wallet/src/trading-agents.ts","apps/universal-trading/index.html"],"requiredScripts":["alpha:validate","alpha:wallet","latin:agents","alpha:native","product:validate","private-cloud:validate","repo-federation:validate","training:build","training:validate","alpha:models","terminal:validate","sovereign:validate","alpha:product","alpha:launch"],"commercialPlanes":[{"plane":"execution","surfaces":["AI wallet policy","Latin agents","paper order lifecycle","human threshold","operator halt"]},{"plane":"proof","surfaces":["receipts","Merkle proof room","training receipt","release receipt"]},{"plane":"federation","surfaces":["multi-repo feeder registry","feeder manifests","promotion gates"]},{"plane":"deployment","surfaces":["Cloudflare edge","private cloud runway","launch serving","CI gates"]},{"plane":"model","surfaces":["training manifest","seed examples","feeder classifier","risk gatekeeper","execution router","receipt writer"]},{"plane":"governance","surfaces":["paper/testnet posture","blocked live claims","SNS feeder boundary","private trunk protection"]}],"openFollowUps":[{"id":"PR-34","name":"three-agent orchestration layer","status":"open_stale_review_required","reason":"older branch overlaps newer federation and Latin agent work; do not merge blindly"}],"releaseGate":"pnpm commercial:validate && pnpm alpha:product && pnpm alpha:launch"}
+{
+  "schema": "parallax.commercial_grade.v1",
+  "posture": "paper_testnet_first",
+  "authorityRepo": "ItsNotAILABS/PARALLAX-Exchange-Clearinghouse",
+  "standard": "commercial_alpha_not_live_financial_institution",
+  "generatedAt": "2026-07-15T00:00:00-05:00",
+  "hardBoundaries": {
+    "liveMoneyMovement": false,
+    "liveBrokerExecution": false,
+    "custody": false,
+    "regulatedExchangeActivity": false,
+    "publicMainnetBridge": false,
+    "externalAuditClaim": false,
+    "financialPerformanceClaim": false
+  },
+  "requiredSurfaces": [
+    "README.md",
+    "package.json",
+    "config/ledgers/parallax.multiledger.ecosystem.json",
+    "config/tokenomics/parallax.agent-tokenomics.json",
+    "config/crypto/parallax.crypto-user-funding.json",
+    "config/clouds/parallax.private-clouds.json",
+    "config/federation/parallax.repo-federation.json",
+    "config/use-cases/parallax.use-cases.json",
+    "config/training/parallax.model-training.manifest.json",
+    "docs/AGENT_EXECUTION_PROTOCOL.md",
+    "docs/AGENT_EXECUTION_DEMOS.md",
+    "docs/CRYPTO_USER_FUNDING_RUNWAY.md",
+    "docs/PRIVATE_SOVEREIGN_CLOUDS.md",
+    "docs/PRIVATE_BLOCKCHAIN_CLOUDS.md",
+    "docs/MULTI_REPO_FEDERATION.md",
+    "docs/PARALLAX_USE_CASES.md",
+    "docs/MODEL_TRAINING_RUNWAY.md",
+    "docs/LATIN_TRADING_ENGINES.md",
+    "scripts/validate-alpha-services.mjs",
+    "scripts/validate-parallax-product.mjs",
+    "scripts/validate-crypto-user-funding.mjs",
+    "scripts/validate-private-clouds.mjs",
+    "scripts/validate-repo-federation.mjs",
+    "scripts/validate-model-training.mjs",
+    "src/ai-wallet/src/latin-engines.ts",
+    "src/ai-wallet/src/trading-agents.ts",
+    "apps/crypto-funding-gateway/src/index.js",
+    "apps/universal-trading/index.html"
+  ],
+  "requiredScripts": [
+    "alpha:validate",
+    "alpha:wallet",
+    "latin:agents",
+    "alpha:native",
+    "product:validate",
+    "crypto:funding:validate",
+    "private-cloud:validate",
+    "repo-federation:validate",
+    "training:build",
+    "training:validate",
+    "alpha:models",
+    "terminal:validate",
+    "sovereign:validate",
+    "alpha:product",
+    "alpha:launch"
+  ],
+  "commercialPlanes": [
+    { "plane": "execution", "surfaces": ["AI wallet policy", "Latin agents", "paper order lifecycle", "human threshold", "operator halt"] },
+    { "plane": "funding", "surfaces": ["crypto funding intent", "provider session reference", "wallet transfer reference", "purchase authorization receipt"] },
+    { "plane": "proof", "surfaces": ["receipts", "Merkle proof room", "training receipt", "release receipt"] },
+    { "plane": "federation", "surfaces": ["multi-repo feeder registry", "feeder manifests", "promotion gates"] },
+    { "plane": "deployment", "surfaces": ["Cloudflare edge", "private cloud runway", "launch serving", "CI gates"] },
+    { "plane": "model", "surfaces": ["training manifest", "seed examples", "feeder classifier", "risk gatekeeper", "execution router", "receipt writer"] },
+    { "plane": "governance", "surfaces": ["paper/testnet posture", "blocked live claims", "SNS feeder boundary", "private trunk protection"] }
+  ],
+  "openFollowUps": [
+    {
+      "id": "PR-34",
+      "name": "three-agent orchestration layer",
+      "status": "open_stale_review_required",
+      "reason": "older branch overlaps newer federation and Latin agent work; do not merge blindly"
+    }
+  ],
+  "releaseGate": "pnpm commercial:validate && pnpm crypto:funding:validate && pnpm alpha:product && pnpm alpha:launch"
+}
