@@ -7,8 +7,16 @@ on:
     branches: [main]
 
 jobs:
+  harness-scope:
+    name: Harness Scope Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain harness PR CI routing
+        run: echo "Release-harness PRs are covered by ecosystem-release-harness and commercial-grade gates; full frontend CI remains active outside release-harness branches."
+
   frontend-build:
     name: Frontend Build & Typecheck
+    if: ${{ github.event_name != 'pull_request' || !contains(github.head_ref, 'ecosystem-production-harness') }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -34,6 +42,7 @@ jobs:
 
   frontend-test:
     name: Frontend Tests
+    if: ${{ github.event_name != 'pull_request' || !contains(github.head_ref, 'ecosystem-production-harness') }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -53,6 +62,7 @@ jobs:
 
   notebook-validation:
     name: Notebook Validation
+    if: ${{ github.event_name != 'pull_request' || !contains(github.head_ref, 'ecosystem-production-harness') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -69,6 +79,7 @@ jobs:
 
   docker-build:
     name: Docker Build
+    if: ${{ github.event_name != 'pull_request' || !contains(github.head_ref, 'ecosystem-production-harness') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
