@@ -25,7 +25,9 @@ jobs:
           node-version: 24
 
       - name: Install dependencies
-        run: pnpm install --prefer-offline --no-frozen-lockfile --lockfile=false
+        run: |
+          rm -f pnpm-lock.yaml
+          pnpm install --prefer-offline --no-frozen-lockfile --lockfile=false
 
       - name: Typecheck
         run: pnpm typecheck
@@ -54,7 +56,9 @@ jobs:
           node-version: 24
 
       - name: Install dependencies
-        run: pnpm install --prefer-offline --no-frozen-lockfile --lockfile=false
+        run: |
+          rm -f pnpm-lock.yaml
+          pnpm install --prefer-offline --no-frozen-lockfile --lockfile=false
 
       - name: Run tests
         run: pnpm test
