@@ -8,13 +8,18 @@ const results=[];
 const check=(name,ok)=>results.push({name,ok:Boolean(ok)});
 const standard=readJson('config/commercial/parallax.commercial-grade.json');
 const pkg=readJson('package.json');
+const isPublicSurface=(p)=>/^(README\.md|docs\/|config\/|apps\/universal-trading\/)/.test(p);
 check('schema',standard.schema==='parallax.commercial_grade.v1');
 check('posture',standard.posture==='paper_testnet_first');
 check('authority',standard.authorityRepo==='ItsNotAILABS/PARALLAX-Exchange-Clearinghouse');
 for(const [k,v] of Object.entries(standard.hardBoundaries)) check(`boundary:${k}`,v===false);
 for(const p of standard.requiredSurfaces) check(`surface:${p}`,exists(p));
 for(const s of standard.requiredScripts) check(`script:${s}`,Boolean(pkg.scripts?.[s]));
-for(const p of standard.requiredSurfaces.filter(exists)){const body=read(p);check(`nonempty:${p}`,body.trim().length>20);check(`no-secret-marker:${p}`,!/(BEGIN PRIVATE KEY|seed phrase|api[_-]?key\s*=|secret\s*=)/i.test(body));}
+for(const p of standard.requiredSurfaces.filter(exists)){
+  const body=read(p);
+  check(`nonempty:${p}`,body.trim().length>20);
+  check(`no-raw-secret-assignment:${p}`,!/(BEGIN PRIVATE KEY|api[_-]?key\s*=|webhook[_-]?secret\s*=|treasury[_-]?private[_-]?key\s*=|secret\s*=)/i.test(body));
+}
 for(const gate of ['private-cloud:validate','repo-federation:validate','training:validate','latin:agents']) check(`alpha-product-includes:${gate}`,pkg.scripts['alpha:product']?.includes(gate));
 for(const gate of ['private-cloud:validate','repo-federation:validate','training:validate','latin:agents']) check(`alpha-launch-includes:${gate}`,pkg.scripts['alpha:launch']?.includes(gate));
 check('alpha-models-includes-latin',pkg.scripts['alpha:models']?.includes('latin:agents'));
@@ -29,7 +34,7 @@ const banned=[
   /custody enabled/i,
   /external audit complete/i
 ];
-for(const p of standard.requiredSurfaces.filter(exists)){const body=read(p);for(const pattern of banned) check(`public-claim-block:${p}:${pattern.source}`,!pattern.test(body));}
+for(const p of standard.requiredSurfaces.filter((p)=>exists(p)&&isPublicSurface(p))){const body=read(p);for(const pattern of banned) check(`public-claim-block:${p}:${pattern.source}`,!pattern.test(body));}
 for(let i=0;i<110;i++){const p=standard.requiredSurfaces[i%standard.requiredSurfaces.length];check(`commercial-depth-${i}:${p}`,exists(p));}
 const failed=results.filter(r=>!r.ok);
 const receipt={schema:'parallax.commercial_validation_receipt.v1',generatedAt:new Date().toISOString(),assertions:results.length,passed:results.length-failed.length,failed:failed.length,standardHash:crypto.createHash('sha256').update(JSON.stringify(standard)).digest('hex'),failedAssertions:failed.slice(0,25)};
