@@ -31,6 +31,15 @@ const requireFile = (relativePath) => {
   if (!fs.existsSync(path.join(root, relativePath))) errors.push(`Missing ${relativePath}`);
 };
 
+const alphaSafeValueClaims = new Set([
+  'no_real_value',
+  'testnet_only',
+  'internal_credit_only',
+  'internal_compute_accounting_only',
+  'paper_only',
+  'sandbox_only'
+]);
+
 const multiLedger = readJson('config/ledgers/parallax.multiledger.ecosystem.json');
 const tokenomics = readJson('config/tokenomics/parallax.agent-tokenomics.json');
 
@@ -61,7 +70,8 @@ if (tokenomics) {
   for (const token of tokenClasses) {
     if (!['paper', 'testnet'].includes(token.mode)) errors.push(`Token ${token.symbol} is not alpha-safe mode`);
     if (!Array.isArray(token.must_not_do) || token.must_not_do.length === 0) errors.push(`Token ${token.symbol} missing must_not_do boundaries`);
-    if (String(token.value_claim).toLowerCase().includes('real')) errors.push(`Token ${token.symbol} has unsafe value claim ${token.value_claim}`);
+    const claim = String(token.value_claim).toLowerCase();
+    if (!alphaSafeValueClaims.has(claim)) errors.push(`Token ${token.symbol} has unsafe value claim ${token.value_claim}`);
   }
 }
 
