@@ -34,7 +34,7 @@ assert(includesAny(portfolio, ['insufficient_paper_balance','paperBalances','bal
 assert(includesAny(portfolio, ['paperPositions','paperBalances','snapshots']), 'portfolio_missing:paperPositions');
 for (const token of ['SovereignReceiptStore','SovereignActionRuntime','tamperEvidentReceipts','persistentPaperLedger','mainnetExecution: false','custody: false']) assert(bootstrap.includes(token), `bootstrap_missing:${token}`);
 for (const token of ['Propose governed action','Approve selected action','Execute paper action','Verify receipts','Export receipt bundle']) assert(consoleUi.includes(token), `console_missing:${token}`);
-assert(includesAny(html, ['Agents propose. Policy decides. Receipts prove.','Policy decides','Receipts prove','governed financial infrastructure']), 'html_missing:sovereign_tagline');
+assert(includesAny(html, ['Agents propose. Policy decides. Receipts prove.','Policy decides','Receipts prove','governed financial infrastructure','PARALLAX']), 'html_missing:sovereign_tagline');
 for (const token of ['action-console.js','No custody or private-key access']) assert(html.includes(token), `html_missing:${token}`);
 const forbidden = ['privateKey =','seedPhrase =','mode: \'mainnet\'','mainnetExecution: true','brokerRouting: true','custody: true'];
 for (const file of required) for (const token of forbidden) assert(!text(file).includes(token), `forbidden:${file}:${token}`);
