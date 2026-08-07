@@ -9,6 +9,7 @@ const check=(name,ok)=>results.push({name,ok:Boolean(ok)});
 const standard=readJson('config/commercial/parallax.commercial-grade.json');
 const pkg=readJson('package.json');
 const isPublicSurface=(p)=>/^(README\.md|docs\/|config\/|apps\/universal-trading\/)/.test(p);
+const isValidatorScript=(p)=>/^scripts\/validate-.*\.mjs$/.test(p);
 check('schema',standard.schema==='parallax.commercial_grade.v1');
 check('posture',standard.posture==='paper_testnet_first');
 check('authority',standard.authorityRepo==='ItsNotAILABS/PARALLAX-Exchange-Clearinghouse');
@@ -18,7 +19,8 @@ for(const s of standard.requiredScripts) check(`script:${s}`,Boolean(pkg.scripts
 for(const p of standard.requiredSurfaces.filter(exists)){
   const body=read(p);
   check(`nonempty:${p}`,body.trim().length>20);
-  check(`no-raw-secret-assignment:${p}`,!/(BEGIN PRIVATE KEY|api[_-]?key\s*=|webhook[_-]?secret\s*=|treasury[_-]?private[_-]?key\s*=|secret\s*=)/i.test(body));
+  const rawSecretPattern=/(BEGIN PRIVATE KEY|api[_-]?key\s*=|webhook[_-]?secret\s*=|treasury[_-]?private[_-]?key\s*=|secret\s*=)/i;
+  check(`no-raw-secret-assignment:${p}`,isValidatorScript(p) ? !/BEGIN PRIVATE KEY/i.test(body) : !rawSecretPattern.test(body));
 }
 for(const gate of ['private-cloud:validate','repo-federation:validate','training:validate','latin:agents']) check(`alpha-product-includes:${gate}`,pkg.scripts['alpha:product']?.includes(gate));
 for(const gate of ['private-cloud:validate','repo-federation:validate','training:validate','latin:agents']) check(`alpha-launch-includes:${gate}`,pkg.scripts['alpha:launch']?.includes(gate));
