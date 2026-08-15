@@ -1,0 +1,64 @@
+{
+  "schema": "parallax.liquidity_providers.v1",
+  "posture": "catalog_and_routing_metadata_only_no_broker_execution",
+  "boundary": {
+    "custody": false,
+    "brokerRouting": false,
+    "mainnetExecution": false,
+    "catalogAvailabilityDoesNotImplyVenueListing": true
+  },
+  "providers": [
+    {
+      "id": "parallax-paper-liquidity",
+      "name": "PARALLAX Paper Liquidity",
+      "mode": "paper",
+      "ecosystems": ["evm", "icp", "solana", "bitcoin", "cosmos"],
+      "supportedQuotes": ["USDC", "USDT", "PXUSD", "USD", "MXN"],
+      "execution": "simulation_only",
+      "custody": false
+    },
+    {
+      "id": "parallax-testnet-liquidity",
+      "name": "PARALLAX Testnet Liquidity",
+      "mode": "testnet",
+      "ecosystems": ["evm", "icp", "solana"],
+      "supportedQuotes": ["tUSDC", "tETH", "tICP", "PXUSD"],
+      "execution": "testnet_only",
+      "custody": false
+    },
+    {
+      "id": "provider-card-rail-usmx",
+      "name": "US/MX Card Rail Provider Adapter",
+      "mode": "provider_adapter",
+      "corridors": ["US_MX"],
+      "supportedQuotes": ["USD", "MXN"],
+      "execution": "provider_executes_funds_flow_parallax_receipts_only",
+      "custody": false,
+      "rawCardDataStorage": false
+    },
+    {
+      "id": "coingecko-reference-prices",
+      "name": "CoinGecko Reference Prices",
+      "mode": "reference_data",
+      "ecosystems": ["evm", "bitcoin", "solana", "cosmos", "icp"],
+      "execution": "pricing_reference_only",
+      "custody": false
+    },
+    {
+      "id": "coinbase-public-market-data",
+      "name": "Coinbase Public Market Data",
+      "mode": "reference_data",
+      "ecosystems": ["evm", "bitcoin", "solana"],
+      "execution": "market_data_only_no_broker_routing",
+      "custody": false
+    },
+    {
+      "id": "binance-public-market-data",
+      "name": "Binance Public Market Data",
+      "mode": "reference_data",
+      "ecosystems": ["evm", "bitcoin", "solana", "cosmos"],
+      "execution": "market_data_only_no_broker_routing",
+      "custody": false
+    }
+  ]
+}
