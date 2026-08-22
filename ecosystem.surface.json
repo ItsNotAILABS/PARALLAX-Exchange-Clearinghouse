@@ -1,0 +1,13 @@
+{
+  "schema":"nexus.capability.v1",
+  "component":"parallax-clearinghouse",
+  "repository":"ItsNotAILABS/PARALLAX-Exchange-Clearinghouse",
+  "role":"machine-checkable-netting-clearing-and-settlement-evidence-plane",
+  "actions":["clearing.trade.validate","clearing.netting.compute","clearing.margin.evaluate","clearing.settlement.plan","clearing.receipt.verify","clearing.ledger.snapshot"],
+  "risk_tiers":{"clearing.trade.validate":"read","clearing.netting.compute":"compute-bounded","clearing.margin.evaluate":"read","clearing.settlement.plan":"plan","clearing.receipt.verify":"read","clearing.ledger.snapshot":"read-sensitive"},
+  "produces":["nexus.execution-receipt.v1","nexus.artifact.v1","nexus.telemetry.v1","nexus.policy-decision.v1"],
+  "consumes":["nexus.task.v1","nexus.budget.v1","nexus.policy-decision.v1"],
+  "limits":{"live_settlement_default":false,"external_funds_movement":false,"machine_checkable_netting":true,"operator_required_for_irreversible_settlement":true},
+  "proof":{"state":"source","live_clearing_requires_ledger_and_counterparty_evidence":true},
+  "authority":"ItsNotAILABS/nexus"
+}
